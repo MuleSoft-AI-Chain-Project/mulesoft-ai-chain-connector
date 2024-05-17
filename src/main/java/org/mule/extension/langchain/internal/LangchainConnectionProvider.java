@@ -6,6 +6,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.extension.langchain.internal.llm.LangchainLLMConnection;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
@@ -24,24 +25,24 @@ import org.slf4j.LoggerFactory;
  * will be pooled and reused. There are other implementations like {@link CachedConnectionProvider} which lazily creates and
  * caches connections or simply {@link ConnectionProvider} if you want a new connection each time something requires one.
  */
-public class LangchaintemplateConnectionProvider implements PoolingConnectionProvider<LangchaintemplateConnection> {
+public class LangchainConnectionProvider implements PoolingConnectionProvider<LangchainLLMConnection> {
 
-  private final Logger LOGGER = LoggerFactory.getLogger(LangchaintemplateConnectionProvider.class);
+  private final Logger LOGGER = LoggerFactory.getLogger(LangchainConnectionProvider.class);
 
 @Override
-public LangchaintemplateConnection connect() throws ConnectionException {
+public LangchainLLMConnection connect() throws ConnectionException {
 	// TODO Auto-generated method stub
 	return null;
 }
 
 @Override
-public void disconnect(LangchaintemplateConnection arg0) {
+public void disconnect(LangchainLLMConnection arg0) {
 	// TODO Auto-generated method stub
 	
 }
 
 @Override
-public ConnectionValidationResult validate(LangchaintemplateConnection arg0) {
+public ConnectionValidationResult validate(LangchainLLMConnection arg0) {
 	// TODO Auto-generated method stub
 	return null;
 }

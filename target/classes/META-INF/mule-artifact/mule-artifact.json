@@ -2,8 +2,8 @@
   "extensionModelLoaderDescriptor": {
     "id": "java",
     "attributes": {
-      "type": "org.mule.extension.langchain.internal.LangchaintemplateExtension",
-      "version": "0.0.13"
+      "type": "org.mule.extension.langchain.internal.LangchainExtension",
+      "version": "0.0.14"
     }
   },
   "name": "Langchain",

@@ -1,6 +1,8 @@
 package org.mule.extension.langchain.internal;
 
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.extension.langchain.internal.embedding.models.LangchainEmbeddingModelConfiguration;
+import org.mule.extension.langchain.internal.llm.LangchainLLMConfiguration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 
@@ -11,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
  */
 @Xml(prefix = "langchain")
 @Extension(name = "Langchain")
-@Configurations(LangchaintemplateConfiguration.class)
-public class LangchaintemplateExtension {
+@Configurations({LangchainLLMConfiguration.class, LangchainEmbeddingModelConfiguration.class})
+public class LangchainExtension {
 
 }
