@@ -1,7 +1,7 @@
-# Langchain--template Extension
+# Langchain Extension for MuleSoft
 
-Add description ...
-
+Langchain4J is used as base framework
+![langchain4mule](image.png)
 
 ...
 
@@ -12,8 +12,10 @@ Add description ...
 Add this dependency to your application pom.xml
 
 ```
+<dependency>
 <groupId>com.mule.langchain</groupId>
 <artifactId>langchain-connector</artifactId>
-<version>1.0.0</version>
+<version>0.1.0</version>
 <classifier>mule-plugin</classifier>
+</dependency>
 ```
