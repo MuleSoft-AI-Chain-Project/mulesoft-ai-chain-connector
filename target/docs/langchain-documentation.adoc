@@ -1,0 +1,295 @@
+:toc:               left
+:toc-title:         Langchain Module
+:toclevels:         2
+:last-update-label!:
+:docinfo:
+:source-highlighter: coderay
+:icons: font
+
+
+= Langchain Module Documentation Reference
+
++++
+This is the main class of an extension, is the entry point from which configurations, connection providers, operations and sources are going to be declared.
++++
+
+
+== Configurations
+---
+[[config]]
+=== Config
+
++++
+Default configuration
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+|Name | String | The name for this configuration. Connectors reference the configuration with this name. | | *x*{nbsp}
+| Connection a| <<config_connection, Connection>>
+ | The connection types that can be provided to this configuration. | | *x*{nbsp}
+| Llm Type a| String |  |  | *x*{nbsp}
+| Llm Api Key a| String |  |  | *x*{nbsp}
+| Expiration Policy a| <<ExpirationPolicy>> |  +++Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.+++ |  | {nbsp}
+|======================
+
+==== Connection Types
+[[config_connection]]
+===== Connection
+
+
+====== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Reconnection a| <<Reconnection>> |  +++When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy+++ |  | {nbsp}
+| Pooling Profile a| <<PoolingProfile>> |  +++Characteristics of the connection pool+++ |  | {nbsp}
+|======================
+
+==== Associated Operations
+* <<Answer-prompt>> {nbsp}
+* <<Answer-prompt-by-model>> {nbsp}
+* <<Define-prompt-template>> {nbsp}
+* <<Run-with-memory>> {nbsp}
+* <<Sentiment-Analyzer>> {nbsp}
+
+
+
+== Operations
+
+[[Answer-prompt]]
+=== Answer Prompt
+`<langchain:answer-prompt>`
+
++++
+Example of an operation that uses the configuration and a connection instance to perform some action.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| Prompt a| String |  |  | *x*{nbsp}
+| Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
+| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
+| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| String
+|======================
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+
+
+[[Answer-prompt-by-model]]
+=== Answer Prompt By Model
+`<langchain:answer-prompt-by-model>`
+
++++
+Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| Prompt a| String |  |  | *x*{nbsp}
+| Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
+| Model Name a| String |  |  +++gpt-3.5-turbo+++ | {nbsp}
+| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
+| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| String
+|======================
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+
+
+[[Define-prompt-template]]
+=== Define Prompt Template
+`<langchain:define-prompt-template>`
+
++++
+Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| Template a| String |  |  | *x*{nbsp}
+| Instructions a| String |  |  | *x*{nbsp}
+| Dataset a| String |  |  | *x*{nbsp}
+| Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
+| Model Name a| String |  |  +++gpt-3.5-turbo+++ | {nbsp}
+| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
+| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| String
+|======================
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+
+
+[[Run-with-memory]]
+=== Run With Memory
+`<langchain:run-with-memory>`
+
++++
+Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| Data a| String |  |  | *x*{nbsp}
+| Context File a| String |  |  | *x*{nbsp}
+| Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
+| Model Name a| String |  |  +++gpt-3.5-turbo+++ | {nbsp}
+| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
+| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| String
+|======================
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+
+
+[[Sentiment-Analyzer]]
+=== Sentiment Analyzer
+`<langchain:sentiment-analyzer>`
+
++++
+Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| Data a| String |  |  | *x*{nbsp}
+| Model Name a| String |  |  +++gpt-3.5-turbo+++ | {nbsp}
+| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
+| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| Enumeration, one of:
+
+** POSITIVE
+** NEUTRAL
+** NEGATIVE
+|======================
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+
+
+
+== Types
+[[Reconnection]]
+=== Reconnection
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Fails Deployment a| Boolean | When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy |  | 
+| Reconnection Strategy a| * <<reconnect>>
+* <<reconnect-forever>> | The reconnection strategy to use |  | 
+|======================
+
+[[reconnect]]
+=== Reconnect
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Frequency a| Number | How often (in ms) to reconnect |  | 
+| Count a| Number | How many reconnection attempts to make |  | 
+|======================
+
+[[reconnect-forever]]
+=== Reconnect Forever
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Frequency a| Number | How often (in ms) to reconnect |  | 
+|======================
+
+[[PoolingProfile]]
+=== Pooling Profile
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Max Active a| Number | Controls the maximum number of Mule components that can be borrowed from a session at one time. When set to a negative value, there is no limit to the number of components that may be active at one time. When maxActive is exceeded, the pool is said to be exhausted. |  | 
+| Max Idle a| Number | Controls the maximum number of Mule components that can sit idle in the pool at any time. When set to a negative value, there is no limit to the number of Mule components that may be idle at one time. |  | 
+| Max Wait a| Number | Specifies the number of milliseconds to wait for a pooled component to become available when the pool is exhausted and the exhaustedAction is set to WHEN_EXHAUSTED_WAIT. |  | 
+| Min Eviction Millis a| Number | Determines the minimum amount of time an object may sit idle in the pool before it is eligible for eviction. When non-positive, no objects will be evicted from the pool due to idle time alone. |  | 
+| Eviction Check Interval Millis a| Number | Specifies the number of milliseconds between runs of the object evictor. When non-positive, no object evictor is executed. |  | 
+| Exhausted Action a| Enumeration, one of:
+
+** WHEN_EXHAUSTED_GROW
+** WHEN_EXHAUSTED_WAIT
+** WHEN_EXHAUSTED_FAIL | Specifies the behavior of the Mule component pool when the pool is exhausted. Possible values are: "WHEN_EXHAUSTED_FAIL", which will throw a NoSuchElementException, "WHEN_EXHAUSTED_WAIT", which will block by invoking Object.wait(long) until a new or idle object is available, or WHEN_EXHAUSTED_GROW, which will create a new Mule instance and return it, essentially making maxActive meaningless. If a positive maxWait value is supplied, it will block for at most that many milliseconds, after which a NoSuchElementException will be thrown. If maxThreadWait is a negative value, it will block indefinitely. |  | 
+| Initialisation Policy a| Enumeration, one of:
+
+** INITIALISE_NONE
+** INITIALISE_ONE
+** INITIALISE_ALL | Determines how components in a pool should be initialized. The possible values are: INITIALISE_NONE (will not load any components into the pool on startup), INITIALISE_ONE (will load one initial component into the pool on startup), or INITIALISE_ALL (will load all components in the pool on startup) |  | 
+| Disabled a| Boolean | Whether pooling should be disabled |  | 
+|======================
+
+[[ExpirationPolicy]]
+=== Expiration Policy
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Max Idle Time a| Number | A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it's considered eligible for expiration |  | 
+| Time Unit a| Enumeration, one of:
+
+** NANOSECONDS
+** MICROSECONDS
+** MILLISECONDS
+** SECONDS
+** MINUTES
+** HOURS
+** DAYS | A time unit that qualifies the maxIdleTime attribute |  | 
+|======================
+
