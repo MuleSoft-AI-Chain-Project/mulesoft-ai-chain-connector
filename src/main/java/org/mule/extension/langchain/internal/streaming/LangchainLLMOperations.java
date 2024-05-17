@@ -5,6 +5,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import java.util.stream.Stream;
 
 import org.mule.extension.langchain.internal.llm.LangchainLLMConfiguration;
+import org.mule.extension.langchain.internal.llm.LangchainLLMParameters;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -69,7 +70,7 @@ public class LangchainLLMOperations {
   /*   
    * https://docs.mulesoft.com/mule-sdk/latest/define-operations
    * Define output resolver
-   * 
+   *  */
   interface Assistant {
 
       TokenStream chat(String message);
@@ -77,7 +78,7 @@ public class LangchainLLMOperations {
   
   @MediaType(value = ANY, strict = false)
   @Alias("Stream-prompt-answer")  
-  public TokenStream streamingPrompt(String prompt, @Config LangchaintemplateConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchaintemplateParameters LangchainParams) {
+  public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 
       // Sorry, "demo" API key does not support streaming (yet). Please use your own key.
       StreamingChatLanguageModel model = OpenAiStreamingChatModel.builder()
@@ -101,5 +102,5 @@ public class LangchainLLMOperations {
       
 	  return tokenStream;
  
-  } */
+  }
 }

@@ -1,14 +1,14 @@
 {
   "name": "Langchain",
   "description": "This is the main class of an extension, is the entry point from which configurations, connection providers, operations and sources are going to be declared.",
-  "version": "0.0.14",
+  "version": "0.0.18",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "langchain",
     "namespace": "http://www.mulesoft.org/schema/mule/langchain",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/langchain/current/mule-langchain.xsd",
-    "schemaVersion": "0.0.14",
+    "schemaVersion": "0.0.18",
     "xsdFileName": "mule-langchain.xsd"
   },
   "resources": [],

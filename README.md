@@ -1,7 +1,7 @@
 # Langchain Extension for MuleSoft
 
 Langchain4J is used as base framework
-![langchain4mule](image.png)
+![langchain4mule](image-1.png)
 
 ...
 

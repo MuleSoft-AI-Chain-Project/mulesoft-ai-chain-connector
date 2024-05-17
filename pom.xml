@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
 	<artifactId>langchain-connector</artifactId>
-	<version>0.0.14</version>
+	<version>0.0.18</version>
 	<packaging>mule-extension</packaging>
 	<name>LangChain</name>
 
