@@ -2080,6 +2080,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#Create-text-embedding">Create Text Embedding</a></li>
 <li><a href="#Answer-prompt">Answer Prompt</a></li>
 <li><a href="#Define-prompt-template">Define Prompt Template</a></li>
+<li><a href="#Persistent-memory">Persistent Memory</a></li>
 <li><a href="#Run-with-memory">Run With Memory</a></li>
 <li><a href="#Sentiment-Analyzer">Sentiment Analyzer</a></li>
 </ul>
@@ -2320,6 +2321,9 @@ This class represents an extension configuration, values set in this class are c
 </li>
 <li>
 <p><a href="#Define-prompt-template">Define Prompt Template</a> &#160;</p>
+</li>
+<li>
+<p><a href="#Persistent-memory">Persistent Memory</a> &#160;</p>
 </li>
 <li>
 <p><a href="#Run-with-memory">Run With Memory</a> &#160;</p>
@@ -2685,6 +2689,119 @@ Example of a simple operation that receives a string parameter and returns a new
 </div>
 </div>
 <div class="sect2">
+<h3 id="Persistent-memory">Persistent Memory</h3>
+<div class="paragraph">
+<p><code>&lt;langchain:persistent-memory&gt;</code></p>
+</div>
+<div class="paragraph">
+<p>
+Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+</p>
+</div>
+<div class="sect3">
+<h4 id="_parameters_7">Parameters</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 35%;">
+<col style="width: 20%;">
+<col style="width: 5%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-middle">Name</th>
+<th class="tableblock halign-left valign-middle">Type</th>
+<th class="tableblock halign-left valign-middle">Description</th>
+<th class="tableblock halign-left valign-middle">Default Value</th>
+<th class="tableblock halign-center valign-middle">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Configuration</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">The name of the configuration to use.</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock"><strong>x</strong>&#160;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Data</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>String</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock"><strong>x</strong>&#160;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Output Mime Type</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>String</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">The mime type of the payload that this operation outputs.</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">&#160;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Model Name</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>String</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">gpt-3.5-turbo</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">&#160;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Target Variable</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>String</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">The name of a variable on which the operation's output will be placed</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">&#160;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Target Value</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>String</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">#[payload]</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">&#160;</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_output_4">Output</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><strong>Type</strong></p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>String</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_for_configurations_4">For Configurations.</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#llm-configuration">Llm Configuration</a> &#160;</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="Run-with-memory">Run With Memory</h3>
 <div class="paragraph">
 <p><code>&lt;langchain:run-with-memory&gt;</code></p>
@@ -2695,7 +2812,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_7">Parameters</h4>
+<h4 id="_parameters_8">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2779,7 +2896,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </table>
 </div>
 <div class="sect3">
-<h4 id="_output_4">Output</h4>
+<h4 id="_output_5">Output</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -2796,7 +2913,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </table>
 </div>
 <div class="sect3">
-<h4 id="_for_configurations_4">For Configurations.</h4>
+<h4 id="_for_configurations_5">For Configurations.</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -2817,7 +2934,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_8">Parameters</h4>
+<h4 id="_parameters_9">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2883,7 +3000,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </table>
 </div>
 <div class="sect3">
-<h4 id="_output_5">Output</h4>
+<h4 id="_output_6">Output</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -2902,7 +3019,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </table>
 </div>
 <div class="sect3">
-<h4 id="_for_configurations_5">For Configurations.</h4>
+<h4 id="_for_configurations_6">For Configurations.</h4>
 <div class="ulist">
 <ul>
 <li>
