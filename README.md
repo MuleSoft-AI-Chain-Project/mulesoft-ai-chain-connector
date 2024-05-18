@@ -3,6 +3,11 @@
 Langchain4J is used as base framework
 ![langchain4mule](image-1.png)
 
+Mule Palette get extended with the lanchain adopter:
+![lanchain4mule in Palette](image-2.png)
+
+Mule Flows with langchain4mule adopter:
+![lanchain4mule in Mule Flows](langchain-mule-extension-test.png)
 ...
 
 
