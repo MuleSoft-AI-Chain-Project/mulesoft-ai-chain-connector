@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
 	<artifactId>langchain-connector</artifactId>
-	<version>0.0.18</version>
+	<version>0.0.21</version>
 	<packaging>mule-extension</packaging>
 	<name>LangChain</name>
 
@@ -28,6 +28,11 @@
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>
 			<version>0.30.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>dev.langchain4j</groupId>
+		    <artifactId>langchain4j-mistral-ai</artifactId>
+		    <version>0.30.0</version>
 		</dependency>
 	</dependencies>
 	<repositories>

@@ -14,5 +14,6 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="src" path="src/test/munit"/>
+	<classpathentry kind="lib" path="/Users/amir.khan/Downloads/langchain4j-mistral-ai-0.30.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

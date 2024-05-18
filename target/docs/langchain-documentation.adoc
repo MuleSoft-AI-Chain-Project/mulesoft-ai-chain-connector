@@ -76,7 +76,6 @@ This class represents an extension configuration, values set in this class are c
 
 ==== Associated Operations
 * <<Answer-prompt>> {nbsp}
-* <<Answer-prompt-by-model>> {nbsp}
 * <<Define-prompt-template>> {nbsp}
 * <<Run-with-memory>> {nbsp}
 * <<Sentiment-Analyzer>> {nbsp}
@@ -118,36 +117,6 @@ Example of an operation that uses the configuration and a connection instance to
 [[Answer-prompt]]
 === Answer Prompt
 `<langchain:answer-prompt>`
-
-+++
-Example of an operation that uses the configuration and a connection instance to perform some action.
-+++
-
-==== Parameters
-[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
-|======================
-| Name | Type | Description | Default Value | Required
-| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
-| Prompt a| String |  |  | *x*{nbsp}
-| Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
-| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
-| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
-|======================
-
-==== Output
-[cols=".^50%,.^50%"]
-|======================
-| *Type* a| String
-|======================
-
-==== For Configurations.
-* <<llm-configuration>> {nbsp}
-
-
-
-[[Answer-prompt-by-model]]
-=== Answer Prompt By Model
-`<langchain:answer-prompt-by-model>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
