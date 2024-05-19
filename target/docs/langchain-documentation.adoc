@@ -51,8 +51,6 @@ This class (as it's name implies) provides connection instances and the funciona
 | Pooling Profile a| <<PoolingProfile>> |  +++Characteristics of the connection pool+++ |  | {nbsp}
 |======================
 
-==== Associated Operations
-* <<Create-text-embedding>> {nbsp}
 
 
 ---
@@ -77,43 +75,13 @@ This class represents an extension configuration, values set in this class are c
 ==== Associated Operations
 * <<Answer-prompt>> {nbsp}
 * <<Define-prompt-template>> {nbsp}
+* <<Load-document>> {nbsp}
 * <<Persistent-memory>> {nbsp}
-* <<Run-with-memory>> {nbsp}
 * <<Sentiment-Analyzer>> {nbsp}
 
 
 
 == Operations
-
-[[Create-text-embedding]]
-=== Create Text Embedding
-`<langchain:create-text-embedding>`
-
-+++
-Example of an operation that uses the configuration and a connection instance to perform some action.
-+++
-
-==== Parameters
-[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
-|======================
-| Name | Type | Description | Default Value | Required
-| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
-| Text a| String |  |  | *x*{nbsp}
-| Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
-| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
-| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
-|======================
-
-==== Output
-[cols=".^50%,.^50%"]
-|======================
-| *Type* a| String
-|======================
-
-==== For Configurations.
-* <<embedding-model-configuration>> {nbsp}
-
-
 
 [[Answer-prompt]]
 === Answer Prompt
@@ -179,9 +147,9 @@ Example of a simple operation that receives a string parameter and returns a new
 
 
 
-[[Persistent-memory]]
-=== Persistent Memory
-`<langchain:persistent-memory>`
+[[Load-document]]
+=== Load Document
+`<langchain:load-document>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -193,6 +161,7 @@ Example of a simple operation that receives a string parameter and returns a new
 | Name | Type | Description | Default Value | Required
 | Configuration | String | The name of the configuration to use. | | *x*{nbsp}
 | Data a| String |  |  | *x*{nbsp}
+| Context File a| String |  |  | *x*{nbsp}
 | Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
 | Model Name a| String |  |  +++gpt-3.5-turbo+++ | {nbsp}
 | Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
@@ -210,9 +179,9 @@ Example of a simple operation that receives a string parameter and returns a new
 
 
 
-[[Run-with-memory]]
-=== Run With Memory
-`<langchain:run-with-memory>`
+[[Persistent-memory]]
+=== Persistent Memory
+`<langchain:persistent-memory>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -224,7 +193,7 @@ Example of a simple operation that receives a string parameter and returns a new
 | Name | Type | Description | Default Value | Required
 | Configuration | String | The name of the configuration to use. | | *x*{nbsp}
 | Data a| String |  |  | *x*{nbsp}
-| Context File a| String |  |  | *x*{nbsp}
+| Db File Path a| String |  |  | *x*{nbsp}
 | Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
 | Model Name a| String |  |  +++gpt-3.5-turbo+++ | {nbsp}
 | Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}

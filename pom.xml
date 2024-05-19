@@ -4,9 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
 	<artifactId>langchain-connector</artifactId>
-	<version>0.0.26</version>
+	<version>0.0.34</version>
 	<packaging>mule-extension</packaging>
 	<name>LangChain</name>
+
+	<!--  <modelVersion>4.0.0</modelVersion>
+	<groupId>c0ddb541-59f8-4782-8613-96c5c39a663e</groupId>
+	<artifactId>langchain-connector</artifactId>
+	<version>0.0.31</version>
+	<packaging>mule-extension</packaging>
+	<name>LangChain</name> -->
 
 	<parent>
 		<groupId>org.mule.extensions</groupId>
@@ -35,9 +42,14 @@
 		    <version>0.30.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.mapdb</groupId>
+		    <groupId>org.mapdb</groupId>	
 		    <artifactId>mapdb</artifactId>
 		    <version>3.1.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20240303</version>
 		</dependency>
 	</dependencies>
 	<repositories>
@@ -59,4 +71,18 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
+	<distributionManagement>
+	  <snapshotRepository>
+	    <id>exchange-repository</id>
+	    <name>Exchange Repository</name>
+	    <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/c0ddb541-59f8-4782-8613-96c5c39a663e/maven</url>
+	    <layout>default</layout>
+	  </snapshotRepository>
+	  <repository>
+	    <id>exchange-repository</id>
+	    <name>Exchange Repository</name>
+	    <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/c0ddb541-59f8-4782-8613-96c5c39a663e/maven</url>
+	    <layout>default</layout>
+	  </repository>
+	</distributionManagement>	
 </project>

@@ -53,7 +53,27 @@ import java.nio.file.Paths;
 
 
 import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import dev.langchain4j.classification.EmbeddingModelTextClassifier;
+import dev.langchain4j.classification.*;
+import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+//import static embedding.classification.EmbeddingModelTextClassifierExample.CustomerServiceCategory.*;
+import static java.util.Arrays.asList;
 
 
 /**
@@ -64,18 +84,16 @@ public class LangchainEmbeddingModelsOperations {
 	
 	
 
-  /**
-   * Example of an operation that uses the configuration and a connection instance to perform some action.
-   */
-  @MediaType(value = ANY, strict = false)
-  @Alias("Create-text-embedding")
-  public String predict(String text, @Config LangchainEmbeddingModelConfiguration configuration){
-	    
-	    
-	  return "";
-  }
+//  /**
+//   * Example of an operation that uses the configuration and a connection instance to perform some action.
+//   */
+//  @MediaType(value = ANY, strict = false)
+//  @Alias("Apply-classification")
+//  public String predict(String prompt, String jsonString, @Config LangchainEmbeddingModelConfiguration configuration){
+//	  
+//      //System.out.println(categories); // [ORDER_STATUS]	    
+//
+//	  return "";
+//  }
 
-  
-  
-  
 }

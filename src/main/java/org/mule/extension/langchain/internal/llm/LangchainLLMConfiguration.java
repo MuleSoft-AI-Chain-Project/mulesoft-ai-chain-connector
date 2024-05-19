@@ -1,5 +1,7 @@
 package org.mule.extension.langchain.internal.llm;
 
+
+import org.mule.extension.langchain.internal.embedding.stores.LangchainEmbeddingStoresOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
@@ -12,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.*;
  * operations since they represent something core from the extension.
  */
 @Configuration(name="llm-configuration") 
-@Operations(LangchainLLMOperations.class)
+@Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class})
 //@ConnectionProviders(LangchainLLMConnectionProvider.class)
 public class LangchainLLMConfiguration {
 
