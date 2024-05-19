@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
 	<artifactId>langchain-connector</artifactId>
-	<version>0.0.34</version>
+	<version>0.0.43</version>
 	<packaging>mule-extension</packaging>
 	<name>LangChain</name>
 
@@ -51,6 +51,11 @@
 		    <artifactId>json</artifactId>
 		    <version>20240303</version>
 		</dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-document-parser-apache-tika</artifactId>
+            <version>0.30.0</version>
+        </dependency>
 	</dependencies>
 	<repositories>
 		<repository>

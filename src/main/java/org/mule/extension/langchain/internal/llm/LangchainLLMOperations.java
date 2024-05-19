@@ -1,18 +1,17 @@
 package org.mule.extension.langchain.internal.llm;
 
 import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
+
 import static java.time.Duration.ofSeconds;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.parser.TextDocumentParser;
@@ -60,41 +59,34 @@ import static org.mapdb.Serializer.STRING;
 public class LangchainLLMOperations {
 
 
-
-//	public ChatLanguageModel switchLLM(LangchainLLMConfiguration configuration, LangchainLLMParameters LangchainParams) {
-//		
-//	    ChatLanguageModel model = null;
-//	    
-//		switch(configuration.getLlmType()) {
-//		case "OPENAI_API_KEY": 
-//			
-//		      model = OpenAiChatModel.builder()
-//		              .apiKey(configuration.getLlmApiKey())
-//		              .modelName(LangchainParams.getModelName())
-//		              .temperature(0.3)
-//		              .timeout(ofSeconds(60))
-//		              .logRequests(true)
-//		              .logResponses(true)
-//		              .build();
-//		      break;
-//		      
-//		case "MISTRALAI_API_KEY": 
-//			
-//		      model = MistralAiChatModel.builder()
-//		              .apiKey(configuration.getLlmApiKey())
-//		              .modelName(LangchainParams.getModelName())
-//		              .temperature(0.3)
-//		              .timeout(ofSeconds(60))
-//		              .logRequests(true)
-//		              .logResponses(true)
-//		              .build();
-//		      break;
-//		}
-//	      
-//		return model;
-//
-//	}
-//  
+	private ChatLanguageModel createModel(LangchainLLMConfiguration configuration, LangchainLLMParameters LangchainParams) {
+	    ChatLanguageModel model = null;
+	    switch (configuration.getLlmType()) {
+	        case "OPENAI_API_KEY":
+	            model = OpenAiChatModel.builder()
+	                    .apiKey(configuration.getLlmApiKey())
+	                    .modelName(LangchainParams.getModelName())
+	                    .temperature(0.3)
+	                    .timeout(ofSeconds(60))
+	                    .logRequests(true)
+	                    .logResponses(true)
+	                    .build();
+	            break;
+	        case "MISTRALAI_API_KEY":
+	            model = MistralAiChatModel.builder()
+	                    .apiKey(configuration.getLlmApiKey())
+	                    .modelName(LangchainParams.getModelName())
+	                    .temperature(0.3)
+	                    .timeout(ofSeconds(60))
+	                    .logRequests(true)
+	                    .logResponses(true)
+	                    .build();
+	            break;
+	        default:
+	            throw new IllegalArgumentException("Unsupported LLM type: " + configuration.getLlmType());
+	    }
+	    return model;
+	}
 
   
   /**
@@ -106,40 +98,14 @@ public class LangchainLLMOperations {
       // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
 
 	  
-	  ChatLanguageModel model = null;
-		switch(configuration.getLlmType()) {
-		case "OPENAI_API_KEY": 
-			
-		      model = OpenAiChatModel.builder()
-		              .apiKey(configuration.getLlmApiKey())
-		              .modelName(LangchainParams.getModelName())
-		              .temperature(0.3)
-		              .timeout(ofSeconds(60))
-		              .logRequests(true)
-		              .logResponses(true)
-		              .build();
-		      break;
-		      
-		case "MISTRALAI_API_KEY": 
-			
-		      model = MistralAiChatModel.builder()
-		              .apiKey(configuration.getLlmApiKey())
-		              .modelName(LangchainParams.getModelName())
-		              .temperature(0.3)
-		              .timeout(ofSeconds(60))
-		              .logRequests(true)
-		              .logResponses(true)
-		              .build();
-		      break;
-		}
-	  
-	  
-      String answer = prompt;
+	    ChatLanguageModel model = createModel(configuration, LangchainParams);
 
-      String response = model.generate(answer);
+	    String answer = prompt;
+	    String response = model.generate(answer);
 
-      //System.out.println(response);
-	return response;
+	    // System.out.println(response);
+	    return response;
+
  }
   
   
@@ -154,32 +120,7 @@ public class LangchainLLMOperations {
   @Alias("Define-prompt-template")  
   public String definePromptTemplate(String template, String instructions, String dataset, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 
-	  ChatLanguageModel model = null;
-		switch(configuration.getLlmType()) {
-		case "OPENAI_API_KEY": 
-			
-		      model = OpenAiChatModel.builder()
-		              .apiKey(configuration.getLlmApiKey())
-		              .modelName(LangchainParams.getModelName())
-		              .temperature(0.3)
-		              .timeout(ofSeconds(60))
-		              .logRequests(true)
-		              .logResponses(true)
-		              .build();
-		      break;
-		      
-		case "MISTRALAI_API_KEY": 
-			
-		      model = MistralAiChatModel.builder()
-		              .apiKey(configuration.getLlmApiKey())
-		              .modelName(LangchainParams.getModelName())
-		              .temperature(0.3)
-		              .timeout(ofSeconds(60))
-		              .logRequests(true)
-		              .logResponses(true)
-		              .build();
-		      break;
-		}
+	      ChatLanguageModel model = createModel(configuration, LangchainParams);
 	  
 
           String templateString = template;
@@ -227,34 +168,8 @@ public class LangchainLLMOperations {
   @Alias("Sentiment-Analyzer")  
   public Sentiment extractSentiments(String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
   
-	  ChatLanguageModel model = null;
-		switch(configuration.getLlmType()) {
-		case "OPENAI_API_KEY": 
-			
-		      model = OpenAiChatModel.builder()
-		              .apiKey(configuration.getLlmApiKey())
-		              .modelName(LangchainParams.getModelName())
-		              .temperature(0.3)
-		              .timeout(ofSeconds(60))
-		              .logRequests(true)
-		              .logResponses(true)
-		              .build();
-		      break;
-		      
-		case "MISTRALAI_API_KEY": 
-			
-		      model = MistralAiChatModel.builder()
-		              .apiKey(configuration.getLlmApiKey())
-		              .modelName(LangchainParams.getModelName())
-		              .temperature(0.3)
-		              .timeout(ofSeconds(60))
-		              .logRequests(true)
-		              .logResponses(true)
-		              .build();
-		      break;
-		}
+      ChatLanguageModel model = createModel(configuration, LangchainParams);
 	  
-
 
       SentimentAnalyzer sentimentAnalyzer = AiServices.create(SentimentAnalyzer.class, model);
 

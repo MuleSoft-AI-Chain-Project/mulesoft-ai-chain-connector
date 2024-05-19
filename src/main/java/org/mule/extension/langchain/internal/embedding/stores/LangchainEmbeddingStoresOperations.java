@@ -42,8 +42,10 @@ import static java.util.Arrays.asList;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
+import dev.langchain4j.data.document.loader.UrlDocumentLoader;
 import dev.langchain4j.data.document.parser.TextDocumentParser;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import dev.langchain4j.data.document.transformer.HtmlTextExtractor;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
@@ -58,10 +60,12 @@ import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser;
 
 
 import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
@@ -75,14 +79,43 @@ import static dev.langchain4j.data.message.ChatMessageSerializer.messagesToJson;
  */
 public class LangchainEmbeddingStoresOperations {
 
-	
+
+	private ChatLanguageModel createModel(LangchainLLMConfiguration configuration, LangchainLLMParameters LangchainParams) {
+	    ChatLanguageModel model = null;
+	    switch (configuration.getLlmType()) {
+	        case "OPENAI_API_KEY":
+	            model = OpenAiChatModel.builder()
+	                    .apiKey(configuration.getLlmApiKey())
+	                    .modelName(LangchainParams.getModelName())
+	                    .temperature(0.3)
+	                    .timeout(ofSeconds(60))
+	                    .logRequests(true)
+	                    .logResponses(true)
+	                    .build();
+	            break;
+	        case "MISTRALAI_API_KEY":
+	            model = MistralAiChatModel.builder()
+	                    .apiKey(configuration.getLlmApiKey())
+	                    .modelName(LangchainParams.getModelName())
+	                    .temperature(0.3)
+	                    .timeout(ofSeconds(60))
+	                    .logRequests(true)
+	                    .logResponses(true)
+	                    .build();
+	            break;
+	        default:
+	            throw new IllegalArgumentException("Unsupported LLM type: " + configuration.getLlmType());
+	    }
+	    return model;
+	}
+
 	
 
 	  /**
 	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
 	   */
 	  @MediaType(value = ANY, strict = false)
-	  @Alias("Load-document")  
+	  @Alias("Load-document-txt-file")  
 	  public String loadDocumentToStore(String data, String contextFile, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
 	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
@@ -101,32 +134,104 @@ public class LangchainEmbeddingStoresOperations {
 	      ingestor.ingest(document);
 	      
 	      
-		  ChatLanguageModel model = null;
-			switch(configuration.getLlmType()) {
-			case "OPENAI_API_KEY": 
-				
-			      model = OpenAiChatModel.builder()
-			              .apiKey(configuration.getLlmApiKey())
-			              .modelName(LangchainParams.getModelName())
-			              .temperature(0.3)
-			              .timeout(ofSeconds(60))
-			              .logRequests(true)
-			              .logResponses(true)
-			              .build();
-			      break;
-			      
-			case "MISTRALAI_API_KEY": 
-				
-			      model = MistralAiChatModel.builder()
-			              .apiKey(configuration.getLlmApiKey())
-			              .modelName(LangchainParams.getModelName())
-			              .temperature(0.3)
-			              .timeout(ofSeconds(60))
-			              .logRequests(true)
-			              .logResponses(true)
-			              .build();
-			      break;
-			}
+	      ChatLanguageModel model = createModel(configuration, LangchainParams);
+	      
+	      
+
+	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+	              .chatLanguageModel(model)
+	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
+	              // .chatMemory() // you can override default chat memory
+	              // .promptTemplate() // you can override default prompt template
+	              .build();
+
+	      String answer = chain.execute(data);
+	      //System.out.println(answer); 
+	      return answer;
+	  }  
+  
+
+
+	  
+	  
+	  /**
+	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+	   */
+	  @MediaType(value = ANY, strict = false)
+	  @Alias("Load-document-pdf-file")  
+	  public String loadDocumentPDFFile(String data, String contextFile, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+	  
+	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+	      EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
+	      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+	              //.documentSplitter(DocumentSplitters.recursive(300, 0))
+	              .documentSplitter(DocumentSplitters.recursive(1000, 200, new OpenAiTokenizer()))
+	              .embeddingModel(embeddingModel)
+	              .embeddingStore(embeddingStore)
+	              .build();
+
+	      //Document document = loadDocument(toPath("story-about-happy-carrot.txt"), new TextDocumentParser());
+	      
+	      Document document = loadDocument(contextFile, new ApacheTikaDocumentParser());
+	      ingestor.ingest(document);
+	      
+	      
+	      ChatLanguageModel model = createModel(configuration, LangchainParams);
+	      
+	      
+
+	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+	              .chatLanguageModel(model)
+	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
+	              // .chatMemory() // you can override default chat memory
+	              // .promptTemplate() // you can override default prompt template
+	              .build();
+
+	      String answer = chain.execute(data);
+	      //System.out.println(answer); 
+	      return answer;
+	  }  
+  
+
+	  
+	  /**
+	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+	   */
+	  @MediaType(value = ANY, strict = false)
+	  @Alias("Load-document-from-url")  
+	  public String loadDocumentFromURL(String data, String contextURL, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+	  
+	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+	      EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
+	      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+	              //.documentSplitter(DocumentSplitters.recursive(300, 0))
+	              .documentSplitter(DocumentSplitters.recursive(1000, 200, new OpenAiTokenizer()))
+	              .embeddingModel(embeddingModel)
+	              .embeddingStore(embeddingStore)
+	              .build();
+
+	      //Document document = loadDocument(toPath("story-about-happy-carrot.txt"), new TextDocumentParser());
+	      
+	    URL url = null;
+		try {
+			url = new URL(contextURL);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	      Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
+	      HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
+	      Document document = transformer.transform(htmlDocument);
+	      document.metadata().add("url", contextURL);
+	      ingestor.ingest(document);
+	      
+	      
+	      ChatLanguageModel model = createModel(configuration, LangchainParams);
 	      
 	      
 
@@ -144,6 +249,14 @@ public class LangchainEmbeddingStoresOperations {
   
 	  
 	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
 	  interface Assistant {
 
 	      String chat(@MemoryId int memoryId, @UserMessage String userMessage);
@@ -157,32 +270,7 @@ public class LangchainEmbeddingStoresOperations {
 	  @Alias("Persistent-memory")  
 	  public String chatWithPersistentMemory(String data, String dbFilePath, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	      
-		  ChatLanguageModel model = null;
-			switch(configuration.getLlmType()) {
-			case "OPENAI_API_KEY": 
-				
-			      model = OpenAiChatModel.builder()
-			              .apiKey(configuration.getLlmApiKey())
-			              .modelName(LangchainParams.getModelName())
-			              .temperature(0.3)
-			              .timeout(ofSeconds(60))
-			              .logRequests(true)
-			              .logResponses(true)
-			              .build();
-			      break;
-			      
-			case "MISTRALAI_API_KEY": 
-				
-			      model = MistralAiChatModel.builder()
-			              .apiKey(configuration.getLlmApiKey())
-			              .modelName(LangchainParams.getModelName())
-			              .temperature(0.3)
-			              .timeout(ofSeconds(60))
-			              .logRequests(true)
-			              .logResponses(true)
-			              .build();
-			      break;
-			}
+	      	ChatLanguageModel model = createModel(configuration, LangchainParams);
 		  
 	        //String dbFilePath = "/Users/amir.khan/Documents/langchain4mule resources/multi-user-chat-memory.db";
 	        PersistentChatMemoryStore.initialize(dbFilePath);

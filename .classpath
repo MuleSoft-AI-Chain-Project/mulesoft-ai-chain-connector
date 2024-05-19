@@ -16,5 +16,6 @@
 	<classpathentry kind="src" path="src/test/munit"/>
 	<classpathentry kind="lib" path="/Users/amir.khan/Downloads/langchain4j-mistral-ai-0.30.0.jar"/>
 	<classpathentry kind="lib" path="/Users/amir.khan/Downloads/mapdb-3.1.0.jar"/>
+	<classpathentry kind="lib" path="/Users/amir.khan/Downloads/langchain4j-document-parser-apache-tika-0.30.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
