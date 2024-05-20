@@ -20,6 +20,7 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.model.StreamingResponseHandler;
+import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
@@ -32,6 +33,7 @@ import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.input.structured.StructuredPrompt;
 import dev.langchain4j.model.input.structured.StructuredPromptProcessor;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -99,6 +101,20 @@ public class LangchainEmbeddingStoresOperations {
 	                    .modelName(LangchainParams.getModelName())
 	                    .temperature(0.3)
 	                    .timeout(ofSeconds(60))
+	                    .logRequests(true)
+	                    .logResponses(true)
+	                    .build();
+	            break;
+	        case "OLLAMA_BASE_URL":
+	            model = OllamaChatModel.builder()
+	                    .baseUrl(configuration.getLlmApiKey())
+	                    .modelName(LangchainParams.getModelName())
+	                    .build();
+	            break;
+	        case "ANTHROPIC_API_KEY":
+	            model = AnthropicChatModel.builder()
+	                    .apiKey(configuration.getLlmApiKey())
+	                    .modelName(LangchainParams.getModelName())
 	                    .logRequests(true)
 	                    .logResponses(true)
 	                    .build();

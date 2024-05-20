@@ -2,6 +2,11 @@ package org.mule.extension.langchain.internal.llm;
 
 import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
 
+import dev.langchain4j.model.anthropic.AnthropicChatModel;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
+
+
 import static java.time.Duration.ofSeconds;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
@@ -78,6 +83,20 @@ public class LangchainLLMOperations {
 	                    .modelName(LangchainParams.getModelName())
 	                    .temperature(0.3)
 	                    .timeout(ofSeconds(60))
+	                    .logRequests(true)
+	                    .logResponses(true)
+	                    .build();
+	            break;
+	        case "OLLAMA_BASE_URL":
+	            model = OllamaChatModel.builder()
+	                    .baseUrl(configuration.getLlmApiKey())
+	                    .modelName(LangchainParams.getModelName())
+	                    .build();
+	            break;
+	        case "ANTHROPIC_API_KEY":
+	            model = AnthropicChatModel.builder()
+	                    .apiKey(configuration.getLlmApiKey())
+	                    .modelName(LangchainParams.getModelName())
 	                    .logRequests(true)
 	                    .logResponses(true)
 	                    .build();

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
 	<artifactId>langchain-connector</artifactId>
-	<version>0.0.52</version>
+	<version>0.0.53</version>
 	<packaging>mule-extension</packaging>
 	<name>LangChain</name>
 
@@ -56,6 +56,27 @@
             <artifactId>langchain4j-document-parser-apache-tika</artifactId>
             <version>0.30.0</version>
         </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-ollama</artifactId>
+            <version>0.30.0</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-anthropic</artifactId>
+            <version>0.30.0</version>
+        </dependency>
+		<dependency>
+		    <groupId>dev.langchain4j</groupId>
+		    <artifactId>langchain4j-azure-open-ai</artifactId>
+		    <version>0.30.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>dev.langchain4j</groupId>
+		    <artifactId>langchain4j-hugging-face</artifactId>
+		    <version>0.30.0</version>
+		</dependency>
+
 	</dependencies>
 	<repositories>
 		<repository>
