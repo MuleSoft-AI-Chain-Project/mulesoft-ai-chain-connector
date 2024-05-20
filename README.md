@@ -1,10 +1,10 @@
 # Langchain Extension for MuleSoft
 
 Langchain4J is used as base framework
-![langchain4mule](image.png)
+![Base Framework](image-1.png)
 
 Mule Palette get extended with the lanchain adopter:
-![Mule Palette Extension](image-1.png)
+![Palette](image.png)
 
 
 ...
