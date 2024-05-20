@@ -14,7 +14,7 @@ public class LangchainLLMParameterModelNameProvider implements ValueProvider {
 	public Set<Value> resolve() throws ValueResolvingException {
 		// TODO Auto-generated method stub
 		
-		return ValueBuilder.getValuesFor("gpt-3.5-turbo","gpt-4","gpt-4-turbo","mistral-small-latest", "mistral-medium-latest", "mistral-large-latest");
+		return ValueBuilder.getValuesFor("gpt-3.5-turbo","gpt-4","gpt-4-turbo","dall-e-3","mistral-small-latest", "mistral-medium-latest", "mistral-large-latest");
 	}
 
 }

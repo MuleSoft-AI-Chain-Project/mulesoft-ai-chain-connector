@@ -1,4 +1,4 @@
-package org.mule.extension.langchain.internal.embedding.models;
+package org.mule.extension.langchain.internal.tools;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
@@ -79,7 +79,7 @@ import static java.util.Arrays.asList;
 /**
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
  */
-public class LangchainEmbeddingModelsOperations {
+public class LangchainToolsOperations {
 
 	
 	
@@ -96,10 +96,4 @@ public class LangchainEmbeddingModelsOperations {
 //	  return "";
 //  }
 
-	
-	
-	
-	
-	
-	
 }
