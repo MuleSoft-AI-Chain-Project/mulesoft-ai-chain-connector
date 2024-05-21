@@ -243,6 +243,29 @@
                 </parameter>
             </parameters>
         </operation>
+        <operation name="Use-tools">
+            <description><![CDATA[Example of an operation that uses the configuration and a connection instance to perform some action.]]></description>
+            <parameters>
+                <parameter name="prompt">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="endpointUrl">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="outputMimeType">
+                    <description><![CDATA[The mime type of the payload that this operation outputs.]]></description>
+                </parameter>
+                <parameter name="modelName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
     </operations>
     <sources/>
     <types/>
