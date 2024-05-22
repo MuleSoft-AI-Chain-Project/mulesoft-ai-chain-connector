@@ -570,7 +570,7 @@ public class LangchainEmbeddingStoresOperations {
 
 	      
 	      // Create an instance of the custom tool with parameters
-          GenericRestApiTool restApiTool = new GenericRestApiTool(apiEndpoint, "API Call", "Execute GET and POST Requests");
+          GenericRestApiTool restApiTool = new GenericRestApiTool(apiEndpoint, "API Call", "Execute GET or POST Requests");
 	      
 	      
           ChatLanguageModel agent = OpenAiChatModel.builder()

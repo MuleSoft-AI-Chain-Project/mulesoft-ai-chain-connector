@@ -39,20 +39,24 @@ public class GenericRestApiTool implements Tool {
     //@Tool("Executes GET and POST requests for API endpoints.")
     ///Users/amir.khan/Documents/workspaces/langchain-mule-extension-test/src/main/resources/tool.config.json
     //@Tool(name = "DefaultName", value = "DefaultDescription")
-    @Tool("Execute GET and POST requests for API endpoints.")
-    public String execute(@P("Input contains all information about the API such as name and description.")String input, 
-    		@P("The method for the API. Support only GET or POST")String method, 
-    		@P("The payload for the API")String payload) {
+    @Tool("Execute POST requests for API endpoints.")
+    public String execute(@P("Input contains the URL for this request")String input, 
+    		@P("The method for the API. Support only POST")String method, 
+    		@P("The payload for the API, doublequotes must be masked")String payload) {
         try {
+       	 	System.out.println(method);
+        	
             // Construct the full URL with parameters for GET request
             StringBuilder urlBuilder = new StringBuilder(apiEndpoint);
-            if ("GET".equalsIgnoreCase(method)) {
-//                urlBuilder.append(input);
-//                for (Map.Entry<String, String> param : defaultParams.entrySet()) {
-//                    urlBuilder.append("&").append(param.getKey()).append("=").append(param.getValue());
-//                }
-            }
-//
+
+       	 	System.out.println("URL " + urlBuilder.toString());
+       	 	System.out.println("input " + input);
+       	 	System.out.println("Method " + method);
+       	 	System.out.println("payload " + payload);
+	       	if (method == null) {
+	             method="GET";
+	        }
+
             URL url = new URL(urlBuilder.toString());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method.toUpperCase());
@@ -61,6 +65,7 @@ public class GenericRestApiTool implements Tool {
 
             // If the request method is POST, send the payload
             if ("POST".equalsIgnoreCase(method) && payload != null && !payload.isEmpty()) {
+           	 	System.out.println("POST");
                 conn.setDoOutput(true);
                 byte[] inputBytes = payload.getBytes(StandardCharsets.UTF_8);
                 try (OutputStream os = conn.getOutputStream()) {
@@ -81,13 +86,6 @@ public class GenericRestApiTool implements Tool {
 
            	 	System.out.println(sb.toString());
     			return sb.toString();
-//                Scanner scanner = new Scanner(conn.getInputStream());
-//                StringBuilder response = new StringBuilder();
-//                while (scanner.hasNext()) {
-//                    response.append(scanner.nextLine());
-//                }
-//                scanner.close();
-//                return response.toString();
             } else {
            	 	System.out.println(responseCode);
                 return "Error: Received response code " + responseCode;
@@ -98,8 +96,8 @@ public class GenericRestApiTool implements Tool {
         }
     }
 
-    @Tool("This method is used for GET, whenever there is no payload defined.")
-    public String execute(String input) {
+    @Tool("Execute GET requests for API endpoints.")
+    public String execute(@P("Input contains the URL for this request")String input) {
         // Default to GET method with no payload
         return execute(input, "GET", null);
     }
