@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
 	<artifactId>langchain-connector</artifactId>
-	<version>0.0.63</version>
+	<version>0.0.80</version>
 	<packaging>mule-extension</packaging>
 	<name>LangChain</name>
 
@@ -76,7 +76,11 @@
 		    <artifactId>langchain4j-hugging-face</artifactId>
 		    <version>0.30.0</version>
 		</dependency>
-
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20210307</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>

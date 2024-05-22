@@ -83,6 +83,7 @@ This class represents an extension configuration, values set in this class are c
 * <<Read-from-image>> {nbsp}
 * <<Sentiment-Analyzer>> {nbsp}
 * <<Use-tools>> {nbsp}
+* <<Use-tools-dynamically>> {nbsp}
 
 
 
@@ -391,6 +392,38 @@ Example of an operation that uses the configuration and a connection instance to
 | Configuration | String | The name of the configuration to use. | | *x*{nbsp}
 | Prompt a| String |  |  | *x*{nbsp}
 | Endpoint Url a| String |  |  | *x*{nbsp}
+| Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
+| Model Name a| String |  |  +++gpt-3.5-turbo+++ | {nbsp}
+| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
+| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| String
+|======================
+
+==== For Configurations.
+* <<llm-configuration>> {nbsp}
+
+
+
+[[Use-tools-dynamically]]
+=== Use Tools Dynamically
+`<langchain:use-tools-dynamically>`
+
++++
+Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| Data a| String |  |  | *x*{nbsp}
+| Tool Config a| String |  |  | *x*{nbsp}
 | Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
 | Model Name a| String |  |  +++gpt-3.5-turbo+++ | {nbsp}
 | Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
