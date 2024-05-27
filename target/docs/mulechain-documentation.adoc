@@ -16,6 +16,28 @@ This is the main class of an extension, is the entry point from which configurat
 
 == Configurations
 ---
+[[anypoint-configuration]]
+=== Anypoint Configuration
+
++++
+This class represents an extension configuration, values set in this class are commonly used across multiple operations since they represent something core from the extension.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+|Name | String | The name for this configuration. Connectors reference the configuration with this name. | | *x*{nbsp}
+| Anypoint Url a| String |  |  | *x*{nbsp}
+| Anypoint Client Id a| String |  |  | *x*{nbsp}
+| Anypoint Client Secret a| String |  |  | *x*{nbsp}
+| Expiration Policy a| <<ExpirationPolicy>> |  +++Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.+++ |  | {nbsp}
+|======================
+
+
+
+
+---
 [[embedding-model-configuration]]
 === Embedding Model Configuration
 
@@ -443,6 +465,24 @@ Example of a simple operation that receives a string parameter and returns a new
 
 
 == Types
+[[ExpirationPolicy]]
+=== Expiration Policy
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Max Idle Time a| Number | A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it's considered eligible for expiration |  | 
+| Time Unit a| Enumeration, one of:
+
+** NANOSECONDS
+** MICROSECONDS
+** MILLISECONDS
+** SECONDS
+** MINUTES
+** HOURS
+** DAYS | A time unit that qualifies the maxIdleTime attribute |  | 
+|======================
+
 [[Reconnection]]
 === Reconnection
 
@@ -495,23 +535,5 @@ Example of a simple operation that receives a string parameter and returns a new
 ** INITIALISE_ONE
 ** INITIALISE_ALL | Determines how components in a pool should be initialized. The possible values are: INITIALISE_NONE (will not load any components into the pool on startup), INITIALISE_ONE (will load one initial component into the pool on startup), or INITIALISE_ALL (will load all components in the pool on startup) |  | 
 | Disabled a| Boolean | Whether pooling should be disabled |  | 
-|======================
-
-[[ExpirationPolicy]]
-=== Expiration Policy
-
-[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
-|======================
-| Field | Type | Description | Default Value | Required
-| Max Idle Time a| Number | A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it's considered eligible for expiration |  | 
-| Time Unit a| Enumeration, one of:
-
-** NANOSECONDS
-** MICROSECONDS
-** MILLISECONDS
-** SECONDS
-** MINUTES
-** HOURS
-** DAYS | A time unit that qualifies the maxIdleTime attribute |  | 
 |======================
 

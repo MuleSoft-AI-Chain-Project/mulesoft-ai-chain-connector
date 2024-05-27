@@ -2071,6 +2071,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel1">
 <li><a href="#_configurations">Configurations</a>
 <ul class="sectlevel2">
+<li><a href="#anypoint-configuration">Anypoint Configuration</a></li>
 <li><a href="#embedding-model-configuration">Embedding Model Configuration</a></li>
 <li><a href="#llm-configuration">Llm Configuration</a></li>
 </ul>
@@ -2092,11 +2093,11 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_types">Types</a>
 <ul class="sectlevel2">
+<li><a href="#ExpirationPolicy">Expiration Policy</a></li>
 <li><a href="#Reconnection">Reconnection</a></li>
 <li><a href="#reconnect">Reconnect</a></li>
 <li><a href="#reconnect-forever">Reconnect Forever</a></li>
 <li><a href="#PoolingProfile">Pooling Profile</a></li>
-<li><a href="#ExpirationPolicy">Expiration Policy</a></li>
 </ul>
 </li>
 </ul>
@@ -2117,7 +2118,7 @@ This is the main class of an extension, is the entry point from which configurat
 <div class="sectionbody">
 <hr>
 <div class="sect2">
-<h3 id="embedding-model-configuration">Embedding Model Configuration</h3>
+<h3 id="anypoint-configuration">Anypoint Configuration</h3>
 <div class="paragraph">
 <p>
 This class represents an extension configuration, values set in this class are commonly used across multiple operations since they represent something core from the extension.
@@ -2125,6 +2126,81 @@ This class represents an extension configuration, values set in this class are c
 </div>
 <div class="sect3">
 <h4 id="_parameters">Parameters</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 35%;">
+<col style="width: 20%;">
+<col style="width: 5%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-middle">Name</th>
+<th class="tableblock halign-left valign-middle">Type</th>
+<th class="tableblock halign-left valign-middle">Description</th>
+<th class="tableblock halign-left valign-middle">Default Value</th>
+<th class="tableblock halign-center valign-middle">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">The name for this configuration. Connectors reference the configuration with this name.</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock"><strong>x</strong>&#160;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Anypoint Url</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>String</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock"><strong>x</strong>&#160;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Anypoint Client Id</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>String</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock"><strong>x</strong>&#160;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Anypoint Client Secret</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>String</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock"><strong>x</strong>&#160;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Expiration Policy</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p><a href="#ExpirationPolicy">Expiration Policy</a></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">&#160;</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="embedding-model-configuration">Embedding Model Configuration</h3>
+<div class="paragraph">
+<p>
+This class represents an extension configuration, values set in this class are commonly used across multiple operations since they represent something core from the extension.
+</p>
+</div>
+<div class="sect3">
+<h4 id="_parameters_2">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2199,7 +2275,7 @@ This class (as it's name implies) provides connection instances and the funciona
 </p>
 </div>
 <div class="sect5">
-<h6 id="_parameters_2">Parameters</h6>
+<h6 id="_parameters_3">Parameters</h6>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2251,7 +2327,7 @@ This class represents an extension configuration, values set in this class are c
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_3">Parameters</h4>
+<h4 id="_parameters_4">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2364,7 +2440,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_4">Parameters</h4>
+<h4 id="_parameters_5">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2477,7 +2553,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_5">Parameters</h4>
+<h4 id="_parameters_6">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2608,7 +2684,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_6">Parameters</h4>
+<h4 id="_parameters_7">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2712,7 +2788,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_7">Parameters</h4>
+<h4 id="_parameters_8">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2834,7 +2910,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_8">Parameters</h4>
+<h4 id="_parameters_9">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -2956,7 +3032,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_9">Parameters</h4>
+<h4 id="_parameters_10">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -3078,7 +3154,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_10">Parameters</h4>
+<h4 id="_parameters_11">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -3200,7 +3276,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_11">Parameters</h4>
+<h4 id="_parameters_12">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -3322,7 +3398,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_12">Parameters</h4>
+<h4 id="_parameters_13">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -3428,7 +3504,7 @@ Example of an operation that uses the configuration and a connection instance to
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_13">Parameters</h4>
+<h4 id="_parameters_14">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -3550,7 +3626,7 @@ Example of a simple operation that receives a string parameter and returns a new
 </p>
 </div>
 <div class="sect3">
-<h4 id="_parameters_14">Parameters</h4>
+<h4 id="_parameters_15">Parameters</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 20%;">
@@ -3666,6 +3742,72 @@ Example of a simple operation that receives a string parameter and returns a new
 <div class="sect1">
 <h2 id="_types">Types</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="ExpirationPolicy">Expiration Policy</h3>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 25%;">
+<col style="width: 30%;">
+<col style="width: 15%;">
+<col style="width: 10%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-middle">Field</th>
+<th class="tableblock halign-left valign-middle">Type</th>
+<th class="tableblock halign-left valign-middle">Description</th>
+<th class="tableblock halign-left valign-middle">Default Value</th>
+<th class="tableblock halign-left valign-middle">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Max Idle Time</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>Number</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it&#8217;s considered eligible for expiration</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Time Unit</p></td>
+<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
+<p>Enumeration, one of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>NANOSECONDS</p>
+</li>
+<li>
+<p>MICROSECONDS</p>
+</li>
+<li>
+<p>MILLISECONDS</p>
+</li>
+<li>
+<p>SECONDS</p>
+</li>
+<li>
+<p>MINUTES</p>
+</li>
+<li>
+<p>HOURS</p>
+</li>
+<li>
+<p>DAYS</p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">A time unit that qualifies the maxIdleTime attribute</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="sect2">
 <h3 id="Reconnection">Reconnection</h3>
 <table class="tableblock frame-all grid-all spread">
@@ -3902,72 +4044,6 @@ Example of a simple operation that receives a string parameter and returns a new
 <p>Boolean</p>
 </div></div></td>
 <td class="tableblock halign-left valign-middle"><p class="tableblock">Whether pooling should be disabled</p></td>
-<td class="tableblock halign-left valign-middle"></td>
-<td class="tableblock halign-left valign-middle"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="ExpirationPolicy">Expiration Policy</h3>
-<table class="tableblock frame-all grid-all spread">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 25%;">
-<col style="width: 30%;">
-<col style="width: 15%;">
-<col style="width: 10%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-middle">Field</th>
-<th class="tableblock halign-left valign-middle">Type</th>
-<th class="tableblock halign-left valign-middle">Description</th>
-<th class="tableblock halign-left valign-middle">Default Value</th>
-<th class="tableblock halign-left valign-middle">Required</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Max Idle Time</p></td>
-<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
-<p>Number</p>
-</div></div></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it&#8217;s considered eligible for expiration</p></td>
-<td class="tableblock halign-left valign-middle"></td>
-<td class="tableblock halign-left valign-middle"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Time Unit</p></td>
-<td class="tableblock halign-left valign-middle"><div><div class="paragraph">
-<p>Enumeration, one of:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>NANOSECONDS</p>
-</li>
-<li>
-<p>MICROSECONDS</p>
-</li>
-<li>
-<p>MILLISECONDS</p>
-</li>
-<li>
-<p>SECONDS</p>
-</li>
-<li>
-<p>MINUTES</p>
-</li>
-<li>
-<p>HOURS</p>
-</li>
-<li>
-<p>DAYS</p>
-</li>
-</ul>
-</div></div></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">A time unit that qualifies the maxIdleTime attribute</p></td>
 <td class="tableblock halign-left valign-middle"></td>
 <td class="tableblock halign-left valign-middle"></td>
 </tr>
