@@ -115,7 +115,7 @@ public class LangchainToolsOperations {
    * Example of an operation that uses the configuration and a connection instance to perform some action.
    */
   @MediaType(value = ANY, strict = false)
-  @Alias("Use-tools")
+  @Alias("Use-static-tools")
   public String predict(String prompt, String endpointUrl, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams){
 	  
  

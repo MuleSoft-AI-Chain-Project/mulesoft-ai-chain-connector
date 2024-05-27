@@ -5,7 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.2">
-<title>Langchain Module Documentation Reference</title>
+<title>MuleChain Module Documentation Reference</title>
 <style>
 /**
  * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright
@@ -2065,9 +2065,9 @@ table.CodeRay td.code>pre{padding:0}
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>Langchain Module Documentation Reference</h1>
+<h1>MuleChain Module Documentation Reference</h1>
 <div id="toc" class="toc2">
-<div id="toctitle">Langchain Module</div>
+<div id="toctitle">MuleChain Module</div>
 <ul class="sectlevel1">
 <li><a href="#_configurations">Configurations</a>
 <ul class="sectlevel2">
@@ -2086,7 +2086,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#Persistent-memory">Persistent Memory</a></li>
 <li><a href="#Read-from-image">Read From Image</a></li>
 <li><a href="#Sentiment-Analyzer">Sentiment Analyzer</a></li>
-<li><a href="#Use-tools">Use Tools</a></li>
+<li><a href="#Use-static-tools">Use Static Tools</a></li>
 <li><a href="#Use-tools-dynamically">Use Tools Dynamically</a></li>
 </ul>
 </li>
@@ -2339,7 +2339,7 @@ This class represents an extension configuration, values set in this class are c
 <p><a href="#Sentiment-Analyzer">Sentiment Analyzer</a> &#160;</p>
 </li>
 <li>
-<p><a href="#Use-tools">Use Tools</a> &#160;</p>
+<p><a href="#Use-static-tools">Use Static Tools</a> &#160;</p>
 </li>
 <li>
 <p><a href="#Use-tools-dynamically">Use Tools Dynamically</a> &#160;</p>
@@ -2356,7 +2356,7 @@ This class represents an extension configuration, values set in this class are c
 <div class="sect2">
 <h3 id="Answer-prompt">Answer Prompt</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:answer-prompt&gt;</code></p>
+<p><code>&lt;mulechain:answer-prompt&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -2469,7 +2469,7 @@ Example of a simple operation that receives a string parameter and returns a new
 <div class="sect2">
 <h3 id="Define-prompt-template">Define Prompt Template</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:define-prompt-template&gt;</code></p>
+<p><code>&lt;mulechain:define-prompt-template&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -2600,7 +2600,7 @@ Example of a simple operation that receives a string parameter and returns a new
 <div class="sect2">
 <h3 id="Generate-image">Generate Image</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:generate-image&gt;</code></p>
+<p><code>&lt;mulechain:generate-image&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -2704,7 +2704,7 @@ Example of a simple operation that receives a string parameter and returns a new
 <div class="sect2">
 <h3 id="Load-document-from-url">Load Document From Url</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:load-document-from-url&gt;</code></p>
+<p><code>&lt;mulechain:load-document-from-url&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -2826,7 +2826,7 @@ Example of a simple operation that receives a string parameter and returns a new
 <div class="sect2">
 <h3 id="Load-document-pdf-file">Load Document Pdf File</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:load-document-pdf-file&gt;</code></p>
+<p><code>&lt;mulechain:load-document-pdf-file&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -2948,7 +2948,7 @@ Example of a simple operation that receives a string parameter and returns a new
 <div class="sect2">
 <h3 id="Load-document-txt-file">Load Document Txt File</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:load-document-txt-file&gt;</code></p>
+<p><code>&lt;mulechain:load-document-txt-file&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -3070,7 +3070,7 @@ Example of a simple operation that receives a string parameter and returns a new
 <div class="sect2">
 <h3 id="Persistent-memory">Persistent Memory</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:persistent-memory&gt;</code></p>
+<p><code>&lt;mulechain:persistent-memory&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -3192,7 +3192,7 @@ Example of a simple operation that receives a string parameter and returns a new
 <div class="sect2">
 <h3 id="Read-from-image">Read From Image</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:read-from-image&gt;</code></p>
+<p><code>&lt;mulechain:read-from-image&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -3314,7 +3314,7 @@ Example of a simple operation that receives a string parameter and returns a new
 <div class="sect2">
 <h3 id="Sentiment-Analyzer">Sentiment Analyzer</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:sentiment-analyzer&gt;</code></p>
+<p><code>&lt;mulechain:sentiment-analyzer&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -3418,9 +3418,9 @@ Example of a simple operation that receives a string parameter and returns a new
 </div>
 </div>
 <div class="sect2">
-<h3 id="Use-tools">Use Tools</h3>
+<h3 id="Use-static-tools">Use Static Tools</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:use-tools&gt;</code></p>
+<p><code>&lt;mulechain:use-static-tools&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>
@@ -3542,7 +3542,7 @@ Example of an operation that uses the configuration and a connection instance to
 <div class="sect2">
 <h3 id="Use-tools-dynamically">Use Tools Dynamically</h3>
 <div class="paragraph">
-<p><code>&lt;langchain:use-tools-dynamically&gt;</code></p>
+<p><code>&lt;mulechain:use-tools-dynamically&gt;</code></p>
 </div>
 <div class="paragraph">
 <p>

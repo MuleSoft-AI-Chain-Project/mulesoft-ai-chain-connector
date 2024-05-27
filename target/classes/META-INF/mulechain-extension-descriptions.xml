@@ -43,7 +43,7 @@
             </parameters>
         </connection>
     </connections>
-    <extension name="Langchain">
+    <extension name="MuleChain">
         <description><![CDATA[This is the main class of an extension, is the entry point from which configurations, connection providers, operations and sources are going to be declared.]]></description>
         <parameters/>
     </extension>
@@ -243,7 +243,7 @@
                 </parameter>
             </parameters>
         </operation>
-        <operation name="Use-tools">
+        <operation name="Use-static-tools">
             <description><![CDATA[Example of an operation that uses the configuration and a connection instance to perform some action.]]></description>
             <parameters>
                 <parameter name="prompt">

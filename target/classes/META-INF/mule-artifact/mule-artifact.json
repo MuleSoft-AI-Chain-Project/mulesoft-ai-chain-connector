@@ -3,10 +3,10 @@
     "id": "java",
     "attributes": {
       "type": "org.mule.extension.langchain.internal.LangchainExtension",
-      "version": "0.0.86"
+      "version": "0.0.88"
     }
   },
-  "name": "Langchain",
+  "name": "MuleChain",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",

@@ -42,6 +42,7 @@ public class GenericRestApiTool implements Tool {
     @Tool("Execute POST requests for API endpoints.")
     public String execute(@P("Input contains the URL for this request")String input, 
     		@P("The method for the API. Support only POST")String method, 
+    		@P("The authorization header value for the request")String authHeader,
     		@P("The payload for the API, doublequotes must be masked")String payload) {
         try {
        	 	System.out.println(method);
@@ -60,6 +61,7 @@ public class GenericRestApiTool implements Tool {
             URL url = new URL(urlBuilder.toString());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method.toUpperCase());
+            conn.setRequestProperty("Authorization", authHeader);
             conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             conn.setRequestProperty("Accept", "application/json");    	
 
@@ -97,9 +99,9 @@ public class GenericRestApiTool implements Tool {
     }
 
     @Tool("Execute GET requests for API endpoints.")
-    public String execute(@P("Input contains the URL for this request")String input) {
+    public String execute(@P("Input contains the URL for this request")String input, @P("The authorization header value for the request")String authHeader) {
         // Default to GET method with no payload
-        return execute(input, "GET", null);
+        return execute(input, "GET", authHeader, null);
     }
 
 	@Override

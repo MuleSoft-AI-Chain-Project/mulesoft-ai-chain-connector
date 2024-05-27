@@ -1,15 +1,15 @@
 {
-  "name": "Langchain",
+  "name": "MuleChain",
   "description": "This is the main class of an extension, is the entry point from which configurations, connection providers, operations and sources are going to be declared.",
-  "version": "0.0.86",
+  "version": "0.0.88",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
-    "prefix": "langchain",
-    "namespace": "http://www.mulesoft.org/schema/mule/langchain",
-    "schemaLocation": "http://www.mulesoft.org/schema/mule/langchain/current/mule-langchain.xsd",
-    "schemaVersion": "0.0.86",
-    "xsdFileName": "mule-langchain.xsd"
+    "prefix": "mulechain",
+    "namespace": "http://www.mulesoft.org/schema/mule/mulechain",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/mulechain/current/mule-mulechain.xsd",
+    "schemaVersion": "0.0.88",
+    "xsdFileName": "mule-mulechain.xsd"
   },
   "resources": [],
   "subTypes": [],
@@ -21,7 +21,7 @@
     {
       "stereotype": {
         "type": "EMBEDDING-MODEL-CONFIGURATION",
-        "namespace": "LANGCHAIN",
+        "namespace": "MULECHAIN",
         "parent": {
           "type": "MODULE_CONFIG",
           "namespace": "MULE"
@@ -220,7 +220,7 @@
           "supportsConnectivityTesting": true,
           "stereotype": {
             "type": "CONNECTION",
-            "namespace": "LANGCHAIN",
+            "namespace": "MULECHAIN",
             "parent": {
               "type": "CONNECTION",
               "namespace": "MULE"
@@ -637,7 +637,7 @@
     {
       "stereotype": {
         "type": "LLM-CONFIGURATION",
-        "namespace": "LANGCHAIN",
+        "namespace": "MULECHAIN",
         "parent": {
           "type": "MODULE_CONFIG",
           "namespace": "MULE"
@@ -3548,7 +3548,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "Use-tools",
+          "name": "Use-static-tools",
           "description": "Example of an operation that uses the configuration and a connection instance to perform some action.",
           "modelProperties": {},
           "kind": "operation"
@@ -3831,23 +3831,23 @@
       "handleable": true
     },
     {
-      "error": "LANGCHAIN:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
-      "handleable": true
-    },
-    {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
     },
     {
-      "error": "LANGCHAIN:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "MULECHAIN:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     },
     {
       "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULECHAIN:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     }
   ],

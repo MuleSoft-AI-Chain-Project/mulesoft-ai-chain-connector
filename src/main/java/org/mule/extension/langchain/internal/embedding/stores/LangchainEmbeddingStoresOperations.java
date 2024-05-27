@@ -601,5 +601,15 @@ public class LangchainEmbeddingStoresOperations {
 		    String chat(String userMessage);
 		}
   
+		
+		
+		//************ IMPORTANT ******************//
+		
+		// TO DO TASKS SERIALIZATION AND DESERIALIZATION FOR STORE
+        // In-memory embedding store can be serialized and deserialized to/from file
+        // String filePath = "/home/me/embedding.store";
+        // embeddingStore.serializeToFile(filePath);
+        // InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(filePath);
+
   
 }

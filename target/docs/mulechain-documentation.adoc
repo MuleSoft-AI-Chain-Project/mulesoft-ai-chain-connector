@@ -1,5 +1,5 @@
 :toc:               left
-:toc-title:         Langchain Module
+:toc-title:         MuleChain Module
 :toclevels:         2
 :last-update-label!:
 :docinfo:
@@ -7,7 +7,7 @@
 :icons: font
 
 
-= Langchain Module Documentation Reference
+= MuleChain Module Documentation Reference
 
 +++
 This is the main class of an extension, is the entry point from which configurations, connection providers, operations and sources are going to be declared.
@@ -82,7 +82,7 @@ This class represents an extension configuration, values set in this class are c
 * <<Persistent-memory>> {nbsp}
 * <<Read-from-image>> {nbsp}
 * <<Sentiment-Analyzer>> {nbsp}
-* <<Use-tools>> {nbsp}
+* <<Use-static-tools>> {nbsp}
 * <<Use-tools-dynamically>> {nbsp}
 
 
@@ -91,7 +91,7 @@ This class represents an extension configuration, values set in this class are c
 
 [[Answer-prompt]]
 === Answer Prompt
-`<langchain:answer-prompt>`
+`<mulechain:answer-prompt>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -122,7 +122,7 @@ Example of a simple operation that receives a string parameter and returns a new
 
 [[Define-prompt-template]]
 === Define Prompt Template
-`<langchain:define-prompt-template>`
+`<mulechain:define-prompt-template>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -155,7 +155,7 @@ Example of a simple operation that receives a string parameter and returns a new
 
 [[Generate-image]]
 === Generate Image
-`<langchain:generate-image>`
+`<mulechain:generate-image>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -185,7 +185,7 @@ Example of a simple operation that receives a string parameter and returns a new
 
 [[Load-document-from-url]]
 === Load Document From Url
-`<langchain:load-document-from-url>`
+`<mulechain:load-document-from-url>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -217,7 +217,7 @@ Example of a simple operation that receives a string parameter and returns a new
 
 [[Load-document-pdf-file]]
 === Load Document Pdf File
-`<langchain:load-document-pdf-file>`
+`<mulechain:load-document-pdf-file>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -249,7 +249,7 @@ Example of a simple operation that receives a string parameter and returns a new
 
 [[Load-document-txt-file]]
 === Load Document Txt File
-`<langchain:load-document-txt-file>`
+`<mulechain:load-document-txt-file>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -281,7 +281,7 @@ Example of a simple operation that receives a string parameter and returns a new
 
 [[Persistent-memory]]
 === Persistent Memory
-`<langchain:persistent-memory>`
+`<mulechain:persistent-memory>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -313,7 +313,7 @@ Example of a simple operation that receives a string parameter and returns a new
 
 [[Read-from-image]]
 === Read From Image
-`<langchain:read-from-image>`
+`<mulechain:read-from-image>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -345,7 +345,7 @@ Example of a simple operation that receives a string parameter and returns a new
 
 [[Sentiment-Analyzer]]
 === Sentiment Analyzer
-`<langchain:sentiment-analyzer>`
+`<mulechain:sentiment-analyzer>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -377,9 +377,9 @@ Example of a simple operation that receives a string parameter and returns a new
 
 
 
-[[Use-tools]]
-=== Use Tools
-`<langchain:use-tools>`
+[[Use-static-tools]]
+=== Use Static Tools
+`<mulechain:use-static-tools>`
 
 +++
 Example of an operation that uses the configuration and a connection instance to perform some action.
@@ -411,7 +411,7 @@ Example of an operation that uses the configuration and a connection instance to
 
 [[Use-tools-dynamically]]
 === Use Tools Dynamically
-`<langchain:use-tools-dynamically>`
+`<mulechain:use-tools-dynamically>`
 
 +++
 Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
