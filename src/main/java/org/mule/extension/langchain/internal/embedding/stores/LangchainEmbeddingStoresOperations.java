@@ -100,7 +100,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.mapdb.Serializer;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 /**
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
  */
@@ -562,37 +565,44 @@ public class LangchainEmbeddingStoresOperations {
 	              .build();
 
 	      String intermediateAnswer = chain.execute(data);
-	      //String name = chain.execute("What is the name from: " + intermediateAnswer + ". Reply only with the value.");
-	      //String description = chain.execute("What is the description from: " + intermediateAnswer+ ". Reply only with the value.");
-	      String apiEndpoint = chain.execute("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
-	      System.out.println(intermediateAnswer); 
-	      System.out.println(apiEndpoint); 
-
+	      String response;
+	      List<String> findURL = extractUrls(intermediateAnswer);
+	      if (findURL!=null){
+	    	  
+		      //String name = chain.execute("What is the name from: " + intermediateAnswer + ". Reply only with the value.");
+		      //String description = chain.execute("What is the description from: " + intermediateAnswer+ ". Reply only with the value.");
+		      String apiEndpoint = chain.execute("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
+		      System.out.println("intermediate Answer: " + intermediateAnswer); 
+		      System.out.println("apiEndpoint: " + apiEndpoint); 
+	
+		      
+		      // Create an instance of the custom tool with parameters
+	          GenericRestApiTool restApiTool = new GenericRestApiTool(apiEndpoint, "API Call", "Execute GET or POST Requests");
+		      
+		      
+	          ChatLanguageModel agent = OpenAiChatModel.builder()
+	                  .apiKey(configuration.getLlmApiKey())
+	                  .modelName(LangchainParams.getModelName())
+	                  .temperature(0.1)
+	                  .timeout(ofSeconds(60))
+	                  .logRequests(true)
+	                  .logResponses(true)
+	                  .build();
+	          // Build the assistant with the custom tool
+	          AssistantC assistant = AiServices.builder(AssistantC.class)
+	                  .chatLanguageModel(agent)
+	                  .tools(restApiTool)
+	                  .chatMemory(MessageWindowChatMemory.withMaxMessages(100))
+	                  .build();
+	          // Use the assistant to make a query
+	           response = assistant.chat(intermediateAnswer);
+	          System.out.println(response);
+	      } else{
+	    	  response =  intermediateAnswer;
+	      }
 	      
-	      // Create an instance of the custom tool with parameters
-          GenericRestApiTool restApiTool = new GenericRestApiTool(apiEndpoint, "API Call", "Execute GET or POST Requests");
 	      
-	      
-          ChatLanguageModel agent = OpenAiChatModel.builder()
-                  .apiKey(configuration.getLlmApiKey())
-                  .modelName(LangchainParams.getModelName())
-                  .temperature(0.3)
-                  .timeout(ofSeconds(60))
-                  .logRequests(true)
-                  .logResponses(true)
-                  .build();
-          // Build the assistant with the custom tool
-          AssistantC assistant = AiServices.builder(AssistantC.class)
-                  .chatLanguageModel(agent)
-                  .tools(restApiTool)
-                  .chatMemory(MessageWindowChatMemory.withMaxMessages(100))
-                  .build();
-          // Use the assistant to make a query
-          String response = assistant.chat(intermediateAnswer);
-          System.out.println(response);
-	      
-	      
-	      return response;
+		return response;
 	  }  
   
 
@@ -611,5 +621,26 @@ public class LangchainEmbeddingStoresOperations {
         // embeddingStore.serializeToFile(filePath);
         // InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(filePath);
 
+		
+	    public static List<String> extractUrls(String input) {
+	        // Define the URL pattern
+	        String urlPattern = "(https?://\\S+\\b)";
+	        
+	        // Compile the pattern
+	        Pattern pattern = Pattern.compile(urlPattern);
+	        
+	        // Create a matcher from the input string
+	        Matcher matcher = pattern.matcher(input);
+	        
+	        // Find and collect all matches
+	        List<String> urls = new ArrayList<>();
+	        while (matcher.find()) {
+	            urls.add(matcher.group());
+	        }
+	        
+	        // Return null if no URLs are found
+	        return urls.isEmpty() ? null : urls;
+	    }
+		
   
 }
