@@ -3,10 +3,11 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
+<!-- 	<groupId>6235ea6d-eb48-4cf9-a8f0-5f77018fbda2</groupId> -->
 	<artifactId>langchain-connector</artifactId>
-	<version>0.0.92</version>
+	<version>0.0.93</version>
 	<packaging>mule-extension</packaging>
-	<name>LangChain</name>
+	<name>Langchain</name>
 
 	<!--  <modelVersion>4.0.0</modelVersion>
 	<groupId>c0ddb541-59f8-4782-8613-96c5c39a663e</groupId>

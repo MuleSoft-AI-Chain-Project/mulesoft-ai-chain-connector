@@ -12,7 +12,8 @@ public class LangchainLLMParameterProvider implements ValueProvider {
 	@Override
 	public Set<Value> resolve() throws ValueResolvingException {
 		// TODO Auto-generated method stub
-		return ValueBuilder.getValuesFor("OPENAI_API_KEY","MISTRAL_AI_API_KEY","OLLAMA_BASE_URL","ANTHROPIC_API_KEY");
+		return ValueBuilder.getValuesFor("OPENAI_API_KEY","MISTRAL_AI_API_KEY","OLLAMA_BASE_URL","ANTHROPIC_API_KEY",
+				"");
 	}
 
 }
