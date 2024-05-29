@@ -21,7 +21,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.*;
 public class LangchainLLMConfiguration {
 
   @Parameter
-  @OfValues(LangchainLLMParameterProvider.class)
+  @OfValues(LangchainLLMTypeProvider.class)
   private String llmType;
   
   @Parameter

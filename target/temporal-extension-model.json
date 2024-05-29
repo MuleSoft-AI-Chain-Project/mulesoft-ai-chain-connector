@@ -1,14 +1,14 @@
 {
   "name": "MuleChain",
   "description": "This is the main class of an extension, is the entry point from which configurations, connection providers, operations and sources are going to be declared.",
-  "version": "0.0.94",
+  "version": "0.0.99",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "mulechain",
     "namespace": "http://www.mulesoft.org/schema/mule/mulechain",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/mulechain/current/mule-mulechain.xsd",
-    "schemaVersion": "0.0.94",
+    "schemaVersion": "0.0.99",
     "xsdFileName": "mule-mulechain.xsd"
   },
   "resources": [],

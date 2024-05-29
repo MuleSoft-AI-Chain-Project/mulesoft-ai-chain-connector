@@ -3,7 +3,7 @@
     "id": "java",
     "attributes": {
       "type": "org.mule.extension.langchain.internal.LangchainExtension",
-      "version": "0.0.94"
+      "version": "0.0.99"
     }
   },
   "name": "MuleChain",

@@ -7,13 +7,12 @@ import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 
-public class LangchainLLMParameterProvider implements ValueProvider {
+public class LangchainLLMTypeProvider implements ValueProvider {
 
 	@Override
 	public Set<Value> resolve() throws ValueResolvingException {
 		// TODO Auto-generated method stub
-		return ValueBuilder.getValuesFor("OPENAI_API_KEY","MISTRAL_AI_API_KEY","OLLAMA_BASE_URL","ANTHROPIC_API_KEY",
-				"");
+		return ValueBuilder.getValuesFor("OPENAI_API_KEY","MISTRAL_AI_API_KEY","OLLAMA_BASE_URL","ANTHROPIC_API_KEY");
 	}
 
 }
