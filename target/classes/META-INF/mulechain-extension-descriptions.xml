@@ -306,20 +306,6 @@
                 </parameter>
             </parameters>
         </operation>
-        <operation name="extractUrls">
-            <description><![CDATA[]]></description>
-            <parameters>
-                <parameter name="input">
-                    <description><![CDATA[]]></description>
-                </parameter>
-                <parameter name="target">
-                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
-                </parameter>
-                <parameter name="targetValue">
-                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
-                </parameter>
-            </parameters>
-        </operation>
     </operations>
     <sources/>
     <types/>

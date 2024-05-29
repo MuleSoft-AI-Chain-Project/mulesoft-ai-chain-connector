@@ -622,7 +622,7 @@ public class LangchainEmbeddingStoresOperations {
         // InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(filePath);
 
 		
-	    public static List<String> extractUrls(String input) {
+	    private static List<String> extractUrls(String input) {
 	        // Define the URL pattern
 	        String urlPattern = "(https?://\\S+\\b)";
 	        

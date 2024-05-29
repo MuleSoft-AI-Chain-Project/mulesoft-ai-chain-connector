@@ -5,7 +5,7 @@
 	<groupId>com.mule.langchain</groupId>
 <!-- 	<groupId>6235ea6d-eb48-4cf9-a8f0-5f77018fbda2</groupId> -->
 	<artifactId>langchain-connector</artifactId>
-	<version>0.0.93</version>
+	<version>0.0.94</version>
 	<packaging>mule-extension</packaging>
 	<name>Langchain</name>
 
@@ -106,13 +106,13 @@
 	  <snapshotRepository>
 	    <id>exchange-repository</id>
 	    <name>Exchange Repository</name>
-	    <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/c0ddb541-59f8-4782-8613-96c5c39a663e/maven</url>
+	    <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
 	    <layout>default</layout>
 	  </snapshotRepository>
 	  <repository>
 	    <id>exchange-repository</id>
 	    <name>Exchange Repository</name>
-	    <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/c0ddb541-59f8-4782-8613-96c5c39a663e/maven</url>
+	    <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
 	    <layout>default</layout>
 	  </repository>
 	</distributionManagement>	
