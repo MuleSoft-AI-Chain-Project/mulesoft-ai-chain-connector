@@ -52,5 +52,6 @@
 	<classpathentry kind="lib" path="/Users/amir.khan/Downloads/langchain4j-anthropic-0.30.0.jar"/>
 	<classpathentry kind="lib" path="/Users/amir.khan/Downloads/langchain4j-azure-open-ai-0.30.0.jar"/>
 	<classpathentry kind="lib" path="/Users/amir.khan/Downloads/langchain4j-hugging-face-0.30.0.jar"/>
+	<classpathentry kind="lib" path="/Users/amir.khan/Documents/langchain4mule resources/langchain4j-easy-rag-0.31.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

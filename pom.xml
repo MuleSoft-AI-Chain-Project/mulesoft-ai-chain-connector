@@ -5,7 +5,7 @@
 	<groupId>com.mule.langchain</groupId>
 <!-- 	<groupId>6235ea6d-eb48-4cf9-a8f0-5f77018fbda2</groupId> -->
 	<artifactId>langchain-connector</artifactId>
-	<version>0.1.8</version>
+	<version>0.1.10</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleChain</name>
 
@@ -77,6 +77,11 @@
 			<artifactId>langchain4j-hugging-face</artifactId>
 			<version>0.30.0</version>
 		</dependency>
+		<dependency>
+		    <groupId>dev.langchain4j</groupId>
+		    <artifactId>langchain4j-easy-rag</artifactId>
+		    <version>0.31.0</version>
+		</dependency>		
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>

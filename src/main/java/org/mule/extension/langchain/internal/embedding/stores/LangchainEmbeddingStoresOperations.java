@@ -1,6 +1,15 @@
 package org.mule.extension.langchain.internal.embedding.stores;
 
 import static org.mapdb.Serializer.INTEGER;
+import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
+import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import static org.mapdb.Serializer.STRING;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
@@ -181,7 +190,9 @@ public class LangchainEmbeddingStoresOperations {
 	      ChatLanguageModel model = createModel(configuration, LangchainParams);
 	      
 	      
-
+	      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+	      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+	      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
 	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 	              .chatLanguageModel(model)
 	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
@@ -226,6 +237,9 @@ public class LangchainEmbeddingStoresOperations {
 	      
 	      
 
+	      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+	      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+	      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
 	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 	              .chatLanguageModel(model)
 	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
@@ -279,6 +293,9 @@ public class LangchainEmbeddingStoresOperations {
 	      
 	      
 
+	      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+	      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+	      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
 	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 	              .chatLanguageModel(model)
 	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
@@ -557,6 +574,9 @@ public class LangchainEmbeddingStoresOperations {
 	      
 
 	      
+	      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+	      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+	      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
 	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 	              .chatLanguageModel(model)
 	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
@@ -710,25 +730,36 @@ public class LangchainEmbeddingStoresOperations {
 		      ChatLanguageModel model = createModel(configuration, LangchainParams);
 		      
 		      
+		      ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
+		      
+		      AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
+		    		    .chatLanguageModel(model)
+		    		    .contentRetriever(contentRetriever)
+		    		    .build();
 
-		      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
-		              .chatLanguageModel(model)
-		              .retriever(EmbeddingStoreRetriever.from(deserializedStore, embeddingModel))
-		              // .chatMemory() // you can override default chat memory
-		              // .promptTemplate() // you can override default prompt template
-		              .build();
-
-		      String answer = chain.execute(data);
+//		      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+//		              .chatLanguageModel(model)
+//		              .retriever(EmbeddingStoreRetriever.from(deserializedStore, embeddingModel))
+//		              // .chatMemory() // you can override default chat memory
+//		              // .promptTemplate() // you can override default prompt template
+//		              .build();
+//
+//		      String answer = chain.execute(data);
+		      String response = assistant.chat(data);
 		      //System.out.println(answer); 
 
 		      deserializedStore.serializeToFile(storeName);
 
-			return answer;
+			return response;
 		  }
 	    
 	    
 	    
-	    
+		  interface AssistantEmbedding {
+
+			    String chat(String userMessage);
+			}
+   
 	    
 	    
 }
