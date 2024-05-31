@@ -19,7 +19,13 @@ This project extends the Mule Palette with a Langchain adapter, allowing users t
 - **Language Models**: Integrate various language models provided by Langchain to generate text, perform language analysis, and handle complex language-based tasks.
 - **Embeddings**: Utilize embedding models to transform text into numerical vectors for tasks such as text similarity, clustering, and search functionalities.
 - **Tools Integration**: Incorporate APIs and other dynamic functionalities into MuleSoft, facilitating the use of external services and data processing tools.
+- **Image Models**: Work with image models for tasks like image generation, recognition, and manipulation.
 - **Streaming**: Support for real-time data processing and interaction with language models.
+
+## Requirements
+
+- The maximum supported version for Java SDK is JDK 17. You can use JDK 17 only for running your application.
+- Compilation with Java SDK must be done with JDK 8.
 
 ## Installation
 
@@ -36,20 +42,22 @@ To use this connector, add the following dependency to your application's `pom.x
 
 ## Getting Started
 
-1. **Clone the Repository**:
+1.**Clone the Repository**:
 
-   ```bash
-   git clone https://github.com/yourusername/langchain4mule.git
-   cd langchain4mule
-   ```
+```bash
+git clone https://github.com/yourusername/langchain4mule.git
+cd langchain4mule
+```
 
 2. **Set Up Your Development Environment**:
-   Ensure you have the necessary tools installed, such as JDK 8 and Maven.
+
+Ensure you have the necessary tools installed, such as JDK 8 and Maven.
 
 3. **Build the Project**:
-   ```bash
-   mvn clean install
-   ```
+
+```bash
+mvn clean install
+```
 
 ## Usage
 
@@ -71,33 +79,47 @@ Here's an example of how to use the Langchain connector in a Mule flow:
 
 We welcome contributions to enhance the functionality and features of this connector. Please follow these steps to contribute:
 
-1. **Fork the Repository**: Create your own fork of the repository by clicking the "Fork" button at the top right corner of the repository page.
+1. **Fork the Repository**:
+
+   Create your own fork of the repository by clicking the "Fork" button at the top right corner of the repository page.
 
 2. **Clone Your Fork**: Clone your forked repository to your local machine.
    ```bash
    git clone https://github.com/yourusername/langchain4mule.git
    cd langchain4mule
    ```
-3. **Create a Branch**: Create a new branch for your feature or bug fix.
+3. **Create a Branch**:
+
+   Create a new branch for your feature or bug fix.
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
-4. **Make your changes**: Implement your changes and commit them with a descriptive commit message.
+
+4. **Make your changes**:
+
+   Implement your changes and commit them with a descriptive commit message.
+
    ```bash
    git add .
    git commit -m "Add your commit message here"
    ```
-5. **Push your changes**: Push your changes to your forked repository.
+
+5. **Push your changes**:
+
+   Push your changes to your forked repository.
+
    ```bash
    git push origin feature/your-feature-name
    ```
+
 6. **Create a Pull Request**:
 
-- Go to your forked repository on GitHub.
-- Click the "Compare & pull request" button next to your newly pushed branch.
-  Ensure the base fork is **amirkhan-ak-sf/langchain4mule** and the base branch is develop.
-- Provide a clear and descriptive title and description for your pull request, explaining what changes you made and why.
-- Submit the pull request.
+   - Go to your forked repository on GitHub.
+   - Click the "Compare & pull request" button next to your newly pushed branch.
+     Ensure the base fork is **amirkhan-ak-sf/langchain4mule** and the base branch is develop.
+   - Provide a clear and descriptive title and description for your pull request, explaining what changes you made and why.
+   - Submit the pull request.
 
 7. **Review Process**:
 
