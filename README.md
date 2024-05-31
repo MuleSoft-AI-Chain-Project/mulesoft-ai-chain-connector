@@ -44,11 +44,25 @@ MuleChain leverages the MuleSoft ecosystem to provide additional capabilities on
 
 
 🔐 **𝐖𝐡𝐞𝐧 𝐰𝐢𝐥𝐥 𝐌𝐮𝐥𝐞𝐂𝐡𝐚𝐢𝐧 𝐛𝐞 𝐚𝐯𝐚𝐢𝐥𝐚𝐛𝐥𝐞 𝐭𝐨 𝐭𝐡𝐞 𝐌𝐮𝐥𝐞𝐒𝐨𝐟𝐭 𝐂𝐨𝐦𝐦𝐮𝐧𝐢𝐭𝐲?**
+
 We are targeting the end of June / beginning of July to release MuleChain as an open-source project on GitHub. It will be available on my GitHub account: https://lnkd.in/erFX3HeY. 
 
 
  👻 **𝐂𝐨𝐧𝐭𝐫𝐢𝐛𝐮𝐭𝐨𝐫𝐬**
-Who are the contributors: Ajay Rana, Mihael Bosnjak, Jeroen Reizevoort, Prashant Choudhary, Philipp Schöne and Amir Khan
+
+Who are the contributors: 
+
+- Ajay Rana (developer), 
+
+- Mihael Bosnjak (devops engineer), 
+
+- Jeroen Reizevoort (advisor), 
+
+- Prashant Choudhary (advisor), 
+
+- Philipp Schöne (advisor)
+
+- and Amir Khan (developer)
 
 If you want to become a contributor for MuleChain, you have to wait until the project is publicly available on GitHub by the end of June. 
 
