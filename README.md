@@ -7,17 +7,25 @@ Langchain4J is used as the base framework for this extension, which integrates L
 ## Overview
 
  🚩 𝐖𝐡𝐚𝐭 𝐢𝐬 𝐌𝐮𝐥𝐞𝐂𝐡𝐚𝐢𝐧?
+
 MuleChain is a MuleSoft custom connector (𝘣𝘢𝘴𝘦𝘥 on 𝘓𝘢𝘯𝘨𝘊𝘩𝘢𝘪𝘯4𝘫) to provide a complete framework for MuleSoft users to design, build, and manage the lifecycle of AI Agents fully in the Anypoint Platform. 
 
 📌 𝐂𝐨𝐦𝐩𝐨𝐧𝐞𝐧𝐭𝐬 𝐨𝐟 𝐌𝐮𝐥𝐞𝐂𝐡𝐚𝐢𝐧
 Enabled through LangChain4j, MuleChain will provide:
+
 ✅ 𝘌𝘢𝘴𝘪𝘦𝘳 𝘪𝘯𝘵𝘦𝘳𝘢𝘤𝘵𝘪𝘰𝘯 𝘸𝘪𝘵𝘩 𝘓𝘓𝘔𝘴 𝘢𝘯𝘥 𝘝𝘦𝘤𝘵𝘰𝘳 𝘚𝘵𝘰𝘳𝘦𝘴, 
+
 ✅ 𝘖𝘱𝘵𝘪𝘮𝘪𝘻𝘦𝘥 𝘜𝘴𝘢𝘨𝘦 𝘪𝘯 𝘔𝘶𝘭𝘦𝘚𝘰𝘧𝘵 𝘈𝘱𝘱𝘴, 
+
 ✅ 𝘈𝘤𝘤𝘦𝘴𝘴 𝘵𝘰 𝘈𝘐 𝘚𝘦𝘳𝘷𝘪𝘤𝘦𝘴, 𝘙𝘈𝘎, 𝘛𝘰𝘰𝘭𝘴, 𝘊𝘩𝘢𝘪𝘯, 𝘦𝘵𝘤.
 
+
 🔀𝐖𝐡𝐚𝐭 𝐝𝐢𝐝 𝐰𝐞 𝐚𝐝𝐝 𝐨𝐧 𝐭𝐨𝐩 𝐨𝐟 𝐋𝐚𝐧𝐠𝐂𝐡𝐚𝐢𝐧4𝐣?
+
 MuleChain leverages the MuleSoft ecosystem to provide additional capabilities on top of the great LangChain4j project. 
+
 ✅ Dynamic tooling through a configuration file
+
 ✅ Flexible tooling through Anypoint Exchange
 
 Through MuleSoft Anypoint Platform, we enabled:
