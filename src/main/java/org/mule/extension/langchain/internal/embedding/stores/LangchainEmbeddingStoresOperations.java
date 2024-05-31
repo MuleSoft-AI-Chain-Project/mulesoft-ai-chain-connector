@@ -1,6 +1,15 @@
 package org.mule.extension.langchain.internal.embedding.stores;
 
 import static org.mapdb.Serializer.INTEGER;
+import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
+import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import static org.mapdb.Serializer.STRING;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
@@ -181,7 +190,9 @@ public class LangchainEmbeddingStoresOperations {
 	      ChatLanguageModel model = createModel(configuration, LangchainParams);
 	      
 	      
-
+	      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+	      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+	      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
 	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 	              .chatLanguageModel(model)
 	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
@@ -226,6 +237,9 @@ public class LangchainEmbeddingStoresOperations {
 	      
 	      
 
+	      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+	      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+	      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
 	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 	              .chatLanguageModel(model)
 	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
@@ -279,6 +293,9 @@ public class LangchainEmbeddingStoresOperations {
 	      
 	      
 
+	      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+	      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+	      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
 	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 	              .chatLanguageModel(model)
 	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
@@ -557,6 +574,9 @@ public class LangchainEmbeddingStoresOperations {
 	      
 
 	      
+	      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+	      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+	      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
 	      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 	              .chatLanguageModel(model)
 	              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
@@ -643,4 +663,103 @@ public class LangchainEmbeddingStoresOperations {
 	    }
 		
   
+	    
+	    
+	    
+	    
+	    ////////////////////////////////////////////
+	    
+	    
+	    
+		  /**
+		   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+		   */
+		  @MediaType(value = ANY, strict = false)
+		  @Alias("New-embedding-store")  
+		  public String createEmbedding(String storeName) {
+			
+			InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+						
+			//embeddingStore.serializeToFile(storeName);
+			embeddingStore.serializeToFile(storeName);
+	    
+			return "Embedding-store created.";
+		  }
+	    
+	    
+	    
+		  /**
+		   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+		   */
+		  @MediaType(value = ANY, strict = false)
+		  @Alias("Add-file-to-embedding-store")  
+		  public String addFileEmbedding(String storeName, String contextFile, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+
+			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
+		      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+		              .documentSplitter(DocumentSplitters.recursive(300, 0))
+		              .embeddingModel(embeddingModel)
+		              .embeddingStore(deserializedStore)
+		              .build();
+
+		      //Document document = loadDocument(toPath("story-about-happy-carrot.txt"), new TextDocumentParser());
+		      
+		      Document document = loadDocument(contextFile, new TextDocumentParser());
+		      ingestor.ingest(document);
+	    
+		      deserializedStore.serializeToFile(storeName);
+			return "Embedding-store updated.";
+		  }
+	    
+	    
+		  /**
+		   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+		   */
+		  @MediaType(value = ANY, strict = false)
+		  @Alias("Get-info-from-embedding-store")  
+		  public String promptFromEmbedding(String storeName, String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+		      
+		      ChatLanguageModel model = createModel(configuration, LangchainParams);
+		      
+		      
+		      ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
+		      
+		      AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
+		    		    .chatLanguageModel(model)
+		    		    .contentRetriever(contentRetriever)
+		    		    .build();
+
+//		      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+//		              .chatLanguageModel(model)
+//		              .retriever(EmbeddingStoreRetriever.from(deserializedStore, embeddingModel))
+//		              // .chatMemory() // you can override default chat memory
+//		              // .promptTemplate() // you can override default prompt template
+//		              .build();
+//
+//		      String answer = chain.execute(data);
+		      String response = assistant.chat(data);
+		      //System.out.println(answer); 
+
+		      deserializedStore.serializeToFile(storeName);
+
+			return response;
+		  }
+	    
+	    
+	    
+		  interface AssistantEmbedding {
+
+			    String chat(String userMessage);
+			}
+   
+	    
+	    
 }
