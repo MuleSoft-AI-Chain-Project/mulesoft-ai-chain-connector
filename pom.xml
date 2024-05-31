@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-<!-- 	<groupId>com.mule.langchain</groupId> -->
-	<groupId>6235ea6d-eb48-4cf9-a8f0-5f77018fbda2</groupId>
+	<groupId>com.mule.langchain</groupId>
+<!-- 	<groupId>6235ea6d-eb48-4cf9-a8f0-5f77018fbda2</groupId> -->
 	<artifactId>langchain-connector</artifactId>
-	<version>0.0.99</version>
+	<version>0.1.1</version>
 	<packaging>mule-extension</packaging>
-	<name>Langchain</name>
+	<name>MuleChain</name>
 
 	<!--  <modelVersion>4.0.0</modelVersion>
 	<groupId>c0ddb541-59f8-4782-8613-96c5c39a663e</groupId>
@@ -38,49 +38,49 @@
 			<version>0.30.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>dev.langchain4j</groupId>
-		    <artifactId>langchain4j-mistral-ai</artifactId>
-		    <version>0.30.0</version>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-mistral-ai</artifactId>
+			<version>0.30.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.mapdb</groupId>	
-		    <artifactId>mapdb</artifactId>
-		    <version>3.1.0</version>
+			<groupId>org.mapdb</groupId>
+			<artifactId>mapdb</artifactId>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.json</groupId>
-		    <artifactId>json</artifactId>
-		    <version>20240303</version>
-		</dependency>
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-document-parser-apache-tika</artifactId>
-            <version>0.30.0</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-ollama</artifactId>
-            <version>0.30.0</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-anthropic</artifactId>
-            <version>0.30.0</version>
-        </dependency>
-		<dependency>
-		    <groupId>dev.langchain4j</groupId>
-		    <artifactId>langchain4j-azure-open-ai</artifactId>
-		    <version>0.30.0</version>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20240303</version>
 		</dependency>
 		<dependency>
-		    <groupId>dev.langchain4j</groupId>
-		    <artifactId>langchain4j-hugging-face</artifactId>
-		    <version>0.30.0</version>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-document-parser-apache-tika</artifactId>
+			<version>0.30.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.json</groupId>
-		    <artifactId>json</artifactId>
-		    <version>20210307</version>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-ollama</artifactId>
+			<version>0.30.0</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-anthropic</artifactId>
+			<version>0.30.0</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-azure-open-ai</artifactId>
+			<version>0.30.0</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-hugging-face</artifactId>
+			<version>0.30.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20210307</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -133,17 +133,17 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<distributionManagement>
-	  <snapshotRepository>
-	    <id>exchange-repository</id>
-	    <name>Exchange Repository</name>
-	    <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
-	    <layout>default</layout>
-	  </snapshotRepository>
-	  <repository>
-	    <id>exchange-repository</id>
-	    <name>Exchange Repository</name>
-	    <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
-	    <layout>default</layout>
-	  </repository>
-	</distributionManagement>	
+		<snapshotRepository>
+			<id>exchange-repository</id>
+			<name>Exchange Repository</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
+			<layout>default</layout>
+		</snapshotRepository>
+		<repository>
+			<id>exchange-repository</id>
+			<name>Exchange Repository</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
+			<layout>default</layout>
+		</repository>
+	</distributionManagement>
 </project>
