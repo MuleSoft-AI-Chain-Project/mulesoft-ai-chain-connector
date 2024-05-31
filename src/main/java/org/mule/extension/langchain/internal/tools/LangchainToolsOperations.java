@@ -114,47 +114,47 @@ public class LangchainToolsOperations {
   /**
    * Example of an operation that uses the configuration and a connection instance to perform some action.
    */
-  @MediaType(value = ANY, strict = false)
-  @Alias("Use-static-tools")
-  public String predict(String prompt, String endpointUrl, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams){
-	  
- 
-      // Create an instance of the custom tool with parameters
-      RestApiTool restApiTool = new RestApiTool(
-    		  endpointUrl, 
-              "Get Inventory", 
-              "Get inventory from SAP ERP system for Material MULETEST0"
-      );
-      
-      
-      //https://docs.langchain4j.dev/tutorials/tools/
-
-      ChatLanguageModel model = OpenAiChatModel.builder()
-              .apiKey(configuration.getLlmApiKey())
-              .modelName(LangchainParams.getModelName())
-              .temperature(0.3)
-              .timeout(ofSeconds(60))
-              .logRequests(true)
-              .logResponses(true)
-              .build();
-      // Build the assistant with the custom tool
-      Assistant assistant = AiServices.builder(Assistant.class)
-              .chatLanguageModel(model)
-              .tools(restApiTool)
-              .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
-              .build();
-      // Use the assistant to make a query
-      String response = assistant.chat(prompt);
-      //System.out.println(response);
-
-	  return response;
-  }
-
-	interface Assistant {
-	
-	    String chat(String userMessage);
-	}
-	
+//  @MediaType(value = ANY, strict = false)
+//  @Alias("Use-static-tools")
+//  public String predict(String prompt, String endpointUrl, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams){
+//	  
+// 
+//      // Create an instance of the custom tool with parameters
+//      RestApiTool restApiTool = new RestApiTool(
+//    		  endpointUrl, 
+//              "Get Inventory", 
+//              "Get inventory from SAP ERP system for Material MULETEST0"
+//      );
+//      
+//      
+//      //https://docs.langchain4j.dev/tutorials/tools/
+//
+//      ChatLanguageModel model = OpenAiChatModel.builder()
+//              .apiKey(configuration.getLlmApiKey())
+//              .modelName(LangchainParams.getModelName())
+//              .temperature(0.3)
+//              .timeout(ofSeconds(60))
+//              .logRequests(true)
+//              .logResponses(true)
+//              .build();
+//      // Build the assistant with the custom tool
+//      Assistant assistant = AiServices.builder(Assistant.class)
+//              .chatLanguageModel(model)
+//              .tools(restApiTool)
+//              .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+//              .build();
+//      // Use the assistant to make a query
+//      String response = assistant.chat(prompt);
+//      //System.out.println(response);
+//
+//	  return response;
+//  }
+//
+//	interface Assistant {
+//	
+//	    String chat(String userMessage);
+//	}
+//	
 	
 	
 //	/**

@@ -643,4 +643,92 @@ public class LangchainEmbeddingStoresOperations {
 	    }
 		
   
+	    
+	    
+	    
+	    
+	    ////////////////////////////////////////////
+	    
+	    
+	    
+		  /**
+		   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+		   */
+		  @MediaType(value = ANY, strict = false)
+		  @Alias("New-embedding-store")  
+		  public String createEmbedding(String storeName) {
+			
+			InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+						
+			//embeddingStore.serializeToFile(storeName);
+			embeddingStore.serializeToFile(storeName);
+	    
+			return "Embedding-store created.";
+		  }
+	    
+	    
+	    
+		  /**
+		   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+		   */
+		  @MediaType(value = ANY, strict = false)
+		  @Alias("Add-file-to-embedding-store")  
+		  public String addFileEmbedding(String storeName, String contextFile, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+
+			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
+		      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+		              .documentSplitter(DocumentSplitters.recursive(300, 0))
+		              .embeddingModel(embeddingModel)
+		              .embeddingStore(deserializedStore)
+		              .build();
+
+		      //Document document = loadDocument(toPath("story-about-happy-carrot.txt"), new TextDocumentParser());
+		      
+		      Document document = loadDocument(contextFile, new TextDocumentParser());
+		      ingestor.ingest(document);
+	    
+		      deserializedStore.serializeToFile(storeName);
+			return "Embedding-store updated.";
+		  }
+	    
+	    
+		  /**
+		   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+		   */
+		  @MediaType(value = ANY, strict = false)
+		  @Alias("Get-info-from-embedding-store")  
+		  public String promptFromEmbedding(String storeName, String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+		      
+		      ChatLanguageModel model = createModel(configuration, LangchainParams);
+		      
+		      
+
+		      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+		              .chatLanguageModel(model)
+		              .retriever(EmbeddingStoreRetriever.from(deserializedStore, embeddingModel))
+		              // .chatMemory() // you can override default chat memory
+		              // .promptTemplate() // you can override default prompt template
+		              .build();
+
+		      String answer = chain.execute(data);
+		      //System.out.println(answer); 
+
+		      deserializedStore.serializeToFile(storeName);
+
+			return answer;
+		  }
+	    
+	    
+	    
+	    
+	    
+	    
 }
