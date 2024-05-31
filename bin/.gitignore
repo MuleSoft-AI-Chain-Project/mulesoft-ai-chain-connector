@@ -1,0 +1,45 @@
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# MuleSoft
+.mule/
+.mule/plugins/
+mule-artifact.json
+exchange-docs/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Compiled class files
+*.class
+
+# Generated files
+generated-sources/
+generated-test-sources/
+
+# Configuration files
+.vscode/
+.classpath
+.project
+.settings/
+
+# Miscellaneous
+*.bak
+*.tmp
+

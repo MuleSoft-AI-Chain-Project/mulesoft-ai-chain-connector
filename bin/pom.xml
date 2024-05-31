@@ -3,10 +3,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-<!-- 	<groupId>com.mule.langchain</groupId> -->
+	<groupId>com.mule.langchain</groupId>
 	<!-- Marketing Org id -->
 	<!-- 	<groupId>6235ea6d-eb48-4cf9-a8f0-5f77018fbda2</groupId> -->
-	<groupId>6235ea6d-eb48-4cf9-a8f0-5f77018fbda2</groupId>
 	<artifactId>langchain-connector</artifactId>
 	<version>0.1.11</version>
 	<packaging>mule-extension</packaging>
@@ -138,14 +137,12 @@
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
 			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
-<!-- 			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/35b550e1-a2ef-41ad-aeef-4b837a72ba43/maven</url> -->
 			<layout>default</layout>
 		</snapshotRepository>
 		<repository>
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
 			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
-<!-- 			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/35b550e1-a2ef-41ad-aeef-4b837a72ba43/maven</url> -->
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
