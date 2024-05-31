@@ -6,8 +6,6 @@ Langchain4J is used as the base framework for this extension, which integrates L
 
 This project extends the Mule Palette with a Langchain adapter, allowing users to leverage advanced natural language processing and AI features within MuleSoft flows.
 
-## Screenshots
-
 ### Base Framework
 
 ![Base Framework](assets/connector_overview.png)
@@ -97,7 +95,7 @@ We welcome contributions to enhance the functionality and features of this conne
 
 - Go to your forked repository on GitHub.
 - Click the "Compare & pull request" button next to your newly pushed branch.
-  Ensure the base fork is amirkhan-ak-sf/langchain4mule and the base branch is develop.
+  Ensure the base fork is **amirkhan-ak-sf/langchain4mule** and the base branch is develop.
 - Provide a clear and descriptive title and description for your pull request, explaining what changes you made and why.
 - Submit the pull request.
 
