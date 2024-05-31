@@ -1,5 +1,5 @@
 # IntelliJ IDEA
-/.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -38,3 +38,14 @@ generated-test-sources/
 .classpath
 .project
 .settings/
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Miscellaneous
+*.bak
+*.tmp
+
