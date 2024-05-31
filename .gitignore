@@ -39,12 +39,6 @@ generated-test-sources/
 .project
 .settings/
 
-# Images
-*.png
-*.jpg
-*.jpeg
-*.gif
-
 # Miscellaneous
 *.bak
 *.tmp
