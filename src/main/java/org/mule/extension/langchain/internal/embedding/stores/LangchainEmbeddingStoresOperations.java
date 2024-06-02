@@ -762,34 +762,5 @@ public class LangchainEmbeddingStoresOperations {
 	  
 			
 
-
-
-	  /**
-	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
-	   */
-	  @MediaType(value = ANY, strict = false)
-	  @Alias("Use-agent-with-embedding")  
-	  public String useEmbeddedAgent(String data, String embeddingStore,  @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
-	  
-	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-
-		  InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(embeddingStore);	      
-	      
-	      ChatLanguageModel model = createModel(configuration, LangchainParams);
-	      
-	      
-		  ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
-		      
-		  AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
-					.chatLanguageModel(model)
-					.contentRetriever(contentRetriever)
-					.build();
-
-
-	      String Answer = assistant.chat(data);
-	      
-	      
-		return Answer;
-	  }  			
 	    
 }
