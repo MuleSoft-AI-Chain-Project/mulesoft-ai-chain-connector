@@ -768,8 +768,8 @@ public class LangchainEmbeddingStoresOperations {
 	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
 	   */
 	  @MediaType(value = ANY, strict = false)
-	  @Alias("Use-embedded-tools")  
-	  public String useEmbeddedTools(String data, String embeddingStore,  @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+	  @Alias("Use-agent-with-embedding")  
+	  public String useEmbeddedAgent(String data, String embeddingStore,  @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
 	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -778,63 +778,18 @@ public class LangchainEmbeddingStoresOperations {
 	      ChatLanguageModel model = createModel(configuration, LangchainParams);
 	      
 	      
-		 // ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
+		  ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
 		      
-		 // AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
-			//		.chatLanguageModel(model)
-			//		.contentRetriever(contentRetriever)
-			//		.build();
-
-			ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
-			.chatLanguageModel(model)
-			.retriever(EmbeddingStoreRetriever.from(deserializedStore, embeddingModel))
-			// .chatMemory() // you can override default chat memory
-			// .promptTemplate() // you can override default prompt template
-			.build();
+		  AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
+					.chatLanguageModel(model)
+					.contentRetriever(contentRetriever)
+					.build();
 
 
-	      //String intermediateAnswer = assistant.chat(data);
-	      String intermediateAnswer = chain.execute(data);
-
-	      String response;
-	      List<String> findURL = extractUrls(intermediateAnswer);
-	      if (findURL!=null){
-	    	  
-		      //String name = chain.execute("What is the name from: " + intermediateAnswer + ". Reply only with the value.");
-		      //String description = chain.execute("What is the description from: " + intermediateAnswer+ ". Reply only with the value.");
-		      //String apiEndpoint = assistant.chat("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
-			  String apiEndpoint = chain.execute("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
-			  System.out.println("intermediate Answer: " + intermediateAnswer); 
-		      System.out.println("apiEndpoint: " + apiEndpoint); 
-	
-		      
-		      // Create an instance of the custom tool with parameters
-	          GenericRestApiTool restApiTool = new GenericRestApiTool(apiEndpoint, "API Call", "Execute GET or POST Requests");
-		      
-		      
-	          ChatLanguageModel agent = OpenAiChatModel.builder()
-	                  .apiKey(configuration.getLlmApiKey())
-	                  .modelName(LangchainParams.getModelName())
-	                  .temperature(0.1)
-	                  .timeout(ofSeconds(60))
-	                  .logRequests(true)
-	                  .logResponses(true)
-	                  .build();
-	          // Build the assistant with the custom tool
-	          AssistantC assistantC = AiServices.builder(AssistantC.class)
-	                  .chatLanguageModel(agent)
-	                  .tools(restApiTool)
-	                  .chatMemory(MessageWindowChatMemory.withMaxMessages(100))
-	                  .build();
-	          // Use the assistant to make a query
-	           response = assistantC.chat(intermediateAnswer);
-	          System.out.println(response);
-	      } else{
-	    	  response =  intermediateAnswer;
-	      }
+	      String Answer = assistant.chat(data);
 	      
 	      
-		return response;
+		return Answer;
 	  }  			
 	    
 }
