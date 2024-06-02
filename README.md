@@ -62,7 +62,7 @@ Who are the contributors:
 
 - Philipp Schöne (advisor)
 
-- and Amir Khan (developer)
+- and Amir Khan (advisor & developer)
 
 If you want to become a contributor for MuleChain, you have to wait until the project is publicly available on GitHub by the end of June. 
 
