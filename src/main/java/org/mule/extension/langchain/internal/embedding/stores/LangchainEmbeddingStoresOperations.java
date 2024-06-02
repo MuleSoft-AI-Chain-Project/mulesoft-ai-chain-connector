@@ -778,15 +778,23 @@ public class LangchainEmbeddingStoresOperations {
 	      ChatLanguageModel model = createModel(configuration, LangchainParams);
 	      
 	      
-		  ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
+		 // ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
 		      
-		  AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
-					.chatLanguageModel(model)
-					.contentRetriever(contentRetriever)
-					.build();
+		 // AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
+			//		.chatLanguageModel(model)
+			//		.contentRetriever(contentRetriever)
+			//		.build();
 
-	      
-	      String intermediateAnswer = assistant.chat(data);
+			ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+			.chatLanguageModel(model)
+			.retriever(EmbeddingStoreRetriever.from(deserializedStore, embeddingModel))
+			// .chatMemory() // you can override default chat memory
+			// .promptTemplate() // you can override default prompt template
+			.build();
+
+
+	      //String intermediateAnswer = assistant.chat(data);
+	      String intermediateAnswer = chain.execute(data);
 
 	      String response;
 	      List<String> findURL = extractUrls(intermediateAnswer);
@@ -794,8 +802,9 @@ public class LangchainEmbeddingStoresOperations {
 	    	  
 		      //String name = chain.execute("What is the name from: " + intermediateAnswer + ". Reply only with the value.");
 		      //String description = chain.execute("What is the description from: " + intermediateAnswer+ ". Reply only with the value.");
-		      String apiEndpoint = assistant.chat("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
-		      System.out.println("intermediate Answer: " + intermediateAnswer); 
+		      //String apiEndpoint = assistant.chat("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
+			  String apiEndpoint = chain.execute("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
+			  System.out.println("intermediate Answer: " + intermediateAnswer); 
 		      System.out.println("apiEndpoint: " + apiEndpoint); 
 	
 		      
