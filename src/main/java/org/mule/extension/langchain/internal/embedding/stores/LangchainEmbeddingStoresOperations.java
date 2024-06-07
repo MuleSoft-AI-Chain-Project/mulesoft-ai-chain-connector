@@ -23,6 +23,8 @@ import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mule.extension.langchain.internal.llm.LangchainLLMConfiguration;
 import org.mule.extension.langchain.internal.llm.LangchainLLMParameters;
+import org.mule.extension.langchain.internal.helpers.fileTypeEmbedding;
+import org.mule.extension.langchain.internal.helpers.fileTypeParameters;
 import org.mule.extension.langchain.internal.tools.DynamicToolWrapper;
 import org.mule.extension.langchain.internal.tools.GenericRestApiTool;
 import org.mule.extension.langchain.internal.tools.RestApiTool;
@@ -164,12 +166,12 @@ public class LangchainEmbeddingStoresOperations {
 
 	
 
-	  /**
+/* 	  /**
 	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
 	   */
-	  @MediaType(value = ANY, strict = false)
+/* 		  @MediaType(value = ANY, strict = false)
 	  @Alias("Load-document-txt-file")  
-	  public String loadDocumentToStore(String data, String contextFile, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+	  public String loadDocumentText(String data, String contextFile, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
 	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -204,7 +206,7 @@ public class LangchainEmbeddingStoresOperations {
 	      //System.out.println(answer); 
 	      return answer;
 	  }  
-  
+   */
 
 
 	  
@@ -212,7 +214,7 @@ public class LangchainEmbeddingStoresOperations {
 	  /**
 	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
 	   */
-	  @MediaType(value = ANY, strict = false)
+/* 		  @MediaType(value = ANY, strict = false)
 	  @Alias("Load-document-pdf-file")  
 	  public String loadDocumentPDFFile(String data, String contextFile, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
@@ -251,13 +253,13 @@ public class LangchainEmbeddingStoresOperations {
 	      //System.out.println(answer); 
 	      return answer;
 	  }  
-  
+ */  
 
 	  
 	  /**
 	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
 	   */
-	  @MediaType(value = ANY, strict = false)
+/* 		  @MediaType(value = ANY, strict = false)
 	  @Alias("Load-document-from-url")  
 	  public String loadDocumentFromURL(String data, String contextURL, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
@@ -307,21 +309,106 @@ public class LangchainEmbeddingStoresOperations {
 	      //System.out.println(answer); 
 	      return answer;
 	  }  
+   */
+	  
+	  
+	  
+	  
+	  
+	  /**
+	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+	   */
+	  @MediaType(value = ANY, strict = false)
+	  @Alias("Load-document")  
+	  public String loadDocumentFile(String data, String contextPath, @ParameterGroup(name="Context") fileTypeParameters fileType, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+	  
+	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+	      EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
+	      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+	              .documentSplitter(DocumentSplitters.recursive(1000, 200, new OpenAiTokenizer()))
+	              .embeddingModel(embeddingModel)
+	              .embeddingStore(embeddingStore)
+	              .build();
+
+		  System.out.println(fileType.getFileType());
+		  
+		 // ChatLanguageModel model = null;
+		 Document document = null;
+		  switch (fileType.getFileType()) {
+			case "text":
+				document = loadDocument(contextPath, new TextDocumentParser());
+				ingestor.ingest(document);
+				break;
+			case "pdf":
+				document = loadDocument(contextPath, new ApacheTikaDocumentParser());
+				ingestor.ingest(document);
+				  break;
+			case "url":
+				URL url = null;
+				try {
+					url = new URL(contextPath);
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
+				HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
+				document = transformer.transform(htmlDocument);
+				document.metadata().add("url", contextPath);
+				ingestor.ingest(document);
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
+		  }
+	      
+	      
+	      ChatLanguageModel model = createModel(configuration, LangchainParams);
+	      
+	      
+	      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+	      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+	      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
+
+		  ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
+		      
+		  AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
+					.chatLanguageModel(model)
+					.contentRetriever(contentRetriever)
+					.build();
+
+	      String answer = assistant.chat(data);
+	      //System.out.println(answer); 
+	      return answer;
+	  }  
   
 	  
-	  
-	  
-	  
-	  
-	  
+
+
+
+
+
+
+
+
 	  
 	  
 	  
 	  
 	  interface Assistant {
 
-	      String chat(@MemoryId int memoryId, @UserMessage String userMessage);
-	  }
+		String chat(@MemoryId int memoryId, @UserMessage String userMessage);
+	}
+
+	interface AssistantMemory {
+
+		String chat(@MemoryId String memoryName, @UserMessage String userMessage);
+	}
+
+
+
 
 
 	  /**
@@ -329,7 +416,7 @@ public class LangchainEmbeddingStoresOperations {
 	   */
 	  @MediaType(value = ANY, strict = false)
 	  @Alias("Persistent-memory")  
-	  public String chatWithPersistentMemory(String data, String dbFilePath, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+	  public String chatWithPersistentMemory(String data, String memoryName, String dbFilePath, int maxMessages, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	      
 	      	ChatLanguageModel model = createModel(configuration, LangchainParams);
 		  
@@ -340,18 +427,31 @@ public class LangchainEmbeddingStoresOperations {
 
 
 
-	        ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
+	       /*  ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
 	                .id(memoryId)
 	                .maxMessages(10)
 	                .chatMemoryStore(store)
 	                .build();
+*/
+			ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
+	                .id(memoryName)
+	                .maxMessages(maxMessages)
+	                .chatMemoryStore(store)
+	                .build();
 
-	        Assistant assistant = AiServices.builder(Assistant.class)
+			/*Assistant assistant = AiServices.builder(Assistant.class)
+	                .chatLanguageModel(model)
+	                .chatMemoryProvider(chatMemoryProvider)
+	                .build(); 
+			*/
+
+			AssistantMemory assistant = AiServices.builder(AssistantMemory.class)
 	                .chatLanguageModel(model)
 	                .chatMemoryProvider(chatMemoryProvider)
 	                .build();
 
-	        return assistant.chat(1, data);
+			//return assistant.chat(1, data);
+			return assistant.chat(memoryName, data);
 
 	  }
 
@@ -360,31 +460,33 @@ public class LangchainEmbeddingStoresOperations {
 	      //private final DB db = DBMaker.fileDB("/Users/amir.khan/Documents/langchain4mule resources/multi-user-chat-memory.db").transactionEnable().fileLockDisable().make();
 	      //private final Map<Integer, String> map = db.hashMap("messages", INTEGER, STRING).createOrOpen();
 	        private static DB db;
-	        private static Map<Integer, String> map;
+	      //  private static Map<Integer, String> map;
+	        private static Map<String, String> map;
 	        public static void initialize(String dbMFilePath) {
 	            db = DBMaker.fileDB(dbMFilePath)
 	                    .transactionEnable()
 	                    .fileLockDisable()
 	                    .make();
-	            map = db.hashMap("messages", INTEGER, STRING).createOrOpen();
-	        }
+				//map = db.hashMap("messages", INTEGER, STRING).createOrOpen();
+				map = db.hashMap("messages", STRING, STRING).createOrOpen();
+					}
 
 	      @Override
 	      public List<ChatMessage> getMessages(Object memoryId) {
-	          String json = map.get((int) memoryId);
+	          String json = map.get((String) memoryId);
 	          return messagesFromJson(json);
 	      }
 
 	      @Override
 	      public void updateMessages(Object memoryId, List<ChatMessage> messages) {
 	          String json = messagesToJson(messages);
-	          map.put((int) memoryId, json);
+	          map.put((String) memoryId, json);
 	          db.commit();
 	      }
 
 	      @Override
 	      public void deleteMessages(Object memoryId) {
-	          map.remove((int) memoryId);
+	          map.remove((String) memoryId);
 	          db.commit();
 	      }
 	  }  
