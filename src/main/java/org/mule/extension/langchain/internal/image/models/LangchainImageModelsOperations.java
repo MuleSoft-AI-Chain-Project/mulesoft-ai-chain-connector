@@ -102,10 +102,10 @@ public class LangchainImageModelsOperations {
 	
 
 	  /**
-	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+	   * Reads an image from an URL. 
 	   */
 	  @MediaType(value = ANY, strict = false)
-	  @Alias("Read-from-image")  
+	  @Alias("IMAGE-read")  
 	  public String readFromImage(String data, String contextURL, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
 	      ChatLanguageModel model = createModel(configuration, LangchainParams);
@@ -122,10 +122,10 @@ public class LangchainImageModelsOperations {
   
 
 	  /**
-	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+	   * Generates an image based on the prompt in data
 	   */
 	  @MediaType(value = ANY, strict = false)
-	  @Alias("Generate-image")  
+	  @Alias("IMAGE-generate")  
 	  public URI drawImage(String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
           ImageModel model = OpenAiImageModel.builder()

@@ -109,10 +109,10 @@ public class LangchainLLMOperations {
 
   
   /**
-   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+   * Implements a simple Chat agent
    */
   @MediaType(value = ANY, strict = false)
-  @Alias("Answer-prompt")  
+  @Alias("CHAT-answer-prompt")  
   public String answerPromptByModelName(String prompt, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
       // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
 
@@ -133,10 +133,10 @@ public class LangchainLLMOperations {
   
   
   /**
-   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+   * Helps defining an AI Agent with a prompt template
    */
   @MediaType(value = ANY, strict = false)
-  @Alias("Define-prompt-template")  
+  @Alias("AGENT-define-prompt-template")  
   public String definePromptTemplate(String template, String instructions, String dataset, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 
 	      ChatLanguageModel model = createModel(configuration, LangchainParams);
@@ -181,10 +181,10 @@ public class LangchainLLMOperations {
 
   
   /**
-   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+   * Example of a sentiment analyzer, which accepts text as input.
    */
   @MediaType(value = ANY, strict = false)
-  @Alias("Sentiment-Analyzer")  
+  @Alias("SENTIMENT-analyze")  
   public Sentiment extractSentiments(String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
   
       ChatLanguageModel model = createModel(configuration, LangchainParams);

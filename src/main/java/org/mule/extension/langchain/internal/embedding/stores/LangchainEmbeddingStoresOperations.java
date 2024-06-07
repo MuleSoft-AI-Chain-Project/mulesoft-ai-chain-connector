@@ -316,10 +316,10 @@ public class LangchainEmbeddingStoresOperations {
 	  
 	  
 	  /**
-	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+	   * Helps perform semantic search on documents of type text. This includes, text files (txt, json, xml, etc.), pdf files (not scanned), and websites via url.
 	   */
 	  @MediaType(value = ANY, strict = false)
-	  @Alias("Load-document")  
+	  @Alias("RAG-load-document")  
 	  public String loadDocumentFile(String data, String contextPath, @ParameterGroup(name="Context") fileTypeParameters fileType, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
 	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
@@ -397,7 +397,7 @@ public class LangchainEmbeddingStoresOperations {
 	  
 	  
 	  
-	  interface Assistant {
+	interface Assistant {
 
 		String chat(@MemoryId int memoryId, @UserMessage String userMessage);
 	}
@@ -412,10 +412,10 @@ public class LangchainEmbeddingStoresOperations {
 
 
 	  /**
-	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+	   * Implements a chat memory for a defined LLM as an AI Agent. The memoryName is allows the multi-channel / profile design.
 	   */
 	  @MediaType(value = ANY, strict = false)
-	  @Alias("Persistent-memory")  
+	  @Alias("CHAT-answer-prompt-with-memory")  
 	  public String chatWithPersistentMemory(String data, String memoryName, String dbFilePath, int maxMessages, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	      
 	      	ChatLanguageModel model = createModel(configuration, LangchainParams);
@@ -427,30 +427,17 @@ public class LangchainEmbeddingStoresOperations {
 
 
 
-	       /*  ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
-	                .id(memoryId)
-	                .maxMessages(10)
-	                .chatMemoryStore(store)
-	                .build();
-*/
 			ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
 	                .id(memoryName)
 	                .maxMessages(maxMessages)
 	                .chatMemoryStore(store)
 	                .build();
 
-			/*Assistant assistant = AiServices.builder(Assistant.class)
-	                .chatLanguageModel(model)
-	                .chatMemoryProvider(chatMemoryProvider)
-	                .build(); 
-			*/
-
 			AssistantMemory assistant = AiServices.builder(AssistantMemory.class)
 	                .chatLanguageModel(model)
 	                .chatMemoryProvider(chatMemoryProvider)
 	                .build();
 
-			//return assistant.chat(1, data);
 			return assistant.chat(memoryName, data);
 
 	  }
@@ -649,10 +636,10 @@ public class LangchainEmbeddingStoresOperations {
 //
 	  
 	  /**
-	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+	   * (Legacy) Usage of tools by a defined AI Agent. Provide a list of tools (APIs) with all required informations (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
 	   */
 	  @MediaType(value = ANY, strict = false)
-	  @Alias("Use-tools-dynamically")  
+	  @Alias("TOOLS-use-ai-service-legacy")  
 	  public String useTools(String data, String toolConfig, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
 	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
@@ -773,10 +760,10 @@ public class LangchainEmbeddingStoresOperations {
 	    
 	    
 		  /**
-		   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+		   * Create a new embedding store (in-memory), which is exported to the defined storeName (full path)
 		   */
 		  @MediaType(value = ANY, strict = false)
-		  @Alias("New-embedding-store")  
+		  @Alias("EMBEDDING-new-store")  
 		  public String createEmbedding(String storeName) {
 			
 			InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -790,11 +777,11 @@ public class LangchainEmbeddingStoresOperations {
 	    
 	    
 		  /**
-		   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+		   * Add document of type text, pdf and url to embedding store (in-memory), which is exported to the defined storeName (full path)
 		   */
 		  @MediaType(value = ANY, strict = false)
-		  @Alias("Add-file-to-embedding-store")  
-		  public String addFileEmbedding(String storeName, String contextFile, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+		  @Alias("EMBEDDING-add-document-to-store")  
+		  public String addFileEmbedding(String storeName, String contextPath, @ParameterGroup(name="Context") fileTypeParameters fileType, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 
 			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -809,19 +796,55 @@ public class LangchainEmbeddingStoresOperations {
 
 		      //Document document = loadDocument(toPath("story-about-happy-carrot.txt"), new TextDocumentParser());
 		      
-		      Document document = loadDocument(contextFile, new TextDocumentParser());
-		      ingestor.ingest(document);
-	    
+		      //Document document = loadDocument(contextFile, new TextDocumentParser());
+		      //ingestor.ingest(document);
+
+			  
+
+		 // ChatLanguageModel model = null;
+		 Document document = null;
+		  switch (fileType.getFileType()) {
+			case "text":
+				document = loadDocument(contextPath, new TextDocumentParser());
+				ingestor.ingest(document);
+				break;
+			case "pdf":
+				document = loadDocument(contextPath, new ApacheTikaDocumentParser());
+				ingestor.ingest(document);
+				  break;
+			case "url":
+				URL url = null;
+				try {
+					url = new URL(contextPath);
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
+				
+				Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
+				HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
+				document = transformer.transform(htmlDocument);
+				document.metadata().add("url", contextPath);
+				ingestor.ingest(document);
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
+		  }
+
+
+
+
+
+
 		      deserializedStore.serializeToFile(storeName);
 			return "Embedding-store updated.";
 		  }
 	    
 	    
 		  /**
-		   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+		   * Reads information via prompt from embedding store (in-Memory), which is imported from the storeName (full path)
 		   */
 		  @MediaType(value = ANY, strict = false)
-		  @Alias("Get-info-from-embedding-store")  
+		  @Alias("EMBEDDING-get-info-from-store")  
 		  public String promptFromEmbedding(String storeName, String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -862,11 +885,11 @@ public class LangchainEmbeddingStoresOperations {
 			}
    
 
-				  /**
-	   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+	   /**
+	   * (AI Services) Usage of tools by a defined AI Agent. Provide a list of tools (APIs) with all required informations (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
 	   */
 	  @MediaType(value = ANY, strict = false)
-	  @Alias("Use-ai-service-with-tools")  
+	  @Alias("TOOLS-use-ai-service")  
 	  public String useAIServiceTools(String data, String toolConfig, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 	  
 	      EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
