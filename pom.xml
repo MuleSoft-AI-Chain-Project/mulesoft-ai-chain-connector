@@ -7,7 +7,7 @@
 	<!-- Marketing Org id -->
 	<!-- 	<groupId>a286c1d3-1971-474f-8a50-8032c6f7f58f</groupId> -->
 	<artifactId>langchain-connector</artifactId>
-	<version>0.1.36</version>
+	<version>0.1.38</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleChain</name>
 

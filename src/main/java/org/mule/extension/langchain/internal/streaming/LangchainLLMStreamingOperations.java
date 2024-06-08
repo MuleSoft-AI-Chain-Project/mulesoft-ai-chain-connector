@@ -100,15 +100,16 @@ public class LangchainLLMStreamingOperations {
 
       Assistant assistant = AiServices.create(Assistant.class, model);
 
-      TokenStream tokenStream = assistant.chat(prompt);
 
-      tokenStream.onNext(System.out::println)
-             .onComplete(System.out::println)
-             .onError(Throwable::printStackTrace)
-      .start();
+       TokenStream tokenStream = assistant.chat(prompt);
+
+       tokenStream.onNext(System.out::println)
+              .onComplete(System.out::println)
+              .onError(Throwable::printStackTrace)
+       .start();
 
 
- 	  return tokenStream;
+ 	   return tokenStream;
 
 	  
   }
