@@ -3,14 +3,18 @@ package org.mule.extension.langchain.internal.streaming;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import java.util.stream.Stream;
+import java.util.List;
 
 import org.mule.extension.langchain.internal.llm.LangchainLLMConfiguration;
 import org.mule.extension.langchain.internal.llm.LangchainLLMParameters;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.Streaming;
+
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.data.message.AiMessage;
@@ -29,6 +33,8 @@ import dev.langchain4j.model.input.structured.StructuredPromptProcessor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static java.time.Duration.ofSeconds;
 import static java.util.Arrays.asList;
@@ -78,9 +84,10 @@ public class LangchainLLMStreamingOperations {
   
   @MediaType(value = ANY, strict = false)
   @Alias("Stream-prompt-answer")  
+  @OutputResolver(output = TokenStreamOutputResolver.class)
+  @Streaming
   public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 
-      // Sorry, "demo" API key does not support streaming (yet). Please use your own key.
       StreamingChatLanguageModel model = OpenAiStreamingChatModel.builder()
               .apiKey(configuration.getLlmApiKey())
               .modelName(LangchainParams.getModelName())
@@ -96,11 +103,12 @@ public class LangchainLLMStreamingOperations {
       TokenStream tokenStream = assistant.chat(prompt);
 
       tokenStream.onNext(System.out::println)
-              .onComplete(System.out::println)
-              .onError(Throwable::printStackTrace)
-              .start();
-      
-	  return tokenStream;
+             .onComplete(System.out::println)
+             .onError(Throwable::printStackTrace)
+      .start();
+
+
+ 	  return tokenStream;
 
 	  
   }

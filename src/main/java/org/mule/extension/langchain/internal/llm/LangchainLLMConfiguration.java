@@ -3,6 +3,7 @@ package org.mule.extension.langchain.internal.llm;
 
 import org.mule.extension.langchain.internal.embedding.stores.LangchainEmbeddingStoresOperations;
 import org.mule.extension.langchain.internal.image.models.LangchainImageModelsOperations;
+import org.mule.extension.langchain.internal.streaming.LangchainLLMStreamingOperations;
 import org.mule.extension.langchain.internal.tools.LangchainToolsOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -16,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.*;
  * operations since they represent something core from the extension.
  */
 @Configuration(name="llm-configuration") 
-@Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class, LangchainImageModelsOperations.class,LangchainToolsOperations.class})
+@Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class, LangchainImageModelsOperations.class,LangchainToolsOperations.class, LangchainLLMStreamingOperations.class})
 //@ConnectionProviders(LangchainLLMConnectionProvider.class)
 public class LangchainLLMConfiguration {
 
