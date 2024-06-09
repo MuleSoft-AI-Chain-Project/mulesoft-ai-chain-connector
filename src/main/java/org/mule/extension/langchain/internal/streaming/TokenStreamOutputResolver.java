@@ -7,6 +7,7 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 public class TokenStreamOutputResolver implements OutputTypeResolver<String> {
     @Override
     public MetadataType getOutputType(MetadataContext metadataContext, String key) {
+        System.out.println(key);
         return metadataContext.getTypeBuilder().stringType().build();
     }
 

@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static java.time.Duration.ofSeconds;
@@ -54,6 +56,9 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -101,15 +106,16 @@ public class LangchainLLMStreamingOperations {
       Assistant assistant = AiServices.create(Assistant.class, model);
 
 
-       TokenStream tokenStream = assistant.chat(prompt);
-
-       tokenStream.onNext(System.out::println)
-              .onComplete(System.out::println)
-              .onError(Throwable::printStackTrace)
-       .start();
+      TokenStream tokenStream = assistant.chat(prompt);
 
 
- 	   return tokenStream;
+          tokenStream.onNext(System.out::println)
+                .onComplete(System.out::println)
+                .onError(Throwable::printStackTrace)
+         .start();
+
+
+        return tokenStream;
 
 	  
   }
