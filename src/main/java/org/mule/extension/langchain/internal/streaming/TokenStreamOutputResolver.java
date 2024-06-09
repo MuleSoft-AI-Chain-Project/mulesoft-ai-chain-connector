@@ -8,6 +8,7 @@ public class TokenStreamOutputResolver implements OutputTypeResolver<String> {
     @Override
     public MetadataType getOutputType(MetadataContext metadataContext, String key) {
         System.out.println(key);
+        System.out.println(metadataContext.toString());
         return metadataContext.getTypeBuilder().stringType().build();
     }
 
