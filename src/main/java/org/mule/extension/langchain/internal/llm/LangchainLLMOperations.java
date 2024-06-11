@@ -3,6 +3,7 @@ package org.mule.extension.langchain.internal.llm;
 import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
 
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
+import dev.langchain4j.model.bedrock.BedrockAnthropicMessageChatModel;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 
@@ -49,7 +50,21 @@ import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ImageContent;
+import dev.langchain4j.model.output.FinishReason;
+import dev.langchain4j.model.output.Response;
+import dev.langchain4j.model.output.TokenUsage;
+import software.amazon.awssdk.regions.Region;
 
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+
+import static dev.langchain4j.internal.Utils.readBytes;
+import static dev.langchain4j.model.bedrock.BedrockMistralAiChatModel.Types.Mistral7bInstructV0_2;
+import static dev.langchain4j.model.bedrock.BedrockMistralAiChatModel.Types.MistralMixtral8x7bInstructV0_1;
 
 import java.util.List;
 import java.util.Map;
@@ -93,13 +108,25 @@ public class LangchainLLMOperations {
 	                    .modelName(LangchainParams.getModelName())
 	                    .build();
 	            break;
-	        case "ANTHROPIC_API_KEY":
+			case "ANTHROPIC_API_KEY":
 	            model = AnthropicChatModel.builder()
 	                    .apiKey(configuration.getLlmApiKey())
 	                    .modelName(LangchainParams.getModelName())
 	                    .logRequests(true)
 	                    .logResponses(true)
 	                    .build();
+	            break;
+			case "AWS_BEDROCK_ID_AND_SECRET":
+				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
+				// For authentication, set the following environment variables:
+        		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+ 				model = BedrockAnthropicMessageChatModel.builder()
+						.region(Region.US_EAST_1)
+						.temperature(0.30f)
+						.maxTokens(300)
+						.model(LangchainParams.getModelName())
+						.maxRetries(1)
+						.build();
 	            break;
 	        default:
 	            throw new IllegalArgumentException("Unsupported LLM type: " + configuration.getLlmType());
@@ -201,7 +228,6 @@ public class LangchainLLMOperations {
       return sentiment;
   }
 
-  
   
   
 }

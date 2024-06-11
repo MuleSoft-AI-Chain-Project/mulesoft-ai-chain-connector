@@ -25,6 +25,7 @@ import dev.langchain4j.retriever.EmbeddingStoreRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+import software.amazon.awssdk.regions.Region;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,6 +39,7 @@ import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.data.message.TextContent;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
+import dev.langchain4j.model.bedrock.BedrockAnthropicMessageChatModel;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
@@ -87,6 +89,18 @@ public class LangchainImageModelsOperations {
 	                    .logResponses(true)
 	                    .build();
 	            break;
+			case "AWS_BEDROCK_ID_AND_SECRET":
+				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
+				// For authentication, set the following environment variables:
+        		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+ 				model = BedrockAnthropicMessageChatModel.builder()
+						.region(Region.US_EAST_1)
+						.temperature(0.30f)
+						.maxTokens(300)
+						.model(LangchainParams.getModelName())
+						.maxRetries(1)
+						.build();
+				break;
 	        default:
 	            throw new IllegalArgumentException("Unsupported LLM type: " + configuration.getLlmType());
 	    }

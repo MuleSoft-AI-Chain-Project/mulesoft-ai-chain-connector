@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
 	<!-- Marketing Org id -->
-	<!-- 	<groupId>a286c1d3-1971-474f-8a50-8032c6f7f58f</groupId> -->
+	<!-- <groupId>2d8e610c-9aba-4462-a7dc-43009b698d56</groupId> -->
 	<artifactId>langchain-connector</artifactId>
 	<version>0.1.53</version>
 	<packaging>mule-extension</packaging>
@@ -78,6 +78,16 @@
 			<version>0.31.0</version>
 		</dependency>
 		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-bedrock</artifactId>
+			<version>0.31.0</version>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>regions</artifactId>
+			<version>2.25.69</version>
+		</dependency>
+		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20210307</version>
@@ -141,13 +151,13 @@
 		<snapshotRepository>
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/2d8e610c-9aba-4462-a7dc-43009b698d56/maven</url>
 			<layout>default</layout>
 		</snapshotRepository>
 		<repository>
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/6235ea6d-eb48-4cf9-a8f0-5f77018fbda2/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/2d8e610c-9aba-4462-a7dc-43009b698d56/maven</url>
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
