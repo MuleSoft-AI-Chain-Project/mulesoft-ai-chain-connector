@@ -6,34 +6,15 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import dev.langchain4j.model.openai.OpenAiImageModel;
 import dev.langchain4j.model.image.ImageModel;
-import dev.langchain4j.chain.ConversationalRetrievalChain;
-import dev.langchain4j.data.document.Document;
-import dev.langchain4j.data.document.parser.TextDocumentParser;
-import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.image.Image;
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
-import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.output.Response;
-import dev.langchain4j.retriever.EmbeddingStoreRetriever;
-import dev.langchain4j.store.embedding.EmbeddingStore;
-import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
-import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import software.amazon.awssdk.regions.Region;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.data.message.TextContent;
@@ -43,8 +24,6 @@ import dev.langchain4j.model.bedrock.BedrockAnthropicMessageChatModel;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.model.output.Response;
 import static java.time.Duration.ofSeconds;
 
 

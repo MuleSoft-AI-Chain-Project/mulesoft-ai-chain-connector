@@ -1,7 +1,5 @@
 package org.mule.extension.langchain.internal.llm;
 
-import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
-
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.bedrock.BedrockAnthropicMessageChatModel;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -11,68 +9,19 @@ import dev.langchain4j.model.ollama.OllamaChatModel;
 import static java.time.Duration.ofSeconds;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import dev.langchain4j.chain.ConversationalRetrievalChain;
-import dev.langchain4j.data.document.Document;
-import dev.langchain4j.data.document.parser.TextDocumentParser;
-import dev.langchain4j.data.document.splitter.DocumentSplitters;
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ImageContent;
-import dev.langchain4j.data.message.TextContent;
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
-import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.model.output.Response;
-import dev.langchain4j.retriever.EmbeddingStoreRetriever;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.store.embedding.EmbeddingStore;
-import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
-import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.memory.chat.ChatMemoryProvider;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.service.AiServices;
-import dev.langchain4j.service.MemoryId;
-import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.ImageContent;
-import dev.langchain4j.model.output.FinishReason;
-import dev.langchain4j.model.output.Response;
-import dev.langchain4j.model.output.TokenUsage;
 import software.amazon.awssdk.regions.Region;
-
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-
-import static dev.langchain4j.internal.Utils.readBytes;
-import static dev.langchain4j.model.bedrock.BedrockMistralAiChatModel.Types.Mistral7bInstructV0_2;
-import static dev.langchain4j.model.bedrock.BedrockMistralAiChatModel.Types.MistralMixtral8x7bInstructV0_1;
-
-import java.util.List;
-import java.util.Map;
-
-import static dev.langchain4j.data.message.ChatMessageDeserializer.messagesFromJson;
-import static dev.langchain4j.data.message.ChatMessageSerializer.messagesToJson;
-import static org.mapdb.Serializer.INTEGER;
-import static org.mapdb.Serializer.STRING;
 /**
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
  */

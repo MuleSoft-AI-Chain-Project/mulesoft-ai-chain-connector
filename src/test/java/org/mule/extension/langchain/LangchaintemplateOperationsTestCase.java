@@ -1,7 +1,5 @@
 package org.mule.extension.langchain;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.junit.Test;
 
