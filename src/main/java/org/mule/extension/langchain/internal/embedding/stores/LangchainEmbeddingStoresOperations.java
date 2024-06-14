@@ -96,6 +96,7 @@ public class LangchainEmbeddingStoresOperations {
                 .logRequests(true)
                 .logResponses(true)
                 .build();
+
     }
 
 	private static MistralAiChatModel createMistralAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
@@ -433,15 +434,15 @@ public class LangchainEmbeddingStoresOperations {
 		      // Create an instance of the custom tool with parameters
 	          GenericRestApiTool restApiTool = new GenericRestApiTool(apiEndpoint, "API Call", "Execute GET or POST Requests");
 		      
-		      
-	          ChatLanguageModel agent = OpenAiChatModel.builder()
-			  		  .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-	                  .modelName(LangchainParams.getModelName())
-	                  .temperature(0.1)
-	                  .timeout(ofSeconds(60))
-	                  .logRequests(true)
-	                  .logResponses(true)
-	                  .build();
+		      ChatLanguageModel agent = createModel(configuration, LangchainParams);
+	        //   ChatLanguageModel agent = OpenAiChatModel.builder()
+			//   		  .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
+	        //           .modelName(LangchainParams.getModelName())
+	        //           .temperature(0.1)
+	        //           .timeout(ofSeconds(60))
+	        //           .logRequests(true)
+	        //           .logResponses(true)
+	        //           .build();
 	          // Build the assistant with the custom tool
 	          AssistantC assistant = AiServices.builder(AssistantC.class)
 	                  .chatLanguageModel(agent)
@@ -682,15 +683,15 @@ public class LangchainEmbeddingStoresOperations {
 		      // Create an instance of the custom tool with parameters
 	          GenericRestApiTool restApiTool = new GenericRestApiTool(apiEndpoint, "API Call", "Execute GET or POST Requests");
 		      
-		      
-	          ChatLanguageModel agent = OpenAiChatModel.builder()
-				 	  .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-					  .modelName(LangchainParams.getModelName())
-	                  .temperature(0.1)
-	                  .timeout(ofSeconds(60))
-	                  .logRequests(true)
-	                  .logResponses(true)
-	                  .build();
+			  ChatLanguageModel agent = createModel(configuration, LangchainParams);
+	        //   ChatLanguageModel agent = OpenAiChatModel.builder()
+			// 	 	  .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
+			// 		  .modelName(LangchainParams.getModelName())
+	        //           .temperature(0.1)
+	        //           .timeout(ofSeconds(60))
+	        //           .logRequests(true)
+	        //           .logResponses(true)
+	        //           .build();
 	          // Build the assistant with the custom tool
 	          AssistantC assistantC = AiServices.builder(AssistantC.class)
 	                  .chatLanguageModel(agent)
