@@ -44,7 +44,7 @@ public class LangchainLLMStreamingOperations {
   public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 
       StreamingChatLanguageModel model = OpenAiStreamingChatModel.builder()
-              .apiKey(configuration.getLlmApiKey())
+              .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
               .modelName(LangchainParams.getModelName())
               .temperature(0.3)
               .timeout(ofSeconds(60))

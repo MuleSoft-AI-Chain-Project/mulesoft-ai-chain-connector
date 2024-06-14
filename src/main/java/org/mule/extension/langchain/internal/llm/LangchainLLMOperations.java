@@ -1,6 +1,7 @@
 package org.mule.extension.langchain.internal.llm;
 
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
+import dev.langchain4j.model.azure.AzureOpenAiChatModel;
 import dev.langchain4j.model.bedrock.BedrockAnthropicMessageChatModel;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
@@ -31,9 +32,10 @@ public class LangchainLLMOperations {
 	private ChatLanguageModel createModel(LangchainLLMConfiguration configuration, LangchainLLMParameters LangchainParams) {
 	    ChatLanguageModel model = null;
 	    switch (configuration.getLlmType()) {
-	        case "OPENAI_API_KEY":
+	        case "OPENAI":
 	            model = OpenAiChatModel.builder()
-	                    .apiKey(configuration.getLlmApiKey())
+	                    //.apiKey(configuration.getLlmApiKey())
+						.apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
 	                    .modelName(LangchainParams.getModelName())
 	                    .temperature(0.3)
 	                    .timeout(ofSeconds(60))
@@ -41,9 +43,10 @@ public class LangchainLLMOperations {
 	                    .logResponses(true)
 	                    .build();
 	            break;
-	        case "MISTRALAI_API_KEY":
+	        case "MISTRAL_AI":
 	            model = MistralAiChatModel.builder()
-	                    .apiKey(configuration.getLlmApiKey())
+	                    //.apiKey(configuration.getLlmApiKey())
+						.apiKey(System.getenv("MISTRAL_AI_API_KEY").replace("\n", "").replace("\r", ""))
 	                    .modelName(LangchainParams.getModelName())
 	                    .temperature(0.3)
 	                    .timeout(ofSeconds(60))
@@ -51,21 +54,23 @@ public class LangchainLLMOperations {
 	                    .logResponses(true)
 	                    .build();
 	            break;
-	        case "OLLAMA_BASE_URL":
+	        case "OLLAMA":
 	            model = OllamaChatModel.builder()
-	                    .baseUrl(configuration.getLlmApiKey())
+	                    //.baseUrl(configuration.getLlmApiKey())
+						.baseUrl(System.getenv("OLLAMA_BASE_URL").replace("\n", "").replace("\r", ""))
 	                    .modelName(LangchainParams.getModelName())
 	                    .build();
 	            break;
-			case "ANTHROPIC_API_KEY":
+	        case "ANTHROPIC":
 	            model = AnthropicChatModel.builder()
-	                    .apiKey(configuration.getLlmApiKey())
+	                    //.apiKey(configuration.getLlmApiKey())
+						.apiKey(System.getenv("ANTHROPIC_API_KEY").replace("\n", "").replace("\r", ""))
 	                    .modelName(LangchainParams.getModelName())
 	                    .logRequests(true)
 	                    .logResponses(true)
 	                    .build();
 	            break;
-			case "AWS_BEDROCK_ID_AND_SECRET":
+			case "AWS_BEDROCK":
 				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
 				// For authentication, set the following environment variables:
         		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
@@ -76,8 +81,21 @@ public class LangchainLLMOperations {
 						.model(LangchainParams.getModelName())
 						.maxRetries(1)
 						.build();
-	            break;
-	        default:
+				break;
+			case "AZURE_OPENAI":
+				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
+				// For authentication, set the following environment variables:
+        		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+ 				model = AzureOpenAiChatModel.builder()
+                    .apiKey(System.getenv("AZURE_OPENAI_KEY").replace("\n", "").replace("\r", ""))
+                    .endpoint(System.getenv("AZURE_OPENAI_ENDPOINT").replace("\n", "").replace("\r", ""))
+                    .deploymentName(System.getenv("AZURE_OPENAI_DEPLOYMENT_NAME").replace("\n", "").replace("\r", ""))
+                    .temperature(0.3)
+                    .logRequestsAndResponses(true)
+                    .build();
+				break;
+
+			default:
 	            throw new IllegalArgumentException("Unsupported LLM type: " + configuration.getLlmType());
 	    }
 	    return model;

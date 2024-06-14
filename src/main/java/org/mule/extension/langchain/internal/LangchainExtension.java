@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
  * and sources are going to be declared.
  */
 @Xml(prefix = "mulechain")
-@Extension(name = "MuleChain")
+@Extension(name = "MuleChain AI")
 @Configurations({LangchainLLMConfiguration.class, LangchainEmbeddingModelConfiguration.class,LangchainToolsConfiguration.class})
 public class LangchainExtension {
 

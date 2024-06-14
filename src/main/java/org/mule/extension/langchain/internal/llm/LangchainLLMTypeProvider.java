@@ -12,8 +12,9 @@ public class LangchainLLMTypeProvider implements ValueProvider {
 	@Override
 	public Set<Value> resolve() throws ValueResolvingException {
 		// TODO Auto-generated method stub
-		return ValueBuilder.getValuesFor("OPENAI_API_KEY","MISTRAL_AI_API_KEY","OLLAMA_BASE_URL","ANTHROPIC_API_KEY",
-												"AWS_BEDROCK_ID_AND_SECRET");
+		return ValueBuilder.getValuesFor("OPENAI","MISTRAL_AI","OLLAMA","ANTHROPIC",
+												"AWS_BEDROCK", "AZURE_OPENAI");
 	}
 
 }
+ 

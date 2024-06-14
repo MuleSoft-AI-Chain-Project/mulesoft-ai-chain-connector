@@ -23,14 +23,14 @@ public class LangchainLLMConfiguration {
   @OfValues(LangchainLLMTypeProvider.class)
   private String llmType;
   
-  @Parameter
-  private String llmApiKey;
+  // @Parameter
+  // private String llmApiKey;
 
   public String getLlmType(){
     return llmType;
   }
   
-  public String getLlmApiKey() {
-	  return llmApiKey;
-  }
+  // public String getLlmApiKey() {
+	//   return llmApiKey;
+  // }
 }
