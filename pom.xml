@@ -3,11 +3,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<!-- <groupId>com.mule.langchain</groupId> -->
+	<groupId>com.mule.langchain</groupId>
 	<!-- Marketing Org id -->
-	<groupId>9c7c42b3-1b21-4ec1-9183-047ec0921663</groupId>
+	<!-- <groupId>9c7c42b3-1b21-4ec1-9183-047ec0921663</groupId> -->
 	<artifactId>langchain-connector</artifactId>
-	<version>0.1.54</version>
+	<version>0.1.55</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleChain</name>
 
