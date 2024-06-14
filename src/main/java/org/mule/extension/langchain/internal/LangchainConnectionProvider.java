@@ -6,8 +6,6 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.extension.langchain.internal.llm.LangchainLLMConnection;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -23,9 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LangchainConnectionProvider implements PoolingConnectionProvider<LangchainLLMConnection> {
 
-  private final Logger LOGGER = LoggerFactory.getLogger(LangchainConnectionProvider.class);
-
-@Override
+  @Override
 public LangchainLLMConnection connect() throws ConnectionException {
 	// TODO Auto-generated method stub
 	return null;
@@ -43,36 +39,5 @@ public ConnectionValidationResult validate(LangchainLLMConnection arg0) {
 	return null;
 }
 
-// /**
-//  * A parameter that is always required to be configured.
-//  */
-//  @Parameter
-//  private String requiredParameter;
-//
-// /**
-//  * A parameter that is not required to be configured by the user.
-//  */
-//  @DisplayName("Friendly Name")
-//  @Parameter
-//  @Optional(defaultValue = "100")
-//  private int optionalParameter;
 
-//  @Override
-//  public LangchaintemplateConnection connect() throws ConnectionException {
-//    return new LangchaintemplateConnection(requiredParameter + ":" + optionalParameter);
-//  }
-//
-//  @Override
-//  public void disconnect(LangchaintemplateConnection connection) {
-//    try {
-//      connection.invalidate();
-//    } catch (Exception e) {
-//      LOGGER.error("Error while disconnecting [" + connection.getId() + "]: " + e.getMessage(), e);
-//    }
-//  }
-//
-//  @Override
-//  public ConnectionValidationResult validate(LangchaintemplateConnection connection) {
-//    return ConnectionValidationResult.success();
-//  }
 }
