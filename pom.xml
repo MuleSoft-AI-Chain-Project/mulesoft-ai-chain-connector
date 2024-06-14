@@ -7,7 +7,7 @@
 	<!-- Marketing Org id -->
 	<!-- <groupId>9c7c42b3-1b21-4ec1-9183-047ec0921663</groupId> -->
 	<artifactId>langchain-connector</artifactId>
-	<version>0.1.62</version>
+	<version>0.1.69</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleChain</name>
 
@@ -92,7 +92,7 @@
 			<artifactId>json</artifactId>
 			<version>20210307</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 			<version>5.3.29</version>
@@ -121,7 +121,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>5.3.29</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>io.reactivex.rxjava2</groupId>
 			<artifactId>rxjava</artifactId>
