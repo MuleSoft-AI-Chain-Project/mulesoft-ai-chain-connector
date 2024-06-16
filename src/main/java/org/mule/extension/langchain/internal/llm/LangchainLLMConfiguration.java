@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
  * operations since they represent something core from the extension.
  */
 @Configuration(name="llm-configuration") 
-@Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class, LangchainImageModelsOperations.class,LangchainToolsOperations.class, LangchainLLMStreamingOperations.class})
+@Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class, LangchainImageModelsOperations.class,LangchainToolsOperations.class})
 //@ConnectionProviders(LangchainLLMConnectionProvider.class)
 public class LangchainLLMConfiguration {
 

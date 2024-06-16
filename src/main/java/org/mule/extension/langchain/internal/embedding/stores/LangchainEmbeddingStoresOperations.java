@@ -624,6 +624,43 @@ public class LangchainEmbeddingStoresOperations {
 			return response;
 		  }
 	    
+
+		  /**
+		   * Reads information via prompt from embedding store (in-Memory), which is imported from the storeName (full path)
+		   */
+		  @MediaType(value = ANY, strict = false)
+		  @Alias("EMBEDDING-get-info-from-store-legacy")  
+		  public String promptFromEmbeddingLegacy(String storeName, String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+		      
+		      ChatLanguageModel model = createModel(configuration, LangchainParams);
+		      
+		      
+		    //   ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
+		      
+		    //   AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
+		    // 		    .chatLanguageModel(model)
+		    // 		    .contentRetriever(contentRetriever)
+		    // 		    .build();
+
+		      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+		              .chatLanguageModel(model)
+		              .retriever(EmbeddingStoreRetriever.from(deserializedStore, embeddingModel))
+		              // .chatMemory() // you can override default chat memory
+		              // .promptTemplate() // you can override default prompt template
+		              .build();
+
+		      String answer = chain.execute(data);
+		      //String response = assistant.chat(data);
+		      //System.out.println(answer); 
+
+		      deserializedStore.serializeToFile(storeName);
+
+			return answer;
+		  }
 	    
 	    
 		  interface AssistantEmbedding {
