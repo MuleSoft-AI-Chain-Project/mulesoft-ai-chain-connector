@@ -3,6 +3,7 @@ package org.mule.extension.langchain.internal.llm;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.azure.AzureOpenAiChatModel;
 import dev.langchain4j.model.bedrock.BedrockAnthropicMessageChatModel;
+import dev.langchain4j.model.bedrock.BedrockTitanChatModel;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 
@@ -44,7 +45,7 @@ public class LangchainLLMOperations {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("File does not exist: " + filePath);
+            //System.out.println("File does not exist: " + filePath);
         }
         return null;
     }
@@ -103,7 +104,7 @@ public class LangchainLLMOperations {
 				.build();
 	}
 
-	private static BedrockAnthropicMessageChatModel createAWSBedrockChatModel(LangchainLLMParameters LangchainParams) {
+	private static BedrockAnthropicMessageChatModel createAWSBedrockAnthropicChatModel(LangchainLLMParameters LangchainParams) {
         return BedrockAnthropicMessageChatModel.builder()
 		.region(Region.US_EAST_1)
 		.temperature(0.30f)
@@ -114,6 +115,19 @@ public class LangchainLLMOperations {
 
 	}
 
+	private static BedrockTitanChatModel createAWSBedrockTitanChatModel(LangchainLLMParameters LangchainParams) {
+        return BedrockTitanChatModel
+        .builder()
+        .temperature(0.50f)
+        .maxTokens(300)
+        .region(Region.US_EAST_1)
+        //.model(BedrockAnthropicMessageChatModel.Types.AnthropicClaude3SonnetV1.getValue())
+        .model(LangchainParams.getModelName())
+        .maxRetries(1)
+        // Other parameters can be set as well
+        .build();
+
+	}
 
 
 
@@ -172,7 +186,8 @@ public class LangchainLLMOperations {
 				// 		.model(LangchainParams.getModelName())
 				// 		.maxRetries(1)
 				// 		.build();
-				model = createAWSBedrockChatModel(LangchainParams);
+				//model = createAWSBedrockAnthropicChatModel(LangchainParams);
+				model = createAWSBedrockTitanChatModel(LangchainParams);
 
 				break;
 			case "AZURE_OPENAI":
