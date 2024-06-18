@@ -91,7 +91,7 @@ public class LangchainEmbeddingStoresOperations {
         return OpenAiChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(LangchainParams.getModelName())
-                .temperature(0.3)
+                .temperature(0.1)
                 .timeout(ofSeconds(60))
                 .logRequests(true)
                 .logResponses(true)
@@ -104,7 +104,7 @@ public class LangchainEmbeddingStoresOperations {
 				//.apiKey(configuration.getLlmApiKey())
 				.apiKey(apiKey)
 				.modelName(LangchainParams.getModelName())
-				.temperature(0.3)
+				.temperature(0.1)
 				.timeout(ofSeconds(60))
 				.logRequests(true)
 				.logResponses(true)
@@ -136,7 +136,7 @@ public class LangchainEmbeddingStoresOperations {
 				.apiKey(apiKey)
 				.endpoint(llmEndpoint)
 				.deploymentName(deploymentName)
-				.temperature(0.3)
+				.temperature(0.1)
 				.logRequestsAndResponses(true)
 				.build();
 	}

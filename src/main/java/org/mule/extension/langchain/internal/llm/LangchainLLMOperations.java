@@ -103,6 +103,18 @@ public class LangchainLLMOperations {
 				.build();
 	}
 
+	private static BedrockAnthropicMessageChatModel createAWSBedrockChatModel(LangchainLLMParameters LangchainParams) {
+        return BedrockAnthropicMessageChatModel.builder()
+		.region(Region.US_EAST_1)
+		.temperature(0.30f)
+		.maxTokens(300)
+		.model(LangchainParams.getModelName())
+		.maxRetries(1)
+		.build();
+
+	}
+
+
 
 
 	private ChatLanguageModel createModel(LangchainLLMConfiguration configuration, LangchainLLMParameters LangchainParams) {
@@ -153,13 +165,15 @@ public class LangchainLLMOperations {
 				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
 				// For authentication, set the following environment variables:
         		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
- 				model = BedrockAnthropicMessageChatModel.builder()
-						.region(Region.US_EAST_1)
-						.temperature(0.30f)
-						.maxTokens(300)
-						.model(LangchainParams.getModelName())
-						.maxRetries(1)
-						.build();
+ 				// model = BedrockAnthropicMessageChatModel.builder()
+				// 		.region(Region.US_EAST_1)
+				// 		.temperature(0.30f)
+				// 		.maxTokens(300)
+				// 		.model(LangchainParams.getModelName())
+				// 		.maxRetries(1)
+				// 		.build();
+				model = createAWSBedrockChatModel(LangchainParams);
+
 				break;
 			case "AZURE_OPENAI":
  				if (configuration.getConfigType() .equals("Environment Variables")) {
@@ -192,17 +206,15 @@ public class LangchainLLMOperations {
 	  
 	    ChatLanguageModel model = createModel(configuration, LangchainParams);
 
-	    String answer = prompt;
-	    String response = model.generate(answer);
+
+
+	    String response = model.generate(prompt);
 
 	    // System.out.println(response);
 	    return response;
 
  }
   
-  
-    
-
   
   
   /**
