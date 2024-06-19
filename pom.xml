@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
 	<!-- Marketing Org id -->
-	<!-- <groupId>9c7c42b3-1b21-4ec1-9183-047ec0921663</groupId> -->
+	<!-- <groupId>283fa94d-5de1-48b1-86e6-3fe01adb7890</groupId> -->
 	<artifactId>langchain-connector</artifactId>
 	<version>0.1.90</version>
 	<packaging>mule-extension</packaging>
@@ -151,13 +151,13 @@
 		<snapshotRepository>
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/9c7c42b3-1b21-4ec1-9183-047ec0921663/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/283fa94d-5de1-48b1-86e6-3fe01adb7890/maven</url>
 			<layout>default</layout>
 		</snapshotRepository>
 		<repository>
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/9c7c42b3-1b21-4ec1-9183-047ec0921663/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/283fa94d-5de1-48b1-86e6-3fe01adb7890/maven</url>
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
