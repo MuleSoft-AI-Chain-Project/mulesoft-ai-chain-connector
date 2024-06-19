@@ -23,13 +23,7 @@ public class LangchainLLMParameterModelNameProvider implements ValueProvider {
 	"tinyllama",
 	"claude-3-haiku-20240307",
 	"claude-3-opus-20240229",
-	"claude-3-sonnet-20240229",
-	"anthropic.claude-instant-v1",
-	"anthropic.claude-v2",
-	"anthropic.claude-v2:1",
-	"anthropic.claude-3-sonnet-20240229-v1:0",
-	"anthropic.claude-3-haiku-20240307-v1:0",
-	"ai21.j2-mid-v1");
+	"claude-3-sonnet-20240229");
 
 	@Override
 	public Set<Value> resolve() throws ValueResolvingException {
