@@ -3,8 +3,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.mule.mulechain</groupId>
-	<!-- <groupId>283fa94d-5de1-48b1-86e6-3fe01adb7890</groupId> -->
+	<!-- <groupId>com.mule.mulechain</groupId> -->
+	<groupId>0b429e15-7202-4436-b494-748364d1c28b</groupId>
 	<artifactId>mulechain-ai-connector</artifactId>
 	<version>0.1.0</version>
 	<packaging>mule-extension</packaging>
@@ -15,6 +15,42 @@
 		<artifactId>mule-modules-parent</artifactId>
 		<version>1.1.3</version>
 	</parent>
+	
+<!--<build>
+<plugins>
+   
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+            
+            <execution>
+                <id>dependency-tree</id>
+                <phase>verify</phase>
+                <goals>
+                    <goal>tree</goal>
+                </goals>
+                <configuration>
+                    <outputFile>${project.build.directory}/dependency-tree.txt</outputFile>
+                   
+                    <excludeScope>test</excludeScope>
+                </configuration>
+            </execution>
+            
+            <execution>
+                <id>license-report</id>
+                <goals>
+                    <goal>list</goal>
+                </goals>
+                <configuration>
+                    <outputFile>${project.build.directory}/dependency-license.txt</outputFile>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>
+</build>-->
 	<dependencies>
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
@@ -91,36 +127,6 @@
 			<artifactId>json</artifactId>
 			<version>20210307</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>5.3.29</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>5.3.29</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-core</artifactId>
-			<version>5.8.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-			<version>5.8.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-crypto</artifactId>
-			<version>5.8.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>5.3.29</version>
-		</dependency> -->
 		<dependency>
 			<groupId>io.reactivex.rxjava2</groupId>
 			<artifactId>rxjava</artifactId>
@@ -150,13 +156,13 @@
 		<snapshotRepository>
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/283fa94d-5de1-48b1-86e6-3fe01adb7890/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/0b429e15-7202-4436-b494-748364d1c28b/maven</url>
 			<layout>default</layout>
 		</snapshotRepository>
 		<repository>
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/283fa94d-5de1-48b1-86e6-3fe01adb7890/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/0b429e15-7202-4436-b494-748364d1c28b/maven</url>
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
