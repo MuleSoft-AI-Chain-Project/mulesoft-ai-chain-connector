@@ -102,10 +102,10 @@ To use this connector, add the following dependency to your application's `pom.x
 
 ```xml
 <dependency>
-    <groupId>com.mule.langchain</groupId>
-    <artifactId>langchain-connector</artifactId>
-    <version>{version}</version>
-    <classifier>mule-plugin</classifier>
+   <groupId>com.mule.mulechain</groupId>
+   <artifactId>mulechain-ai-connector</artifactId>
+   <version>{version}</version>
+   <classifier>mule-plugin</classifier>
 </dependency>
 ```
 

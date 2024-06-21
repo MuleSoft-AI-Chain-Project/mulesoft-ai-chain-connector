@@ -3,10 +3,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.mule.langchain</groupId>
+	<groupId>com.mule.mulechain</groupId>
 	<!-- <groupId>283fa94d-5de1-48b1-86e6-3fe01adb7890</groupId> -->
-	<artifactId>langchain-connector</artifactId>
-	<version>0.1.90</version>
+	<artifactId>mulechain-ai-connector</artifactId>
+	<version>0.1.0</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleChain</name>
 
