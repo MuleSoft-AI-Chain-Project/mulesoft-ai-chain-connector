@@ -4,7 +4,6 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.langchain</groupId>
-	<!-- Marketing Org id -->
 	<!-- <groupId>283fa94d-5de1-48b1-86e6-3fe01adb7890</groupId> -->
 	<artifactId>langchain-connector</artifactId>
 	<version>0.1.90</version>
