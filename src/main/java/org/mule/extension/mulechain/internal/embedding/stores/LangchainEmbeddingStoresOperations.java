@@ -27,7 +27,6 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.azure.AzureOpenAiChatModel;
-import dev.langchain4j.model.bedrock.BedrockAnthropicMessageChatModel;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
@@ -50,7 +49,6 @@ import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.retriever.EmbeddingStoreRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
-import software.amazon.awssdk.regions.Region;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -187,7 +185,7 @@ public class LangchainEmbeddingStoresOperations {
 					model = createAnthropicChatModel(llmTypeKey, LangchainParams);
 				}
 	            break;
-			case "AWS_BEDROCK":
+/* 			case "AWS_BEDROCK":
 				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
 				// For authentication, set the following environment variables:
         		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
@@ -199,7 +197,7 @@ public class LangchainEmbeddingStoresOperations {
 						.maxRetries(1)
 						.build();
 				break;
-			case "AZURE_OPENAI":
+ */			case "AZURE_OPENAI":
  				if (configuration.getConfigType() .equals("Environment Variables")) {
 					model = createAzureOpenAiChatModel(System.getenv("AZURE_OPENAI_KEY").replace("\n", "").replace("\r", ""), 
 														System.getenv("AZURE_OPENAI_ENDPOINT").replace("\n", "").replace("\r", ""), 

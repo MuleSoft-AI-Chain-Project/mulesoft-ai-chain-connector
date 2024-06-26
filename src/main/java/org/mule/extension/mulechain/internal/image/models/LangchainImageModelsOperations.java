@@ -13,7 +13,6 @@ import dev.langchain4j.model.image.ImageModel;
 import dev.langchain4j.data.image.Image;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.output.Response;
-import software.amazon.awssdk.regions.Region;
 
 import java.net.URI;
 import java.nio.file.Files;
@@ -26,7 +25,6 @@ import dev.langchain4j.data.message.TextContent;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.azure.AzureOpenAiChatModel;
-import dev.langchain4j.model.bedrock.BedrockAnthropicMessageChatModel;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
@@ -154,7 +152,7 @@ public class LangchainImageModelsOperations {
 					model = createAnthropicChatModel(llmTypeKey, LangchainParams);
 				}
 	            break;
-			case "AWS_BEDROCK":
+/* 			case "AWS_BEDROCK":
 				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
 				// For authentication, set the following environment variables:
         		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
@@ -166,7 +164,7 @@ public class LangchainImageModelsOperations {
 						.maxRetries(1)
 						.build();
 				break;
-			case "AZURE_OPENAI":
+ */			case "AZURE_OPENAI":
  				if (configuration.getConfigType() .equals("Environment Variables")) {
 					model = createAzureOpenAiChatModel(System.getenv("AZURE_OPENAI_KEY").replace("\n", "").replace("\r", ""), 
 														System.getenv("AZURE_OPENAI_ENDPOINT").replace("\n", "").replace("\r", ""), 

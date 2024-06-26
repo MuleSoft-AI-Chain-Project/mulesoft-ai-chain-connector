@@ -3,10 +3,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<!-- <groupId>com.mule.mulechain</groupId> -->
-	<groupId>0b429e15-7202-4436-b494-748364d1c28b</groupId>
+	<groupId>com.mule.mulechain</groupId>
+	<!-- <groupId>0b429e15-7202-4436-b494-748364d1c28b</groupId> -->
 	<artifactId>mulechain-ai-connector</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleChain</name>
 
@@ -130,17 +130,17 @@
 			<artifactId>langchain4j-azure-open-ai</artifactId>
 			<version>0.31.0</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-hugging-face</artifactId>
 			<version>0.31.0</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-easy-rag</artifactId>
 			<version>0.31.0</version>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-bedrock</artifactId>
 			<version>0.31.0</version>
@@ -149,7 +149,7 @@
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>regions</artifactId>
 			<version>2.25.69</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
