@@ -217,12 +217,27 @@ public class LangchainImageModelsOperations {
 	  @MediaType(value = ANY, strict = false)
 	  @Alias("IMAGE-generate")  
 	  public URI drawImage(String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
-	  
-          ImageModel model = OpenAiImageModel.builder()
+        ImageModel model = null;
+		JSONObject config = readConfigFile(configuration.getFilePath());
+		if (configuration.getConfigType() .equals("Environment Variables")) {
+			model = OpenAiImageModel.builder()
+				.modelName(LangchainParams.getModelName())
+				.apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
+				.build();
+  		} else {
+			JSONObject llmType = config.getJSONObject("OPENAI");
+			String llmTypeKey = llmType.getString("OPENAI_API_KEY");
+			model = OpenAiImageModel.builder()
+				.modelName(LangchainParams.getModelName())
+				.apiKey(llmTypeKey.replace("\n", "").replace("\r", ""))
+				.build();
+
+		}	  
+          /* ImageModel model = OpenAiImageModel.builder()
                   .modelName(LangchainParams.getModelName())
                   .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
                   .build();
-
+ */
           Response<Image> response = model.generate(data);
           System.out.println(response.content().url());
           return response.content().url();
