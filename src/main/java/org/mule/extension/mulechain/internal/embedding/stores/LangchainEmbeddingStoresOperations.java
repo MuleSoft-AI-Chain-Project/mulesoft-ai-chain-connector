@@ -710,7 +710,7 @@ public class LangchainEmbeddingStoresOperations {
 
 
 		  String intermediateAnswer = assistant.chat(data);
-		  String response;
+	      String response = model.generate(data);
 	      List<String> findURL = extractUrls(intermediateAnswer);
 		  //System.out.println("find URL : " + findURL.get(0));
 	      if (findURL!=null){
@@ -743,8 +743,8 @@ public class LangchainEmbeddingStoresOperations {
 	          // Use the assistant to make a query
 	           response = assistantC.chat(intermediateAnswer);
 	          System.out.println(response);
-	      } else{
-	    	  response =  intermediateAnswer;
+	     /*  } else{
+	    	  response =  intermediateAnswer; */
 	      }
 	      
 	      
