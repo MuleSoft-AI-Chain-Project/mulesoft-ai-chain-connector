@@ -56,8 +56,11 @@ public class GenericRestApiTool implements Tool {
 	             method="GET";
 	        }
 
+            System.out.println("apiEndpoint-" + apiEndpoint);
             URL url = new URL(urlBuilder.toString());
+
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
             conn.setRequestMethod(method.toUpperCase());
             conn.setRequestProperty("Authorization", authHeader);
             conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");

@@ -33,8 +33,12 @@ import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static java.time.Duration.ofSeconds;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
@@ -49,7 +53,7 @@ import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.retriever.EmbeddingStoreRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
-
+import io.netty.util.concurrent.Future;
 import java.net.MalformedURLException;
 import java.net.URL;
 import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser;
@@ -417,20 +421,22 @@ public class LangchainEmbeddingStoresOperations {
 	              // .promptTemplate() // you can override default prompt template
 	              .build();
 
+
+
 	      String intermediateAnswer = chain.execute(data);
-	      String response;
+	      String response = model.generate(data);
 	      List<String> findURL = extractUrls(intermediateAnswer);
 	      if (findURL!=null){
 	    	  
 		      //String name = chain.execute("What is the name from: " + intermediateAnswer + ". Reply only with the value.");
 		      //String description = chain.execute("What is the description from: " + intermediateAnswer+ ". Reply only with the value.");
-		      String apiEndpoint = chain.execute("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
-		      System.out.println("intermediate Answer: " + intermediateAnswer); 
-		      System.out.println("apiEndpoint: " + apiEndpoint); 
+		      //String apiEndpoint = chain.execute("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
+		      //System.out.println("intermediate Answer: " + intermediateAnswer); 
+		      //System.out.println("apiEndpoint: " + apiEndpoint); 
 	
 		      
 		      // Create an instance of the custom tool with parameters
-	          GenericRestApiTool restApiTool = new GenericRestApiTool(apiEndpoint, "API Call", "Execute GET or POST Requests");
+	          GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 		      
 		      ChatLanguageModel agent = createModel(configuration, LangchainParams);
 	        //   ChatLanguageModel agent = OpenAiChatModel.builder()
@@ -450,8 +456,8 @@ public class LangchainEmbeddingStoresOperations {
 	          // Use the assistant to make a query
 	           response = assistant.chat(intermediateAnswer);
 	          System.out.println(response);
-	      } else{
-	    	  response =  intermediateAnswer;
+	     /*  } else{
+	    	  response =  intermediateAnswer; */
 	      }
 	      
 	      
@@ -534,7 +540,7 @@ public class LangchainEmbeddingStoresOperations {
 		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
 		      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-		              .documentSplitter(DocumentSplitters.recursive(300, 0))
+		              .documentSplitter(DocumentSplitters.recursive(2000, 200))
 		              .embeddingModel(embeddingModel)
 		              .embeddingStore(deserializedStore)
 		              .build();
@@ -706,17 +712,18 @@ public class LangchainEmbeddingStoresOperations {
 		  String intermediateAnswer = assistant.chat(data);
 		  String response;
 	      List<String> findURL = extractUrls(intermediateAnswer);
+		  //System.out.println("find URL : " + findURL.get(0));
 	      if (findURL!=null){
 	    	  
 		      //String name = chain.execute("What is the name from: " + intermediateAnswer + ". Reply only with the value.");
 		      //String description = chain.execute("What is the description from: " + intermediateAnswer+ ". Reply only with the value.");
-		      String apiEndpoint = assistant.chat("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
-		      System.out.println("intermediate Answer: " + intermediateAnswer); 
-		      System.out.println("apiEndpoint: " + apiEndpoint); 
+		      //String apiEndpoint = assistant.chat("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
+		      //System.out.println("intermediate Answer: " + intermediateAnswer); 
+		      //System.out.println("apiEndpoint: " + apiEndpoint); 
 	
 		      
 		      // Create an instance of the custom tool with parameters
-	          GenericRestApiTool restApiTool = new GenericRestApiTool(apiEndpoint, "API Call", "Execute GET or POST Requests");
+	          GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 		      
 			  ChatLanguageModel agent = createModel(configuration, LangchainParams);
 	        //   ChatLanguageModel agent = OpenAiChatModel.builder()
