@@ -4,7 +4,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.mulechain</groupId>
-	<!-- <groupId>0b429e15-7202-4436-b494-748364d1c28b</groupId> -->
+	<!-- <groupId>aa7af6ad-839e-4607-a6f8-986e4e8166a4</groupId>  -->
 	<artifactId>mulechain-ai-connector</artifactId>
 	<version>0.1.13</version>
 	<packaging>mule-extension</packaging>
@@ -184,13 +184,13 @@
 		<snapshotRepository>
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/0b429e15-7202-4436-b494-748364d1c28b/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/aa7af6ad-839e-4607-a6f8-986e4e8166a4/maven</url>
 			<layout>default</layout>
 		</snapshotRepository>
 		<repository>
 			<id>exchange-repository</id>
 			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/0b429e15-7202-4436-b494-748364d1c28b/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/aa7af6ad-839e-4607-a6f8-986e4e8166a4/maven</url>
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
