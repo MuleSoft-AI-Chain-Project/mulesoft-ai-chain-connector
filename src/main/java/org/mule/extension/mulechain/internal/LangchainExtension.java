@@ -1,9 +1,7 @@
 package org.mule.extension.mulechain.internal;
 
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.extension.mulechain.internal.embedding.models.LangchainEmbeddingModelConfiguration;
 import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
-import org.mule.extension.mulechain.internal.tools.LangchainToolsConfiguration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.sdk.api.annotation.JavaVersionSupport;

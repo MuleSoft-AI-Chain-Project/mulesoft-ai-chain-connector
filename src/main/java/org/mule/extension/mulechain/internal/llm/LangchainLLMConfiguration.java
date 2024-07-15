@@ -3,7 +3,6 @@ package org.mule.extension.mulechain.internal.llm;
 
 import org.mule.extension.mulechain.internal.embedding.stores.LangchainEmbeddingStoresOperations;
 import org.mule.extension.mulechain.internal.image.models.LangchainImageModelsOperations;
-import org.mule.extension.mulechain.internal.streaming.LangchainLLMStreamingOperations;
 import org.mule.extension.mulechain.internal.tools.LangchainToolsOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;

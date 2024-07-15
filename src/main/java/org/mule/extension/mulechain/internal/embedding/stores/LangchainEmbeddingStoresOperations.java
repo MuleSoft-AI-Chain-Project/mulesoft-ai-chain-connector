@@ -33,13 +33,8 @@ import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import static java.time.Duration.ofSeconds;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.document.loader.UrlDocumentLoader;
@@ -53,7 +48,6 @@ import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.retriever.EmbeddingStoreRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
-import io.netty.util.concurrent.Future;
 import java.net.MalformedURLException;
 import java.net.URL;
 import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser;
