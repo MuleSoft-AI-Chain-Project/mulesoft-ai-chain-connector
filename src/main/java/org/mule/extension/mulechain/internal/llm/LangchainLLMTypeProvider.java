@@ -13,7 +13,7 @@ public class LangchainLLMTypeProvider implements ValueProvider {
 	public Set<Value> resolve() throws ValueResolvingException {
 		// TODO Auto-generated method stub
 		return ValueBuilder.getValuesFor("OPENAI","MISTRAL_AI","OLLAMA","ANTHROPIC",
-												 "AZURE_OPENAI");
+												 "AZURE_OPENAI", "GROQAI_OPENAI");
 	}
 
 }

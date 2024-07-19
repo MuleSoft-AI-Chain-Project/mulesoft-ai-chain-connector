@@ -95,6 +95,20 @@ public class LangchainEmbeddingStoresOperations {
 
     }
 
+	private static OpenAiChatModel createGroqOpenAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
+        return OpenAiChatModel.builder()
+				.baseUrl("https://api.groq.com/openai/v1")
+                .apiKey(apiKey)
+                .modelName(LangchainParams.getModelName())
+                .temperature(0.3)
+                .timeout(ofSeconds(60))
+                .logRequests(true)
+                .logResponses(true)
+                .build();
+
+    }
+
+
 	private static MistralAiChatModel createMistralAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
         return MistralAiChatModel.builder()
 				//.apiKey(configuration.getLlmApiKey())
@@ -154,7 +168,19 @@ public class LangchainEmbeddingStoresOperations {
 
 				}
 	            break;
-	        case "MISTRAL_AI":
+
+			case "GROQAI_OPENAI":
+				if (configuration.getConfigType() .equals("Environment Variables")) {
+					model = createGroqOpenAiChatModel(System.getenv("GROQ_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
+				} else {
+					JSONObject llmType = config.getJSONObject("GROQAI_OPENAI");
+					String llmTypeKey = llmType.getString("GROQ_API_KEY");
+					model = createGroqOpenAiChatModel(llmTypeKey, LangchainParams);
+
+				}
+	            break;
+
+			case "MISTRAL_AI":
 				if (configuration.getConfigType() .equals("Environment Variables")) {
 					model = createMistralAiChatModel(System.getenv("MISTRAL_AI_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
 				} else {
