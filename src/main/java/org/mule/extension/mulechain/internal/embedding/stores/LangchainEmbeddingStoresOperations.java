@@ -626,7 +626,7 @@ public class LangchainEmbeddingStoresOperations {
 		   */
 		  @MediaType(value = ANY, strict = false)
 		  @Alias("EMBEDDING-query-from-store")  
-		  public String queryFromEmbedding(String storeName, String question, Number maxResults, Double minScore, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+		  public String queryFromEmbedding(String storeName, String question, Number maxResults, Double minScore) {
 			int maximumResults = (int) maxResults;
 			if (minScore == null || minScore == 0) {
 			  minScore = 0.7;
