@@ -1,5 +1,6 @@
 package org.mule.extension.mulechain.internal.embedding.stores;
 
+import dev.langchain4j.data.document.BlankDocumentException;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -11,7 +12,13 @@ import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import static org.mapdb.Serializer.STRING;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicInteger;
+import dev.langchain4j.data.embedding.Embedding;
+import static java.util.stream.Collectors.joining;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mule.extension.mulechain.internal.helpers.fileTypeParameters;
@@ -46,8 +53,11 @@ import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.retriever.EmbeddingStoreRetriever;
+import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser;
@@ -612,6 +622,38 @@ public class LangchainEmbeddingStoresOperations {
 	    
 	    
 		  /**
+		   * Query information from embedding store (in-Memory), which is imported from the storeName (full path)
+		   */
+		  @MediaType(value = ANY, strict = false)
+		  @Alias("EMBEDDING-query-from-store")  
+		  public String queryFromEmbedding(String storeName, String question, Number maxResults, Double minScore, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+			int maximumResults = (int) maxResults;
+			if (minScore == null || minScore == 0) {
+			  minScore = 0.7;
+			}			  
+
+			EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+		    InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+		      
+			Embedding questionEmbedding = embeddingModel.embed(question).content();
+
+			List<EmbeddingMatch<TextSegment>> relevantEmbeddings = deserializedStore.findRelevant(questionEmbedding, maximumResults, minScore);
+			  
+			String information = relevantEmbeddings.stream()
+			  .map(match -> match.embedded().text())
+			  .collect(joining("\n\n"));
+
+			return information;
+		  }
+
+
+
+
+		  
+
+		  
+		  /**
 		   * Reads information via prompt from embedding store (in-Memory), which is imported from the storeName (full path)
 		   */
 		  @MediaType(value = ANY, strict = false)
@@ -771,7 +813,67 @@ public class LangchainEmbeddingStoresOperations {
 		return response;
 	  }  
 
-			
 
+	  	/**
+		* Add document of type text, pdf and url to embedding store (in-memory), which is exported to the defined storeName (full path)
+		*/
+		@MediaType(value = ANY, strict = false)
+		@Alias("EMBEDDING-add-folder-to-store") 			
+		public String addFilesFromFolderEmbedding(String storeName, String contextPath, @ParameterGroup(name="Context") fileTypeParameters fileType, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+
+			EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+			InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+
+			EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+					.documentSplitter(DocumentSplitters.recursive(2000, 200))
+					.embeddingModel(embeddingModel)
+					.embeddingStore(deserializedStore)
+					.build();
+
+
+			long totalFiles = 0;
+			try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
+				totalFiles = paths.filter(Files::isRegularFile).count();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			System.out.println("Total number of files to process: " + totalFiles);
+			AtomicInteger fileCounter = new AtomicInteger(0);
+			try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
+				paths.filter(Files::isRegularFile).forEach(file -> {
+					int currentFileCounter = fileCounter.incrementAndGet();
+					System.out.println("Processing file " + currentFileCounter + ": " + file.getFileName());
+					Document document = null;
+					try {
+						switch (fileType.getFileType()) {
+							case "text":
+								document = loadDocument(file.toString(), new TextDocumentParser());
+								ingestor.ingest(document);
+								break;
+							case "pdf":
+								document = loadDocument(file.toString(), new ApacheTikaDocumentParser());
+								ingestor.ingest(document);
+								break;
+							case "url":
+								// Handle URLs separately if needed
+								break;
+							default:
+								throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
+						}
+					} catch (BlankDocumentException e) {
+						System.out.println("Skipping file due to BlankDocumentException: " + file.getFileName());
+					}
+				});
+			} catch (IOException e) {
+				e.printStackTrace();
+			}					
+
+
+
+
+			deserializedStore.serializeToFile(storeName);
+			return "Embedding-store updated.";
+		}
 	    
 }
