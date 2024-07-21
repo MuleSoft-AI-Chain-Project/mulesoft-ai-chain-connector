@@ -56,7 +56,7 @@ public class LangchainImageModelsOperations {
         return OpenAiChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(LangchainParams.getModelName())
-                .temperature(0.3)
+                .temperature(0.7)
                 .timeout(ofSeconds(60))
                 .logRequests(true)
                 .logResponses(true)
@@ -69,7 +69,7 @@ public class LangchainImageModelsOperations {
 				//.apiKey(configuration.getLlmApiKey())
 				.apiKey(apiKey)
 				.modelName(LangchainParams.getModelName())
-				.temperature(0.3)
+                .temperature(0.7)
 				.timeout(ofSeconds(60))
 				.logRequests(true)
 				.logResponses(true)
@@ -81,6 +81,7 @@ public class LangchainImageModelsOperations {
 				//.baseUrl(configuration.getLlmApiKey())
 				.baseUrl(baseURL)
 				.modelName(LangchainParams.getModelName())
+                .temperature(0.7)
 				.build();
     }
 
@@ -92,6 +93,7 @@ public class LangchainImageModelsOperations {
 				.modelName(LangchainParams.getModelName())
 				.logRequests(true)
 				.logResponses(true)
+                .temperature(0.7)
 				.build();
     }
 
@@ -101,7 +103,7 @@ public class LangchainImageModelsOperations {
 				.apiKey(apiKey)
 				.endpoint(llmEndpoint)
 				.deploymentName(deploymentName)
-				.temperature(0.3)
+                .temperature(0.7)
 				.logRequestsAndResponses(true)
 				.build();
 	}

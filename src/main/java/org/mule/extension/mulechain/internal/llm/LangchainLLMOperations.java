@@ -51,7 +51,7 @@ public class LangchainLLMOperations {
         return OpenAiChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(LangchainParams.getModelName())
-                .temperature(0.3)
+                .temperature(0.7)
                 .timeout(ofSeconds(60))
                 .logRequests(true)
                 .logResponses(true)
@@ -64,7 +64,7 @@ public class LangchainLLMOperations {
 				.baseUrl("https://api.groq.com/openai/v1")
                 .apiKey(apiKey)
                 .modelName(LangchainParams.getModelName())
-                .temperature(0.3)
+                .temperature(0.7)
                 .timeout(ofSeconds(60))
                 .logRequests(true)
                 .logResponses(true)
@@ -77,7 +77,7 @@ public class LangchainLLMOperations {
 				//.apiKey(configuration.getLlmApiKey())
 				.apiKey(apiKey)
 				.modelName(LangchainParams.getModelName())
-				.temperature(0.3)
+                .temperature(0.7)
 				.timeout(ofSeconds(60))
 				.logRequests(true)
 				.logResponses(true)
@@ -89,6 +89,7 @@ public class LangchainLLMOperations {
 				//.baseUrl(configuration.getLlmApiKey())
 				.baseUrl(baseURL)
 				.modelName(LangchainParams.getModelName())
+                .temperature(0.7)
 				.build();
     }
 
@@ -98,6 +99,7 @@ public class LangchainLLMOperations {
 				//.apiKey(configuration.getLlmApiKey())
 				.apiKey(apiKey)
 				.modelName(LangchainParams.getModelName())
+                .temperature(0.7)
 				.logRequests(true)
 				.logResponses(true)
 				.build();
@@ -109,7 +111,7 @@ public class LangchainLLMOperations {
 				.apiKey(apiKey)
 				.endpoint(llmEndpoint)
 				.deploymentName(deploymentName)
-				.temperature(0.3)
+                .temperature(0.7)
 				.logRequestsAndResponses(true)
 				.build();
 	}

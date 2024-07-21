@@ -117,7 +117,7 @@ public class LangchainEmbeddingStoresOperations {
 				.baseUrl("https://api.groq.com/openai/v1")
                 .apiKey(apiKey)
                 .modelName(LangchainParams.getModelName())
-                .temperature(0.3)
+                .temperature(0.7)
                 .timeout(ofSeconds(60))
                 .logRequests(true)
                 .logResponses(true)
@@ -131,7 +131,7 @@ public class LangchainEmbeddingStoresOperations {
 				//.apiKey(configuration.getLlmApiKey())
 				.apiKey(apiKey)
 				.modelName(LangchainParams.getModelName())
-				.temperature(0.1)
+				.temperature(0.7)
 				.timeout(ofSeconds(60))
 				.logRequests(true)
 				.logResponses(true)
@@ -143,6 +143,7 @@ public class LangchainEmbeddingStoresOperations {
 				//.baseUrl(configuration.getLlmApiKey())
 				.baseUrl(baseURL)
 				.modelName(LangchainParams.getModelName())
+				.temperature(0.7)
 				.build();
     }
 
@@ -152,6 +153,7 @@ public class LangchainEmbeddingStoresOperations {
 				//.apiKey(configuration.getLlmApiKey())
 				.apiKey(apiKey)
 				.modelName(LangchainParams.getModelName())
+				.temperature(0.7)
 				.logRequests(true)
 				.logResponses(true)
 				.build();
@@ -163,7 +165,7 @@ public class LangchainEmbeddingStoresOperations {
 				.apiKey(apiKey)
 				.endpoint(llmEndpoint)
 				.deploymentName(deploymentName)
-				.temperature(0.1)
+				.temperature(0.7)
 				.logRequestsAndResponses(true)
 				.build();
 	}
@@ -326,16 +328,6 @@ public class LangchainEmbeddingStoresOperations {
 	      return answer;
 	  }  
   
-	  
-
-
-
-
-
-
-
-
-	  
 	  
 	  
 	  
