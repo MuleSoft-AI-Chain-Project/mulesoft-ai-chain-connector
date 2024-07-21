@@ -78,6 +78,13 @@ import java.nio.file.Paths;
 public class LangchainEmbeddingStoresOperations {
 
 
+
+	private EmbeddingModel embeddingModel;
+
+    public LangchainEmbeddingStoresOperations() {
+        this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+    }
+
 	private static JSONObject readConfigFile(String filePath) {
         Path path = Paths.get(filePath);
         if (Files.exists(path)) {
@@ -552,6 +559,8 @@ public class LangchainEmbeddingStoresOperations {
 			//embeddingStore.serializeToFile(storeName);
 			embeddingStore.serializeToFile(storeName);
 	    
+
+			embeddingStore = null;
 			return "Embedding-store created.";
 		  }
 	    
@@ -564,14 +573,15 @@ public class LangchainEmbeddingStoresOperations {
 		  @Alias("EMBEDDING-add-document-to-store")  
 		  public String addFileEmbedding(String storeName, String contextPath, @ParameterGroup(name="Context") fileTypeParameters fileType, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 
-			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+			  //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
 
 		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
 		      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
 		              .documentSplitter(DocumentSplitters.recursive(2000, 200))
-		              .embeddingModel(embeddingModel)
+		              .embeddingModel(this.embeddingModel)
 		              .embeddingStore(deserializedStore)
 		              .build();
 
@@ -582,41 +592,40 @@ public class LangchainEmbeddingStoresOperations {
 
 			  
 
-		 // ChatLanguageModel model = null;
-		 Document document = null;
-		  switch (fileType.getFileType()) {
-			case "text":
-				document = loadDocument(contextPath, new TextDocumentParser());
-				ingestor.ingest(document);
-				break;
-			case "pdf":
-				document = loadDocument(contextPath, new ApacheTikaDocumentParser());
-				ingestor.ingest(document);
-				  break;
-			case "url":
-				URL url = null;
-				try {
-					url = new URL(contextPath);
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				}
-				
-				Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
-				HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
-				document = transformer.transform(htmlDocument);
-				document.metadata().add("url", contextPath);
-				ingestor.ingest(document);
-				break;
-			default:
-				throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
-		  }
+			// ChatLanguageModel model = null;
+			Document document = null;
+			switch (fileType.getFileType()) {
+				case "text":
+					document = loadDocument(contextPath, new TextDocumentParser());
+					ingestor.ingest(document);
+					break;
+				case "pdf":
+					document = loadDocument(contextPath, new ApacheTikaDocumentParser());
+					ingestor.ingest(document);
+					break;
+				case "url":
+					URL url = null;
+					try {
+						url = new URL(contextPath);
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					}
+					
+					Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
+					HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
+					document = transformer.transform(htmlDocument);
+					document.metadata().add("url", contextPath);
+					ingestor.ingest(document);
+					break;
+				default:
+					throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
+			}
 
 
 
+		    deserializedStore.serializeToFile(storeName);
+		  	deserializedStore=null;
 
-
-
-		      deserializedStore.serializeToFile(storeName);
 			return "Embedding-store updated.";
 		  }
 	    
@@ -632,17 +641,21 @@ public class LangchainEmbeddingStoresOperations {
 			  minScore = 0.7;
 			}			  
 
-			EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+			//EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
 		    InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 		      
-			Embedding questionEmbedding = embeddingModel.embed(question).content();
+			Embedding questionEmbedding = this.embeddingModel.embed(question).content();
 
 			List<EmbeddingMatch<TextSegment>> relevantEmbeddings = deserializedStore.findRelevant(questionEmbedding, maximumResults, minScore);
 			  
 			String information = relevantEmbeddings.stream()
 			  .map(match -> match.embedded().text())
 			  .collect(joining("\n\n"));
+
+
+			deserializedStore = null;
+			questionEmbedding=null;
 
 			return information;
 		  }
@@ -659,7 +672,7 @@ public class LangchainEmbeddingStoresOperations {
 		  @MediaType(value = ANY, strict = false)
 		  @Alias("EMBEDDING-get-info-from-store")  
 		  public String promptFromEmbedding(String storeName, String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
-			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+			  //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
 		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -667,7 +680,7 @@ public class LangchainEmbeddingStoresOperations {
 		      ChatLanguageModel model = createModel(configuration, LangchainParams);
 		      
 		      
-		      ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
+		      ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, this.embeddingModel);
 		      
 		      AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
 		    		    .chatLanguageModel(model)
@@ -686,7 +699,8 @@ public class LangchainEmbeddingStoresOperations {
 		      //System.out.println(answer); 
 
 		      deserializedStore.serializeToFile(storeName);
-
+			  deserializedStore = null; // Set the deserializedStore variable to null
+			  
 			return response;
 		  }
 	    
@@ -697,7 +711,7 @@ public class LangchainEmbeddingStoresOperations {
 		  @MediaType(value = ANY, strict = false)
 		  @Alias("EMBEDDING-get-info-from-store-legacy")  
 		  public String promptFromEmbeddingLegacy(String storeName, String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
-			  EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+			  //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
 		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -714,7 +728,7 @@ public class LangchainEmbeddingStoresOperations {
 
 		      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 		              .chatLanguageModel(model)
-		              .retriever(EmbeddingStoreRetriever.from(deserializedStore, embeddingModel))
+		              .retriever(EmbeddingStoreRetriever.from(deserializedStore, this.embeddingModel))
 		              // .chatMemory() // you can override default chat memory
 		              // .promptTemplate() // you can override default prompt template
 		              .build();
@@ -724,7 +738,7 @@ public class LangchainEmbeddingStoresOperations {
 		      //System.out.println(answer); 
 
 		      deserializedStore.serializeToFile(storeName);
-
+			  deserializedStore = null;
 			return answer;
 		  }
 	    
@@ -821,12 +835,12 @@ public class LangchainEmbeddingStoresOperations {
 		@Alias("EMBEDDING-add-folder-to-store") 			
 		public String addFilesFromFolderEmbedding(String storeName, String contextPath, @ParameterGroup(name="Context") fileTypeParameters fileType, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 
-			EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+			//EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 			InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 
 			EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
 					.documentSplitter(DocumentSplitters.recursive(2000, 200))
-					.embeddingModel(embeddingModel)
+					.embeddingModel(this.embeddingModel)
 					.embeddingStore(deserializedStore)
 					.build();
 
@@ -873,6 +887,7 @@ public class LangchainEmbeddingStoresOperations {
 
 
 			deserializedStore.serializeToFile(storeName);
+			deserializedStore=null;
 			return "Embedding-store updated.";
 		}
 	    
