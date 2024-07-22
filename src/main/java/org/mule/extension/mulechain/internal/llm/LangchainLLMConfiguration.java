@@ -13,15 +13,16 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
  * This class represents an extension configuration, values set in this class are commonly used across multiple
  * operations since they represent something core from the extension.
  */
-@Configuration(name="llm-configuration") 
-@Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class, LangchainImageModelsOperations.class,LangchainToolsOperations.class})
+@Configuration(name = "llm-configuration")
+@Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class, LangchainImageModelsOperations.class,
+    LangchainToolsOperations.class})
 //@ConnectionProviders(LangchainLLMConnectionProvider.class)
 public class LangchainLLMConfiguration {
 
   @Parameter
   @OfValues(LangchainLLMTypeProvider.class)
   private String llmType;
-  
+
   @Parameter
   @OfValues(LangchainLLMConfigType.class)
   private String configType;
@@ -29,15 +30,15 @@ public class LangchainLLMConfiguration {
   @Parameter
   private String filePath;
 
-  public String getLlmType(){
+  public String getLlmType() {
     return llmType;
   }
-  
+
   public String getConfigType() {
-	   return configType;
+    return configType;
   }
 
-  public String getFilePath(){
+  public String getFilePath() {
     return filePath;
   }
 

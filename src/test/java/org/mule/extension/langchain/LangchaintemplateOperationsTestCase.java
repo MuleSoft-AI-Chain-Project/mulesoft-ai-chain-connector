@@ -15,20 +15,20 @@ public class LangchaintemplateOperationsTestCase extends MuleArtifactFunctionalT
 
   @Test
   public void executeInvokeiOperation() throws Exception {
-//    String payloadValue = ((String) flowRunner("sayHiFlow").run()
-//                                      .getMessage()
-//                                      .getPayload()
-//                                      .getValue());
-//    assertThat(payloadValue, is("Hello Mariano Gonzalez!!!"));
+    //    String payloadValue = ((String) flowRunner("sayHiFlow").run()
+    //                                      .getMessage()
+    //                                      .getPayload()
+    //                                      .getValue());
+    //    assertThat(payloadValue, is("Hello Mariano Gonzalez!!!"));
   }
 
   @Test
   public void executePredictOperation() throws Exception {
-//    String payloadValue = ((String) flowRunner("retrieveInfoFlow")
-//                                      .run()
-//                                      .getMessage()
-//                                      .getPayload()
-//                                      .getValue());
-//    assertThat(payloadValue, is("Using Configuration [configId] with Connection id [aValue:100]"));
+    //    String payloadValue = ((String) flowRunner("retrieveInfoFlow")
+    //                                      .run()
+    //                                      .getMessage()
+    //                                      .getPayload()
+    //                                      .getValue());
+    //    assertThat(payloadValue, is("Using Configuration [configId] with Connection id [aValue:100]"));
   }
 }

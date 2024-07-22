@@ -10,22 +10,22 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  * This class represents an extension configuration, values set in this class are commonly used across multiple
  * operations since they represent something core from the extension.
  */
-@Configuration(name="embedding-model-configuration") 
+@Configuration(name = "embedding-model-configuration")
 @Operations(LangchainEmbeddingModelsOperations.class)
 @ConnectionProviders(LangchainConnectionProvider.class)
 public class LangchainEmbeddingModelConfiguration {
 
   @Parameter
   private String projectId;
-  
+
   @Parameter
   private String modelName;
 
-  public String getProjectId(){
+  public String getProjectId() {
     return projectId;
   }
-  
+
   public String getModelName() {
-	  return modelName;
+    return modelName;
   }
 }

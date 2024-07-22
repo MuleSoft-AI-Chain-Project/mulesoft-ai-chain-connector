@@ -7,14 +7,15 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 
 public class LangchainLLMParameters {
-	@Parameter
-	@Expression(ExpressionSupport.SUPPORTED)
-	@OfValues(LangchainLLMParameterModelNameProvider.class)
-	@Optional(defaultValue = "gpt-3.5-turbo")
-	private String modelName;
 
-	public String getModelName() {
-		return modelName;
-	}
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  @OfValues(LangchainLLMParameterModelNameProvider.class)
+  @Optional(defaultValue = "gpt-3.5-turbo")
+  private String modelName;
+
+  public String getModelName() {
+    return modelName;
+  }
 
 }

@@ -37,215 +37,213 @@ import static java.time.Duration.ofSeconds;
 public class LangchainImageModelsOperations {
 
 
-	private static JSONObject readConfigFile(String filePath) {
-        Path path = Paths.get(filePath);
-        if (Files.exists(path)) {
-            try {
-                String content = new String(Files.readAllBytes(path));
-                return new JSONObject(content);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+  private static JSONObject readConfigFile(String filePath) {
+    Path path = Paths.get(filePath);
+    if (Files.exists(path)) {
+      try {
+        String content = new String(Files.readAllBytes(path));
+        return new JSONObject(content);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    } else {
+      System.out.println("File does not exist: " + filePath);
+    }
+    return null;
+  }
+
+  private static OpenAiChatModel createOpenAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
+    return OpenAiChatModel.builder()
+        .apiKey(apiKey)
+        .modelName(LangchainParams.getModelName())
+        .temperature(0.7)
+        .timeout(ofSeconds(60))
+        .logRequests(true)
+        .logResponses(true)
+        .build();
+
+  }
+
+  private static MistralAiChatModel createMistralAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
+    return MistralAiChatModel.builder()
+        //.apiKey(configuration.getLlmApiKey())
+        .apiKey(apiKey)
+        .modelName(LangchainParams.getModelName())
+        .temperature(0.7)
+        .timeout(ofSeconds(60))
+        .logRequests(true)
+        .logResponses(true)
+        .build();
+  }
+
+  private static OllamaChatModel createOllamaChatModel(String baseURL, LangchainLLMParameters LangchainParams) {
+    return OllamaChatModel.builder()
+        //.baseUrl(configuration.getLlmApiKey())
+        .baseUrl(baseURL)
+        .modelName(LangchainParams.getModelName())
+        .temperature(0.7)
+        .build();
+  }
+
+
+  private static AnthropicChatModel createAnthropicChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
+    return AnthropicChatModel.builder()
+        //.apiKey(configuration.getLlmApiKey())
+        .apiKey(apiKey)
+        .modelName(LangchainParams.getModelName())
+        .logRequests(true)
+        .logResponses(true)
+        .temperature(0.7)
+        .build();
+  }
+
+
+  private static AzureOpenAiChatModel createAzureOpenAiChatModel(String apiKey, String llmEndpoint, String deploymentName,
+                                                                 LangchainLLMParameters LangchainParams) {
+    return AzureOpenAiChatModel.builder()
+        .apiKey(apiKey)
+        .endpoint(llmEndpoint)
+        .deploymentName(deploymentName)
+        .temperature(0.7)
+        .logRequestsAndResponses(true)
+        .build();
+  }
+
+
+
+  private ChatLanguageModel createModel(LangchainLLMConfiguration configuration, LangchainLLMParameters LangchainParams) {
+    ChatLanguageModel model = null;
+    JSONObject config = readConfigFile(configuration.getFilePath());
+
+    switch (configuration.getLlmType()) {
+      case "OPENAI":
+        if (configuration.getConfigType().equals("Environment Variables")) {
+          model = createOpenAiChatModel(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
         } else {
-            System.out.println("File does not exist: " + filePath);
+          JSONObject llmType = config.getJSONObject("OPENAI");
+          String llmTypeKey = llmType.getString("OPENAI_API_KEY");
+          model = createOpenAiChatModel(llmTypeKey, LangchainParams);
+
         }
-        return null;
-    }
+        break;
+      case "MISTRAL_AI":
+        if (configuration.getConfigType().equals("Environment Variables")) {
+          model =
+              createMistralAiChatModel(System.getenv("MISTRAL_AI_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
+        } else {
+          JSONObject llmType = config.getJSONObject("MISTRAL_AI");
+          String llmTypeKey = llmType.getString("MISTRAL_AI_API_KEY");
+          model = createMistralAiChatModel(llmTypeKey, LangchainParams);
 
-	private static OpenAiChatModel createOpenAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
-        return OpenAiChatModel.builder()
-                .apiKey(apiKey)
-                .modelName(LangchainParams.getModelName())
-                .temperature(0.7)
-                .timeout(ofSeconds(60))
-                .logRequests(true)
-                .logResponses(true)
-                .build();
+        }
+        break;
+      case "OLLAMA":
+        if (configuration.getConfigType().equals("Environment Variables")) {
+          model = createOllamaChatModel(System.getenv("OLLAMA_BASE_URL").replace("\n", "").replace("\r", ""), LangchainParams);
+        } else {
+          JSONObject llmType = config.getJSONObject("OLLAMA");
+          String llmTypeUrl = llmType.getString("OLLAMA_BASE_URL");
+          model = createOllamaChatModel(llmTypeUrl, LangchainParams);
 
-    }
-
-	private static MistralAiChatModel createMistralAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
-        return MistralAiChatModel.builder()
-				//.apiKey(configuration.getLlmApiKey())
-				.apiKey(apiKey)
-				.modelName(LangchainParams.getModelName())
-                .temperature(0.7)
-				.timeout(ofSeconds(60))
-				.logRequests(true)
-				.logResponses(true)
-				.build();
-    }
-
-	private static OllamaChatModel createOllamaChatModel(String baseURL, LangchainLLMParameters LangchainParams) {
-        return OllamaChatModel.builder()
-				//.baseUrl(configuration.getLlmApiKey())
-				.baseUrl(baseURL)
-				.modelName(LangchainParams.getModelName())
-                .temperature(0.7)
-				.build();
-    }
-
-
-	private static AnthropicChatModel createAnthropicChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
-        return AnthropicChatModel.builder()
-				//.apiKey(configuration.getLlmApiKey())
-				.apiKey(apiKey)
-				.modelName(LangchainParams.getModelName())
-				.logRequests(true)
-				.logResponses(true)
-                .temperature(0.7)
-				.build();
-    }
-
-
-	private static AzureOpenAiChatModel createAzureOpenAiChatModel(String apiKey, String llmEndpoint, String deploymentName, LangchainLLMParameters LangchainParams) {
-        return AzureOpenAiChatModel.builder()
-				.apiKey(apiKey)
-				.endpoint(llmEndpoint)
-				.deploymentName(deploymentName)
-                .temperature(0.7)
-				.logRequestsAndResponses(true)
-				.build();
-	}
-
-
-
-	private ChatLanguageModel createModel(LangchainLLMConfiguration configuration, LangchainLLMParameters LangchainParams) {
-	    ChatLanguageModel model = null;
-        JSONObject config = readConfigFile(configuration.getFilePath());
-
-	    switch (configuration.getLlmType()) {
-	        case "OPENAI":
-				if (configuration.getConfigType() .equals("Environment Variables")) {
-					model = createOpenAiChatModel(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
-				} else {
-					JSONObject llmType = config.getJSONObject("OPENAI");
-					String llmTypeKey = llmType.getString("OPENAI_API_KEY");
-					model = createOpenAiChatModel(llmTypeKey, LangchainParams);
-
-				}
-	            break;
-	        case "MISTRAL_AI":
-				if (configuration.getConfigType() .equals("Environment Variables")) {
-					model = createMistralAiChatModel(System.getenv("MISTRAL_AI_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
-				} else {
-					JSONObject llmType = config.getJSONObject("MISTRAL_AI");
-					String llmTypeKey = llmType.getString("MISTRAL_AI_API_KEY");
-					model = createMistralAiChatModel(llmTypeKey, LangchainParams);
-
-				}
-	            break;
-	        case "OLLAMA":
-				if (configuration.getConfigType() .equals("Environment Variables")) {
-					model = createOllamaChatModel(System.getenv("OLLAMA_BASE_URL").replace("\n", "").replace("\r", ""), LangchainParams);
-				} else {
-					JSONObject llmType = config.getJSONObject("OLLAMA");
-					String llmTypeUrl = llmType.getString("OLLAMA_BASE_URL");
-					model = createOllamaChatModel(llmTypeUrl, LangchainParams);
-
-				}
-	            break;
-	        case "ANTHROPIC":
-				if (configuration.getConfigType() .equals("Environment Variables")) {
-					model = createAnthropicChatModel(System.getenv("ANTHROPIC_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
-				} else {
-					JSONObject llmType = config.getJSONObject("ANTHROPIC");
-					String llmTypeKey = llmType.getString("ANTHROPIC_API_KEY");
-					model = createAnthropicChatModel(llmTypeKey, LangchainParams);
-				}
-	            break;
-/* 			case "AWS_BEDROCK":
-				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
-				// For authentication, set the following environment variables:
+        }
+        break;
+      case "ANTHROPIC":
+        if (configuration.getConfigType().equals("Environment Variables")) {
+          model =
+              createAnthropicChatModel(System.getenv("ANTHROPIC_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
+        } else {
+          JSONObject llmType = config.getJSONObject("ANTHROPIC");
+          String llmTypeKey = llmType.getString("ANTHROPIC_API_KEY");
+          model = createAnthropicChatModel(llmTypeKey, LangchainParams);
+        }
+        break;
+      /* 			case "AWS_BEDROCK":
+      				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
+      				// For authentication, set the following environment variables:
         		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
- 				model = BedrockAnthropicMessageChatModel.builder()
-						.region(Region.US_EAST_1)
-						.temperature(0.30f)
-						.maxTokens(300)
-						.model(LangchainParams.getModelName())
-						.maxRetries(1)
-						.build();
-				break;
- */			case "AZURE_OPENAI":
- 				if (configuration.getConfigType() .equals("Environment Variables")) {
-					model = createAzureOpenAiChatModel(System.getenv("AZURE_OPENAI_KEY").replace("\n", "").replace("\r", ""), 
-														System.getenv("AZURE_OPENAI_ENDPOINT").replace("\n", "").replace("\r", ""), 
-														System.getenv("AZURE_OPENAI_DEPLOYMENT_NAME").replace("\n", "").replace("\r", ""), LangchainParams);
-				} else {
-					JSONObject llmType = config.getJSONObject("AZURE_OPENAI");
-					String llmTypeKey = llmType.getString("AZURE_OPENAI_KEY");
-					String llmEndpoint = llmType.getString("AZURE_OPENAI_ENDPOINT");
-					String llmDeploymentName = llmType.getString("AZURE_OPENAI_DEPLOYMENT_NAME");
-					model = createAzureOpenAiChatModel(llmTypeKey, llmEndpoint, llmDeploymentName, LangchainParams);
-				}
-				break;
-	        default:
-	            throw new IllegalArgumentException("Unsupported LLM type: " + configuration.getLlmType());
-	    }
-	    return model;
-	}
+       				model = BedrockAnthropicMessageChatModel.builder()
+      						.region(Region.US_EAST_1)
+      						.temperature(0.30f)
+      						.maxTokens(300)
+      						.model(LangchainParams.getModelName())
+      						.maxRetries(1)
+      						.build();
+      				break;
+       */ case "AZURE_OPENAI":
+        if (configuration.getConfigType().equals("Environment Variables")) {
+          model = createAzureOpenAiChatModel(System.getenv("AZURE_OPENAI_KEY").replace("\n", "").replace("\r", ""),
+                                             System.getenv("AZURE_OPENAI_ENDPOINT").replace("\n", "").replace("\r", ""),
+                                             System.getenv("AZURE_OPENAI_DEPLOYMENT_NAME").replace("\n", "").replace("\r", ""),
+                                             LangchainParams);
+        } else {
+          JSONObject llmType = config.getJSONObject("AZURE_OPENAI");
+          String llmTypeKey = llmType.getString("AZURE_OPENAI_KEY");
+          String llmEndpoint = llmType.getString("AZURE_OPENAI_ENDPOINT");
+          String llmDeploymentName = llmType.getString("AZURE_OPENAI_DEPLOYMENT_NAME");
+          model = createAzureOpenAiChatModel(llmTypeKey, llmEndpoint, llmDeploymentName, LangchainParams);
+        }
+        break;
+      default:
+        throw new IllegalArgumentException("Unsupported LLM type: " + configuration.getLlmType());
+    }
+    return model;
+  }
 
-	
 
-	
-	
 
-	
-	
+  /**
+   * Reads an image from an URL. 
+   */
+  @MediaType(value = ANY, strict = false)
+  @Alias("IMAGE-read")
+  public String readFromImage(String data, String contextURL, @Config LangchainLLMConfiguration configuration,
+                              @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
 
-	  /**
-	   * Reads an image from an URL. 
-	   */
-	  @MediaType(value = ANY, strict = false)
-	  @Alias("IMAGE-read")  
-	  public String readFromImage(String data, String contextURL, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
-	  
-	      ChatLanguageModel model = createModel(configuration, LangchainParams);
+    ChatLanguageModel model = createModel(configuration, LangchainParams);
 
-          UserMessage userMessage = UserMessage.from(
-                  TextContent.from(data),
-                  ImageContent.from(contextURL)
-          );
+    UserMessage userMessage = UserMessage.from(
+                                               TextContent.from(data),
+                                               ImageContent.from(contextURL));
 
-          Response<AiMessage> response = model.generate(userMessage);
+    Response<AiMessage> response = model.generate(userMessage);
 
-          return response.content().text();
-	  }  
-  
+    return response.content().text();
+  }
 
-	  /**
-	   * Generates an image based on the prompt in data
-	   */
-	  @MediaType(value = ANY, strict = false)
-	  @Alias("IMAGE-generate")  
-	  public URI drawImage(String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
-        ImageModel model = null;
-		JSONObject config = readConfigFile(configuration.getFilePath());
-		if (configuration.getConfigType() .equals("Environment Variables")) {
-			model = OpenAiImageModel.builder()
-				.modelName(LangchainParams.getModelName())
-				.apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-				.build();
-  		} else {
-			JSONObject llmType = config.getJSONObject("OPENAI");
-			String llmTypeKey = llmType.getString("OPENAI_API_KEY");
-			model = OpenAiImageModel.builder()
-				.modelName(LangchainParams.getModelName())
-				.apiKey(llmTypeKey.replace("\n", "").replace("\r", ""))
-				.build();
 
-		}	  
-          /* ImageModel model = OpenAiImageModel.builder()
-                  .modelName(LangchainParams.getModelName())
-                  .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-                  .build();
- */
-          Response<Image> response = model.generate(data);
-          System.out.println(response.content().url());
-          return response.content().url();
-	  }  
-  
+  /**
+   * Generates an image based on the prompt in data
+   */
+  @MediaType(value = ANY, strict = false)
+  @Alias("IMAGE-generate")
+  public URI drawImage(String data, @Config LangchainLLMConfiguration configuration,
+                       @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
+    ImageModel model = null;
+    JSONObject config = readConfigFile(configuration.getFilePath());
+    if (configuration.getConfigType().equals("Environment Variables")) {
+      model = OpenAiImageModel.builder()
+          .modelName(LangchainParams.getModelName())
+          .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
+          .build();
+    } else {
+      JSONObject llmType = config.getJSONObject("OPENAI");
+      String llmTypeKey = llmType.getString("OPENAI_API_KEY");
+      model = OpenAiImageModel.builder()
+          .modelName(LangchainParams.getModelName())
+          .apiKey(llmTypeKey.replace("\n", "").replace("\r", ""))
+          .build();
 
-	  
-	  
+    }
+    /* ImageModel model = OpenAiImageModel.builder()
+            .modelName(LangchainParams.getModelName())
+            .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
+            .build();
+    */
+    Response<Image> response = model.generate(data);
+    System.out.println(response.content().url());
+    return response.content().url();
+  }
+
+
+
 }

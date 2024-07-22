@@ -645,18 +645,22 @@ public class LangchainEmbeddingStoresOperations {
 
 			//EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
-		    InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+		    //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 		      
+			InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName);
+
+
+
 			Embedding questionEmbedding = this.embeddingModel.embed(question).content();
 
-			List<EmbeddingMatch<TextSegment>> relevantEmbeddings = deserializedStore.findRelevant(questionEmbedding, maximumResults, minScore);
+			List<EmbeddingMatch<TextSegment>> relevantEmbeddings = store.findRelevant(questionEmbedding, maximumResults, minScore);
 			  
 			String information = relevantEmbeddings.stream()
 			  .map(match -> match.embedded().text())
 			  .collect(joining("\n\n"));
 
 
-			deserializedStore = null;
+			//deserializedStore = null;
 			questionEmbedding=null;
 
 			return information;
