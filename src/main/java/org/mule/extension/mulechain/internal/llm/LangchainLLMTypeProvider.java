@@ -9,12 +9,11 @@ import org.mule.runtime.extension.api.values.ValueResolvingException;
 
 public class LangchainLLMTypeProvider implements ValueProvider {
 
-	@Override
-	public Set<Value> resolve() throws ValueResolvingException {
-		// TODO Auto-generated method stub
-		return ValueBuilder.getValuesFor("OPENAI","MISTRAL_AI","OLLAMA","ANTHROPIC",
-												 "AZURE_OPENAI", "GROQAI_OPENAI");
-	}
+  @Override
+  public Set<Value> resolve() throws ValueResolvingException {
+    // TODO Auto-generated method stub
+    return ValueBuilder.getValuesFor("OPENAI", "MISTRAL_AI", "OLLAMA", "ANTHROPIC",
+                                     "AZURE_OPENAI", "GROQAI_OPENAI");
+  }
 
 }
- 

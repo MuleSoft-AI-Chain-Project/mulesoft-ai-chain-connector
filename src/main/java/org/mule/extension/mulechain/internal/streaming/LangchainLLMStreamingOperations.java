@@ -24,49 +24,48 @@ import static java.time.Duration.ofSeconds;
  */
 public class LangchainLLMStreamingOperations {
 
-	
-	
 
-  
+
   /*   
    * https://docs.mulesoft.com/mule-sdk/latest/define-operations
    * Define output resolver
    *  */
   interface Assistant {
 
-      TokenStream chat(String message);
+    TokenStream chat(String message);
   }
-  
+
   @MediaType(value = ANY, strict = false)
-  @Alias("Stream-prompt-answer")  
+  @Alias("Stream-prompt-answer")
   @OutputResolver(output = TokenStreamOutputResolver.class)
   @Streaming
-  public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
+  public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration,
+                                     @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
 
-      StreamingChatLanguageModel model = OpenAiStreamingChatModel.builder()
-              .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-              .modelName(LangchainParams.getModelName())
-              .temperature(0.3)
-              .timeout(ofSeconds(60))
-              .logRequests(true)
-              .logResponses(true)
-              .build();
-
-
-      Assistant assistant = AiServices.create(Assistant.class, model);
+    StreamingChatLanguageModel model = OpenAiStreamingChatModel.builder()
+        .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
+        .modelName(LangchainParams.getModelName())
+        .temperature(0.3)
+        .timeout(ofSeconds(60))
+        .logRequests(true)
+        .logResponses(true)
+        .build();
 
 
-      TokenStream tokenStream = assistant.chat(prompt);
+    Assistant assistant = AiServices.create(Assistant.class, model);
 
 
-          tokenStream.onNext(System.out::println)
-                .onComplete(System.out::println)
-                .onError(Throwable::printStackTrace)
-         .start();
+    TokenStream tokenStream = assistant.chat(prompt);
 
 
-        return tokenStream;
+    tokenStream.onNext(System.out::println)
+        .onComplete(System.out::println)
+        .onError(Throwable::printStackTrace)
+        .start();
 
-	  
+
+    return tokenStream;
+
+
   }
 }

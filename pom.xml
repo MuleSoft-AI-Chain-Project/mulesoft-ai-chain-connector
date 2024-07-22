@@ -53,7 +53,41 @@
 </build>-->
     <properties>
         <muleJavaEeBomVersion>4.6.0</muleJavaEeBomVersion>
+		<formatterConfigPath>formatter.xml</formatterConfigPath>
+		<javaFormatter.plugin.version>2.0.1</javaFormatter.plugin.version>
+		<formatterGoal>validate</formatterGoal>
     </properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+				<version>${javaFormatter.plugin.version}</version>
+				<configuration>
+					<compilerCompliance>${javaVersion}</compilerCompliance>
+					<compilerSource>${javaVersion}</compilerSource>
+					<compilerTargetPlatform>${javaVersion}</compilerTargetPlatform>
+					<configFile>${basedir}/${formatterConfigPath}</configFile>
+					<configJsFile>${basedir}/${formatterConfigPath}</configJsFile>
+					<aggregator>false</aggregator>
+					<executionRoot>true</executionRoot>
+				</configuration>
+				<executions>
+					<execution>
+						<id>apply-format</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>${formatterGoal}</goal>
+						</goals>
+						<configuration>
+							<skipFormatting>${skipVerifications}</skipFormatting>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
     <dependencyManagement>
         <dependencies>
