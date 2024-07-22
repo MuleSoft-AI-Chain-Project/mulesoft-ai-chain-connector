@@ -81,6 +81,16 @@ public class LangchainEmbeddingStoresOperations {
 
 	private EmbeddingModel embeddingModel;
 
+    private static InMemoryEmbeddingStore<TextSegment> deserializedStore;
+
+    public static InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName) {
+        if (deserializedStore == null) {
+            deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+        }
+        return deserializedStore;
+    }
+
+
     public LangchainEmbeddingStoresOperations() {
         this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
     }
@@ -666,13 +676,15 @@ public class LangchainEmbeddingStoresOperations {
 		  public String promptFromEmbedding(String storeName, String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 			  //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
-		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+		      //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-		      
+
+			  InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName);
+
 		      ChatLanguageModel model = createModel(configuration, LangchainParams);
 		      
 		      
-		      ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, this.embeddingModel);
+		      ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(store, this.embeddingModel);
 		      
 		      AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
 		    		    .chatLanguageModel(model)
@@ -690,8 +702,8 @@ public class LangchainEmbeddingStoresOperations {
 		      String response = assistant.chat(data);
 		      //System.out.println(answer); 
 
-		      deserializedStore.serializeToFile(storeName);
-			  deserializedStore = null; // Set the deserializedStore variable to null
+		      //deserializedStore.serializeToFile(storeName);
+			  //deserializedStore = null; // Set the deserializedStore variable to null
 			  
 			return response;
 		  }
@@ -705,9 +717,10 @@ public class LangchainEmbeddingStoresOperations {
 		  public String promptFromEmbeddingLegacy(String storeName, String data, @Config LangchainLLMConfiguration configuration, @ParameterGroup(name= "Additional properties") LangchainLLMParameters LangchainParams) {
 			  //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
-		      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+		      //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 		      //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-		      
+			  InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName);
+
 		      ChatLanguageModel model = createModel(configuration, LangchainParams);
 		      
 		      
@@ -720,7 +733,7 @@ public class LangchainEmbeddingStoresOperations {
 
 		      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
 		              .chatLanguageModel(model)
-		              .retriever(EmbeddingStoreRetriever.from(deserializedStore, this.embeddingModel))
+		              .retriever(EmbeddingStoreRetriever.from(store, this.embeddingModel))
 		              // .chatMemory() // you can override default chat memory
 		              // .promptTemplate() // you can override default prompt template
 		              .build();
@@ -729,8 +742,8 @@ public class LangchainEmbeddingStoresOperations {
 		      //String response = assistant.chat(data);
 		      //System.out.println(answer); 
 
-		      deserializedStore.serializeToFile(storeName);
-			  deserializedStore = null;
+		      //deserializedStore.serializeToFile(storeName);
+			  //deserializedStore = null;
 			return answer;
 		  }
 	    
