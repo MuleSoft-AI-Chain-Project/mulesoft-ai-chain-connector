@@ -21,6 +21,7 @@ import dev.langchain4j.data.embedding.Embedding;
 import static java.util.stream.Collectors.joining;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Atomic.Boolean;
 import org.mule.extension.mulechain.internal.helpers.fileTypeParameters;
 import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.llm.LangchainLLMParameters;
@@ -83,8 +84,8 @@ public class LangchainEmbeddingStoresOperations {
 
   private static InMemoryEmbeddingStore<TextSegment> deserializedStore;
 
-  private static InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName) {
-    if (deserializedStore == null) {
+  private static InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName, boolean getLatest) {
+    if (deserializedStore == null || getLatest) {
       deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
     }
     return deserializedStore;
@@ -640,7 +641,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-query-from-store")
-  public String queryFromEmbedding(String storeName, String question, Number maxResults, Double minScore) {
+  public String queryFromEmbedding(String storeName, String question, Number maxResults, Double minScore, boolean getLatest) {
     int maximumResults = (int) maxResults;
     if (minScore == null || minScore == 0) {
       minScore = 0.7;
@@ -650,7 +651,7 @@ public class LangchainEmbeddingStoresOperations {
 
     //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 
-    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName);
+    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
 
 
@@ -676,14 +677,15 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
-  public String promptFromEmbedding(String storeName, String data, @Config LangchainLLMConfiguration configuration,
+  public String promptFromEmbedding(String storeName, String data, boolean getLatest,
+                                    @Config LangchainLLMConfiguration configuration,
                                     @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
     //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
     //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName);
+    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
     ChatLanguageModel model = createModel(configuration, LangchainParams);
 
@@ -718,14 +720,15 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
-  public String promptFromEmbeddingLegacy(String storeName, String data, @Config LangchainLLMConfiguration configuration,
+  public String promptFromEmbeddingLegacy(String storeName, String data, boolean getLatest,
+                                          @Config LangchainLLMConfiguration configuration,
                                           @ParameterGroup(
                                               name = "Additional properties") LangchainLLMParameters LangchainParams) {
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
     //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
     //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName);
+    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
     ChatLanguageModel model = createModel(configuration, LangchainParams);
 
