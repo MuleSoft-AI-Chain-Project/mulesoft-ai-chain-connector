@@ -83,7 +83,7 @@ public class LangchainEmbeddingStoresOperations {
 
   private static InMemoryEmbeddingStore<TextSegment> deserializedStore;
 
-  public static InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName) {
+  private static InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName) {
     if (deserializedStore == null) {
       deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
     }
