@@ -576,9 +576,7 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-add-document-to-store")
   public String addFileEmbedding(String storeName, String contextPath,
-                                 @ParameterGroup(name = "Context") fileTypeParameters fileType,
-                                 @Config LangchainLLMConfiguration configuration,
-                                 @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
+                                 @ParameterGroup(name = "Context") fileTypeParameters fileType) {
 
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -847,9 +845,7 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-add-folder-to-store")
   public String addFilesFromFolderEmbedding(String storeName, String contextPath,
-                                            @ParameterGroup(name = "Context") fileTypeParameters fileType,
-                                            @Config LangchainLLMConfiguration configuration, @ParameterGroup(
-                                                name = "Additional properties") LangchainLLMParameters LangchainParams) {
+                                            @ParameterGroup(name = "Context") fileTypeParameters fileType) {
 
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
     InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
