@@ -56,8 +56,9 @@ public class LangchainImageModelsOperations {
     return OpenAiChatModel.builder()
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
-        .timeout(ofSeconds(60))
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -69,8 +70,9 @@ public class LangchainImageModelsOperations {
         //.apiKey(configuration.getLlmApiKey())
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
-        .timeout(ofSeconds(60))
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -81,7 +83,8 @@ public class LangchainImageModelsOperations {
         //.baseUrl(configuration.getLlmApiKey())
         .baseUrl(baseURL)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .build();
   }
 
@@ -91,9 +94,11 @@ public class LangchainImageModelsOperations {
         //.apiKey(configuration.getLlmApiKey())
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
-        .temperature(0.7)
         .build();
   }
 
@@ -104,7 +109,9 @@ public class LangchainImageModelsOperations {
         .apiKey(apiKey)
         .endpoint(llmEndpoint)
         .deploymentName(deploymentName)
-        .temperature(0.7)
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequestsAndResponses(true)
         .build();
   }

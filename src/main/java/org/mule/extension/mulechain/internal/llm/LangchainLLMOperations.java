@@ -51,8 +51,9 @@ public class LangchainLLMOperations {
     return OpenAiChatModel.builder()
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
-        .timeout(ofSeconds(60))
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -64,8 +65,9 @@ public class LangchainLLMOperations {
         .baseUrl("https://api.groq.com/openai/v1")
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
-        .timeout(ofSeconds(60))
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -77,8 +79,9 @@ public class LangchainLLMOperations {
         //.apiKey(configuration.getLlmApiKey())
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
-        .timeout(ofSeconds(60))
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -89,7 +92,8 @@ public class LangchainLLMOperations {
         //.baseUrl(configuration.getLlmApiKey())
         .baseUrl(baseURL)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .build();
   }
 
@@ -99,7 +103,9 @@ public class LangchainLLMOperations {
         //.apiKey(configuration.getLlmApiKey())
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -112,35 +118,12 @@ public class LangchainLLMOperations {
         .apiKey(apiKey)
         .endpoint(llmEndpoint)
         .deploymentName(deploymentName)
-        .temperature(0.7)
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequestsAndResponses(true)
         .build();
   }
-
-  /* 	private static BedrockAnthropicMessageChatModel createAWSBedrockAnthropicChatModel(LangchainLLMParameters LangchainParams) {
-        return BedrockAnthropicMessageChatModel.builder()
-  		.region(Region.US_EAST_1)
-  		.temperature(0.30f)
-  		.maxTokens(300)
-  		.model(LangchainParams.getModelName())
-  		.maxRetries(1)
-  		.build();
-  
-  	}
-  
-  	private static BedrockTitanChatModel createAWSBedrockTitanChatModel(LangchainLLMParameters LangchainParams) {
-        return BedrockTitanChatModel
-        .builder()
-        .temperature(0.50f)
-        .maxTokens(300)
-        .region(Region.US_EAST_1)
-        //.model(BedrockAnthropicMessageChatModel.Types.AnthropicClaude3SonnetV1.getValue())
-        .model(LangchainParams.getModelName())
-        .maxRetries(1)
-        // Other parameters can be set as well
-        .build();
-  
-  	} */
 
 
 
@@ -200,21 +183,7 @@ public class LangchainLLMOperations {
           model = createAnthropicChatModel(llmTypeKey, LangchainParams);
         }
         break;
-      /* 			case "AWS_BEDROCK":
-      				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
-      				// For authentication, set the following environment variables:
-        		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-       				// model = BedrockAnthropicMessageChatModel.builder()
-      				// 		.region(Region.US_EAST_1)
-      				// 		.temperature(0.30f)
-      				// 		.maxTokens(300)
-      				// 		.model(LangchainParams.getModelName())
-      				// 		.maxRetries(1)
-      				// 		.build();
-      				//model = createAWSBedrockAnthropicChatModel(LangchainParams);
-      				model = createAWSBedrockTitanChatModel(LangchainParams);
-      
-      			break; */
+
       case "AZURE_OPENAI":
         if (configuration.getConfigType().equals("Environment Variables")) {
           model = createAzureOpenAiChatModel(System.getenv("AZURE_OPENAI_KEY").replace("\n", "").replace("\r", ""),

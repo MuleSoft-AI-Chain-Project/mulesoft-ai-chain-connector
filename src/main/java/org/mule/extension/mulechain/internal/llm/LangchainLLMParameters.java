@@ -18,4 +18,33 @@ public class LangchainLLMParameters {
     return modelName;
   }
 
+
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  @Optional(defaultValue = "500")
+  private Integer maxToken;
+
+  public Integer getMaxToken() {
+    return maxToken;
+  }
+
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  @Optional(defaultValue = "0.7")
+  private Double temperature;
+
+  public Double getTemperature() {
+    return temperature;
+  }
+
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  @Optional(defaultValue = "60")
+  private Integer timeoutInSeconds;
+
+  public Integer getTimeoutInSeconds() {
+    return timeoutInSeconds;
+  }
+
+
 }

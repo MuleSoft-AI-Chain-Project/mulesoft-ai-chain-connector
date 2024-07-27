@@ -115,8 +115,9 @@ public class LangchainEmbeddingStoresOperations {
     return OpenAiChatModel.builder()
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.1)
-        .timeout(ofSeconds(60))
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -128,8 +129,9 @@ public class LangchainEmbeddingStoresOperations {
         .baseUrl("https://api.groq.com/openai/v1")
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
-        .timeout(ofSeconds(60))
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -142,8 +144,9 @@ public class LangchainEmbeddingStoresOperations {
         //.apiKey(configuration.getLlmApiKey())
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
-        .timeout(ofSeconds(60))
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -154,7 +157,8 @@ public class LangchainEmbeddingStoresOperations {
         //.baseUrl(configuration.getLlmApiKey())
         .baseUrl(baseURL)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .build();
   }
 
@@ -164,7 +168,9 @@ public class LangchainEmbeddingStoresOperations {
         //.apiKey(configuration.getLlmApiKey())
         .apiKey(apiKey)
         .modelName(LangchainParams.getModelName())
-        .temperature(0.7)
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequests(true)
         .logResponses(true)
         .build();
@@ -177,7 +183,9 @@ public class LangchainEmbeddingStoresOperations {
         .apiKey(apiKey)
         .endpoint(llmEndpoint)
         .deploymentName(deploymentName)
-        .temperature(0.7)
+        .maxTokens(LangchainParams.getMaxToken())
+        .temperature(LangchainParams.getTemperature())
+        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
         .logRequestsAndResponses(true)
         .build();
   }
@@ -805,25 +813,11 @@ public class LangchainEmbeddingStoresOperations {
     //System.out.println("find URL : " + findURL.get(0));
     if (findURL != null) {
 
-      //String name = chain.execute("What is the name from: " + intermediateAnswer + ". Reply only with the value.");
-      //String description = chain.execute("What is the description from: " + intermediateAnswer+ ". Reply only with the value.");
-      //String apiEndpoint = assistant.chat("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
-      //System.out.println("intermediate Answer: " + intermediateAnswer); 
-      //System.out.println("apiEndpoint: " + apiEndpoint); 
-
 
       // Create an instance of the custom tool with parameters
       GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 
       ChatLanguageModel agent = createModel(configuration, LangchainParams);
-      //   ChatLanguageModel agent = OpenAiChatModel.builder()
-      // 	 	  .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-      // 		  .modelName(LangchainParams.getModelName())
-      //           .temperature(0.1)
-      //           .timeout(ofSeconds(60))
-      //           .logRequests(true)
-      //           .logResponses(true)
-      //           .build();
       // Build the assistant with the custom tool
       AssistantC assistantC = AiServices.builder(AssistantC.class)
           .chatLanguageModel(agent)
