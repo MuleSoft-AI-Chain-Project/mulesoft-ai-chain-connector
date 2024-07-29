@@ -16,7 +16,7 @@ public enum ConfigType {
     return Arrays.stream(ConfigType.values())
         .filter(configType -> configType.value.equals(value))
         .findFirst()
-        .orElse(ENV_VARIABLE);
+        .orElseThrow(() -> new IllegalArgumentException("Unsupported Config Type: " + value));
   }
 
   public String getValue() {

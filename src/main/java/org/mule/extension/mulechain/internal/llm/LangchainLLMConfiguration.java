@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * This class represents an extension configuration, values set in this class are commonly used across multiple
@@ -31,8 +32,13 @@ import java.util.function.BiFunction;
 public class LangchainLLMConfiguration implements Initialisable {
 
   private static final Map<LLMType, BiFunction<ConfigExtractor, LangchainLLMConfiguration, ChatLanguageModel>> llmMap;
+  private static final Map<ConfigType, Function<LangchainLLMConfiguration, ConfigExtractor>> configExtractorMap;
 
   static {
+    configExtractorMap = new HashMap<>();
+    configExtractorMap.put(ConfigType.ENV_VARIABLE, (configuration) -> new EnvConfigExtractor());
+    configExtractorMap.put(ConfigType.CONFIG_JSON, FileConfigExtractor::new);
+
     llmMap = new HashMap<>();
     llmMap.put(LLMType.OPENAI, (LangchainLLMInitializerUtil::createOpenAiChatModel));
     llmMap.put(LLMType.GROQAI_OPENAI, (LangchainLLMInitializerUtil::createGroqOpenAiChatModel));
@@ -71,11 +77,9 @@ public class LangchainLLMConfiguration implements Initialisable {
   @Parameter
   @Expression(ExpressionSupport.SUPPORTED)
   @Optional(defaultValue = "500")
-  private Integer maxTokens;
+  private int maxTokens;
 
   private ChatLanguageModel model;
-
-  private Map<ConfigType, ConfigExtractor> configExtractorMap;
 
   public String getLlmType() {
     return llmType;
@@ -105,7 +109,7 @@ public class LangchainLLMConfiguration implements Initialisable {
     return model;
   }
 
-  public Integer getMaxTokens() {
+  public int getMaxTokens() {
     return maxTokens;
   }
 
@@ -114,19 +118,17 @@ public class LangchainLLMConfiguration implements Initialisable {
     if (llmMap.containsKey(type)) {
       return llmMap.get(type).apply(configExtractor, this);
     }
-    throw new IllegalArgumentException("Unsupported LLM type: " + llmType);
+    throw new IllegalArgumentException("LLM Type not supported: " + llmType);
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    initRequiredConfigurations();
-    ConfigExtractor configExtractor = configExtractorMap.get(ConfigType.fromValue(configType));
-    model = createModel(configExtractor);
-  }
-
-  private void initRequiredConfigurations() {
-    configExtractorMap = new HashMap<>();
-    configExtractorMap.put(ConfigType.ENV_VARIABLE, new EnvConfigExtractor());
-    configExtractorMap.put(ConfigType.CONFIG_JSON, new FileConfigExtractor(filePath, llmType));
+    ConfigType config = ConfigType.fromValue(configType);
+    if (configExtractorMap.containsKey(config)) {
+      ConfigExtractor configExtractor = configExtractorMap.get(config).apply(this);
+      model = createModel(configExtractor);
+    } else {
+      throw new IllegalArgumentException("Config Type not supported: " + configType);
+    }
   }
 }
