@@ -2,6 +2,8 @@ package org.mule.extension.mulechain.internal.tools;
 
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class GenericRestApiTool implements Tool {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(GenericRestApiTool.class);
 
   private final String apiEndpoint;
   //private final Map<String, String> defaultParams;
@@ -43,20 +47,20 @@ public class GenericRestApiTool implements Tool {
                         @P("The authorization header value for the request") String authHeader,
                         @P("The payload for the API, doublequotes must be masked") String payload) {
     try {
-      System.out.println(method);
+      LOGGER.info(method);
 
       // Construct the full URL with parameters for GET request
       StringBuilder urlBuilder = new StringBuilder(apiEndpoint);
 
-      System.out.println("URL " + urlBuilder.toString());
-      System.out.println("input " + input);
-      System.out.println("Method " + method);
-      System.out.println("payload " + payload);
+      LOGGER.info("URL {}", urlBuilder);
+      LOGGER.info("input {}", input);
+      LOGGER.info("Method {}", method);
+      LOGGER.info("payload {}", payload);
       if (method == null) {
         method = "GET";
       }
 
-      System.out.println("apiEndpoint-" + apiEndpoint);
+      LOGGER.info("apiEndpoint-{}", apiEndpoint);
       URL url = new URL(urlBuilder.toString());
 
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -68,7 +72,7 @@ public class GenericRestApiTool implements Tool {
 
       // If the request method is POST, send the payload
       if ("POST".equalsIgnoreCase(method) && payload != null && !payload.isEmpty()) {
-        System.out.println("POST");
+        LOGGER.info("POST");
         conn.setDoOutput(true);
         byte[] inputBytes = payload.getBytes(StandardCharsets.UTF_8);
         try (OutputStream os = conn.getOutputStream()) {
@@ -77,7 +81,7 @@ public class GenericRestApiTool implements Tool {
       }
 
       int responseCode = conn.getResponseCode();
-      System.out.println(responseCode);
+      LOGGER.info("Response code: {}", responseCode);
       if (responseCode == 200) {
         BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         StringBuilder sb = new StringBuilder();
@@ -87,14 +91,14 @@ public class GenericRestApiTool implements Tool {
         }
         br.close();
 
-        System.out.println(sb.toString());
+        LOGGER.info(sb.toString());
         return sb.toString();
       } else {
-        System.out.println(responseCode);
+        LOGGER.info(String.valueOf(responseCode));
         return "Error: Received response code " + responseCode;
       }
     } catch (IOException e) {
-      System.out.println(e.getMessage());
+      LOGGER.warn("Error while executing POST requests for tool: ", e);
       return "Error: " + e.getMessage();
     }
   }

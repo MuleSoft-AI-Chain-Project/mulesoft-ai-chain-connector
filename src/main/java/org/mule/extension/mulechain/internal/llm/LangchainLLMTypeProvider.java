@@ -1,5 +1,6 @@
 package org.mule.extension.mulechain.internal.llm;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import org.mule.runtime.api.value.Value;
@@ -12,8 +13,7 @@ public class LangchainLLMTypeProvider implements ValueProvider {
   @Override
   public Set<Value> resolve() throws ValueResolvingException {
     // TODO Auto-generated method stub
-    return ValueBuilder.getValuesFor("OPENAI", "MISTRAL_AI", "OLLAMA", "ANTHROPIC",
-                                     "AZURE_OPENAI", "GROQAI_OPENAI");
+    return ValueBuilder.getValuesFor(Arrays.stream(LLMType.values()).map(LLMType::name));
   }
 
 }

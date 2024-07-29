@@ -6,14 +6,14 @@
 	<groupId>com.mule.mulechain</groupId>
 	<!-- <groupId>aa7af6ad-839e-4607-a6f8-986e4e8166a4</groupId>  -->
 	<artifactId>mulechain-ai-connector</artifactId>
-	<version>0.1.22</version>
+	<version>0.1.23-SNAPSHOT</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleChain</name>
 
 	<parent>
 		<groupId>org.mule.extensions</groupId>
 		<artifactId>mule-modules-parent</artifactId>
-		<version>1.1.3</version>
+		<version>1.3.2</version>
 	</parent>
 	
 <!--<build>
@@ -56,6 +56,7 @@
 		<formatterConfigPath>formatter.xml</formatterConfigPath>
 		<javaFormatter.plugin.version>2.0.1</javaFormatter.plugin.version>
 		<formatterGoal>validate</formatterGoal>
+		<slf4jApi.version>2.0.7</slf4jApi.version>
     </properties>
 
 	<build>
@@ -120,9 +121,20 @@
 			<version>0.31.0</version>
 		</dependency>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4jApi.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j</artifactId>
 			<version>0.31.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jsoup</artifactId>
+					<groupId>org.jsoup</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
@@ -148,6 +160,12 @@
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-document-parser-apache-tika</artifactId>
 			<version>0.31.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>log4j-api</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
@@ -184,11 +202,6 @@
 			<artifactId>regions</artifactId>
 			<version>2.25.69</version>
 		</dependency>-->
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20210307</version>
-		</dependency>
 		<dependency>
 			<groupId>io.reactivex.rxjava2</groupId>
 			<artifactId>rxjava</artifactId>
@@ -228,4 +241,11 @@
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
+<!--	<repositories>-->
+<!--		<repository>-->
+<!--			<id>mule-releases</id>-->
+<!--			<name>Nexus Public Releases</name>-->
+<!--			<url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>-->
+<!--		</repository>-->
+<!--	</repositories>-->
 </project>
