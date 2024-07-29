@@ -61,12 +61,17 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   @Parameter
   @Optional(defaultValue = "0.7")
-  private double temperature = 0.7;
+  private double temperature;
 
   @Parameter
   @Optional(defaultValue = "60")
   @DisplayName("Duration in sec")
-  private long durationInSeconds = 60;
+  private long durationInSeconds;
+
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  @Optional(defaultValue = "500")
+  private Integer maxTokens;
 
   private ChatLanguageModel model;
 
@@ -98,6 +103,10 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   public ChatLanguageModel getModel() {
     return model;
+  }
+
+  public Integer getMaxTokens() {
+    return maxTokens;
   }
 
   private ChatLanguageModel createModel(ConfigExtractor configExtractor) {

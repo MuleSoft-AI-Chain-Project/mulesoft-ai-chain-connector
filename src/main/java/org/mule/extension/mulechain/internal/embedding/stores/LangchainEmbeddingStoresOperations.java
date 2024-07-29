@@ -74,8 +74,8 @@ public class LangchainEmbeddingStoresOperations {
 
   private static InMemoryEmbeddingStore<TextSegment> deserializedStore;
 
-  public static InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName) {
-    if (deserializedStore == null) {
+  private static InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName, boolean getLatest) {
+    if (deserializedStore == null || getLatest) {
       deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
     }
     return deserializedStore;
@@ -383,8 +383,7 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-add-document-to-store")
   public String addFileEmbedding(String storeName, String contextPath,
-                                 @ParameterGroup(name = "Context") FileTypeParameters fileType,
-                                 @Config LangchainLLMConfiguration configuration) {
+                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -448,7 +447,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-query-from-store")
-  public String queryFromEmbedding(String storeName, String question, Number maxResults, Double minScore) {
+  public String queryFromEmbedding(String storeName, String question, Number maxResults, Double minScore, boolean getLatest) {
     int maximumResults = (int) maxResults;
     if (minScore == null || minScore == 0) {
       minScore = 0.7;
@@ -458,7 +457,7 @@ public class LangchainEmbeddingStoresOperations {
 
     //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
 
-    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName);
+    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
 
 
@@ -484,13 +483,14 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
-  public String promptFromEmbedding(String storeName, String data, @Config LangchainLLMConfiguration configuration) {
+  public String promptFromEmbedding(String storeName, String data, boolean getLatest,
+                                    @Config LangchainLLMConfiguration configuration) {
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
     //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
     //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName);
+    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
     ChatLanguageModel model = configuration.getModel();
 
@@ -525,12 +525,13 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
-  public String promptFromEmbeddingLegacy(String storeName, String data, @Config LangchainLLMConfiguration configuration) {
+  public String promptFromEmbeddingLegacy(String storeName, String data, boolean getLatest,
+                                          @Config LangchainLLMConfiguration configuration) {
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
     //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
     //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName);
+    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
     ChatLanguageModel model = configuration.getModel();
 
@@ -606,24 +607,11 @@ public class LangchainEmbeddingStoresOperations {
     //System.out.println("find URL : " + findURL.get(0));
     if (findURL != null) {
 
-      //String name = chain.execute("What is the name from: " + intermediateAnswer + ". Reply only with the value.");
-      //String description = chain.execute("What is the description from: " + intermediateAnswer+ ". Reply only with the value.");
-      //String apiEndpoint = assistant.chat("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
-      //System.out.println("intermediate Answer: " + intermediateAnswer); 
-      //System.out.println("apiEndpoint: " + apiEndpoint); 
-
 
       // Create an instance of the custom tool with parameters
       GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 
-      //   ChatLanguageModel agent = OpenAiChatModel.builder()
-      // 	 	  .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-      // 		  .modelName(LangchainParams.getModelName())
-      //           .temperature(0.1)
-      //           .timeout(ofSeconds(60))
-      //           .logRequests(true)
-      //           .logResponses(true)
-      //           .build();
+      ChatLanguageModel agent = configuration.getModel();
       // Build the assistant with the custom tool
       AssistantC assistantC = AiServices.builder(AssistantC.class)
           .chatLanguageModel(model)
@@ -648,8 +636,7 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-add-folder-to-store")
   public String addFilesFromFolderEmbedding(String storeName, String contextPath,
-                                            @ParameterGroup(name = "Context") FileTypeParameters fileType,
-                                            @Config LangchainLLMConfiguration configuration) {
+                                            @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
     InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
