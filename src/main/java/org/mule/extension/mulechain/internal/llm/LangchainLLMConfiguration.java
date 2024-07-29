@@ -79,6 +79,8 @@ public class LangchainLLMConfiguration implements Initialisable {
   @Optional(defaultValue = "500")
   private int maxTokens;
 
+  private ConfigExtractor configExtractor;
+
   private ChatLanguageModel model;
 
   public String getLlmType() {
@@ -105,12 +107,16 @@ public class LangchainLLMConfiguration implements Initialisable {
     return durationInSeconds;
   }
 
-  public ChatLanguageModel getModel() {
-    return model;
-  }
-
   public int getMaxTokens() {
     return maxTokens;
+  }
+
+  public ConfigExtractor getConfigExtractor() {
+    return configExtractor;
+  }
+
+  public ChatLanguageModel getModel() {
+    return model;
   }
 
   private ChatLanguageModel createModel(ConfigExtractor configExtractor) {
@@ -125,7 +131,7 @@ public class LangchainLLMConfiguration implements Initialisable {
   public void initialise() throws InitialisationException {
     ConfigType config = ConfigType.fromValue(configType);
     if (configExtractorMap.containsKey(config)) {
-      ConfigExtractor configExtractor = configExtractorMap.get(config).apply(this);
+      configExtractor = configExtractorMap.get(config).apply(this);
       model = createModel(configExtractor);
     } else {
       throw new IllegalArgumentException("Config Type not supported: " + configType);

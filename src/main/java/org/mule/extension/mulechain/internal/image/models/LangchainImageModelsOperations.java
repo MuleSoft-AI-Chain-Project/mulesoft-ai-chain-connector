@@ -1,12 +1,11 @@
 package org.mule.extension.mulechain.internal.image.models;
 
-import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 
-import static org.mule.extension.mulechain.internal.util.JsonUtils.readConfigFile;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import dev.langchain4j.model.openai.OpenAiImageModel;
 import dev.langchain4j.model.image.ImageModel;
@@ -56,22 +55,12 @@ public class LangchainImageModelsOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-generate")
   public URI drawImage(String data, @Config LangchainLLMConfiguration configuration) {
-    ImageModel model = null;
-    JSONObject config = readConfigFile(configuration.getFilePath());
-    if (configuration.getConfigType().equals("Environment Variables")) {
-      model = OpenAiImageModel.builder()
-          .modelName(configuration.getModelName())
-          .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-          .build();
-    } else {
-      JSONObject llmType = config.getJSONObject("OPENAI");
-      String llmTypeKey = llmType.getString("OPENAI_API_KEY");
-      model = OpenAiImageModel.builder()
-          .modelName(configuration.getModelName())
-          .apiKey(llmTypeKey.replace("\n", "").replace("\r", ""))
-          .build();
+    ConfigExtractor configExtractor = configuration.getConfigExtractor();
+    ImageModel model = OpenAiImageModel.builder()
+        .modelName(configuration.getModelName())
+        .apiKey(configExtractor.extractValue("OPENAI_API_KEY"))
+        .build();
 
-    }
     /* ImageModel model = OpenAiImageModel.builder()
             .modelName(LangchainParams.getModelName())
             .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
