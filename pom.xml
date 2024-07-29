@@ -59,6 +59,8 @@
 		<slf4jApi.version>2.0.7</slf4jApi.version>
 		<mule.sdk.api.version>0.9.0-rc1</mule.sdk.api.version>
 		<langchain4j.version>0.31.0</langchain4j.version>
+		<mapdb.version>3.1.0</mapdb.version>
+		<json.version>20240303</json.version>
     </properties>
 
 	<build>
@@ -151,17 +153,17 @@
 		<dependency>
 			<groupId>org.mapdb</groupId>
 			<artifactId>mapdb</artifactId>
-			<version>3.1.0</version>
+			<version>${mapdb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20240303</version>
+			<version>${json.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-document-parser-apache-tika</artifactId>
-			<version>0.31.0</version>
+			<version>${langchain4j.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>log4j-api</artifactId>
@@ -187,7 +189,7 @@
 		<!-- <dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-hugging-face</artifactId>
-			<version>0.31.0</version>
+			<version>${langchain4j.version}</version>
 		</dependency>-->
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
@@ -197,7 +199,7 @@
 		<!--<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-bedrock</artifactId>
-			<version>0.31.0</version>
+			<version>${langchain4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>

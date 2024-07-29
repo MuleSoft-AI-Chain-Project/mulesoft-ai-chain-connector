@@ -3,11 +3,9 @@ package org.mule.extension.mulechain.internal.streaming;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
-import org.mule.extension.mulechain.internal.llm.LangchainLLMParameters;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.Streaming;
 
@@ -39,12 +37,11 @@ public class LangchainLLMStreamingOperations {
   @Alias("Stream-prompt-answer")
   @OutputResolver(output = TokenStreamOutputResolver.class)
   @Streaming
-  public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration,
-                                     @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
+  public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration) {
 
     StreamingChatLanguageModel model = OpenAiStreamingChatModel.builder()
         .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-        .modelName(LangchainParams.getModelName())
+        .modelName(configuration.getModelName())
         .temperature(0.3)
         .timeout(ofSeconds(60))
         .logRequests(true)
