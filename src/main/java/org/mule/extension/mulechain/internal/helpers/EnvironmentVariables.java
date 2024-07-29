@@ -3,7 +3,7 @@ package org.mule.extension.mulechain.internal.helpers;
 import java.io.IOException;
 import java.util.Map;
 
-public class environmentVariables {
+public class EnvironmentVariables {
 
   public static void setVar(String varNam, String varValue) throws IOException {
     ProcessBuilder processBuilder = new ProcessBuilder();
