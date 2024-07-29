@@ -104,35 +104,7 @@ public class LangchainEmbeddingStoresOperations {
     LOGGER.info("RAG loading document with file type: {}", fileType.getFileType());
 
     // ChatLanguageModel model = null;
-    Document document = null;
-    switch (fileType.getFileType()) {
-      case "text":
-        document = loadDocument(contextPath, new TextDocumentParser());
-        ingestor.ingest(document);
-        break;
-      case "pdf":
-        document = loadDocument(contextPath, new ApacheTikaDocumentParser());
-        ingestor.ingest(document);
-        break;
-      case "url":
-        URL url = null;
-        try {
-          url = new URL(contextPath);
-        } catch (MalformedURLException e) {
-          // TODO Auto-generated catch block
-          LOGGER.error("Error while loading the document: " + contextPath, e);
-        }
-
-        Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
-        HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
-        document = transformer.transform(htmlDocument);
-        document.metadata().add("url", contextPath);
-        ingestor.ingest(document);
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
-    }
-
+    ingestDocument(fileType, contextPath, ingestor);
 
     ChatLanguageModel model = configuration.getModel();
 
@@ -148,11 +120,38 @@ public class LangchainEmbeddingStoresOperations {
         .contentRetriever(contentRetriever)
         .build();
 
-    String answer = assistant.chat(data);
-    //System.out.println(answer); 
-    return answer;
+    return assistant.chat(data);
   }
 
+  private void ingestDocument(FileTypeParameters fileType, String contextPath, EmbeddingStoreIngestor ingestor) {
+    Document document = null;
+    switch (fileType.getFileType()) {
+      case "text":
+        document = loadDocument(contextPath, new TextDocumentParser());
+        ingestor.ingest(document);
+        break;
+      case "pdf":
+        document = loadDocument(contextPath, new ApacheTikaDocumentParser());
+        ingestor.ingest(document);
+        break;
+      case "url":
+        URL url = null;
+        try {
+          url = new URL(contextPath);
+        } catch (MalformedURLException e) {
+          LOGGER.error("Error while loading the document: " + contextPath, e);
+        }
+
+        Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
+        HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
+        document = transformer.transform(htmlDocument);
+        document.metadata().add("url", contextPath);
+        ingestor.ingest(document);
+        break;
+      default:
+        throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
+    }
+  }
 
 
   interface Assistant {
@@ -367,9 +366,7 @@ public class LangchainEmbeddingStoresOperations {
 
     InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-    //embeddingStore.serializeToFile(storeName);
     embeddingStore.serializeToFile(storeName);
-
 
     embeddingStore = null;
     return "Embedding-store created.";
@@ -405,35 +402,8 @@ public class LangchainEmbeddingStoresOperations {
 
 
     // ChatLanguageModel model = null;
-    Document document = null;
-    switch (fileType.getFileType()) {
-      case "text":
-        document = loadDocument(contextPath, new TextDocumentParser());
-        ingestor.ingest(document);
-        break;
-      case "pdf":
-        document = loadDocument(contextPath, new ApacheTikaDocumentParser());
-        ingestor.ingest(document);
-        break;
-      case "url":
-        URL url = null;
-        try {
-          url = new URL(contextPath);
-        } catch (MalformedURLException e) {
-          LOGGER.error("Error while loading the document: " + contextPath, e);
-        }
 
-        Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
-        HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
-        document = transformer.transform(htmlDocument);
-        document.metadata().add("url", contextPath);
-        ingestor.ingest(document);
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
-    }
-
-
+    ingestDocument(fileType, contextPath, ingestor);
 
     deserializedStore.serializeToFile(storeName);
     deserializedStore = null;
