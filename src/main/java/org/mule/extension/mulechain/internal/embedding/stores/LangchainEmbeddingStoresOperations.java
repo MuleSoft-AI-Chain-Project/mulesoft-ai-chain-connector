@@ -611,7 +611,6 @@ public class LangchainEmbeddingStoresOperations {
       // Create an instance of the custom tool with parameters
       GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 
-      ChatLanguageModel agent = configuration.getModel();
       // Build the assistant with the custom tool
       AssistantC assistantC = AiServices.builder(AssistantC.class)
           .chatLanguageModel(model)
