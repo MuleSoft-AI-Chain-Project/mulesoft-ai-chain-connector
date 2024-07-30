@@ -63,11 +63,11 @@ public class LangchainLLMConfiguration implements Initialisable {
   @Expression(ExpressionSupport.SUPPORTED)
   @OfValues(LangchainLLMParameterModelNameProvider.class)
   @Optional(defaultValue = "gpt-3.5-turbo")
-  private String modelName;
+  private String modelName = "gpt-3.5-turbo";
 
   @Parameter
   @Optional(defaultValue = "0.7")
-  private double temperature;
+  private double temperature = 0.7;
 
   @Parameter
   @Optional(defaultValue = "60")
