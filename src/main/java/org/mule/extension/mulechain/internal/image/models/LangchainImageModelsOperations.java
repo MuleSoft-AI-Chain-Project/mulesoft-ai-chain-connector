@@ -84,11 +84,7 @@ public class LangchainImageModelsOperations {
 
     JSONObject jsonObject = new JSONObject();
     jsonObject.put("response", response.content().url());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put("inputCount", response.tokenUsage().inputTokenCount());
-    tokenUsage.put("outputCount", response.tokenUsage().outputTokenCount());
-    tokenUsage.put("totalCount", response.tokenUsage().totalTokenCount());
-    jsonObject.put("tokenUsage", tokenUsage);
+
 
 
     return jsonObject.toString();
