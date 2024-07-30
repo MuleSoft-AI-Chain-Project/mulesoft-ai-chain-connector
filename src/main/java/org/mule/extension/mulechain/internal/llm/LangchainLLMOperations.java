@@ -7,12 +7,14 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.Result;
 import dev.langchain4j.service.UserMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,11 @@ public class LangchainLLMOperations {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LangchainLLMOperations.class);
 
+  interface Assistant {
+
+    Result<String> chat(String userMessage);
+  }
+
   /**
    * Implements a simple Chat agent
    */
@@ -33,7 +40,24 @@ public class LangchainLLMOperations {
     // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
 
     ChatLanguageModel model = configuration.getModel();
-    return model.generate(prompt);
+
+    Assistant assistant = AiServices.create(Assistant.class, model);
+
+    Result<String> answer = assistant.chat(prompt);
+
+
+    //String response = model.generate(prompt);
+
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", answer.content());
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", answer.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", answer.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", answer.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+
+    return jsonObject.toString();
   }
 
   /**
@@ -55,7 +79,21 @@ public class LangchainLLMOperations {
 
     Prompt prompt = promptTemplate.apply(variables);
 
-    return model.generate(prompt.text());
+    //String response = model.generate(prompt.text());
+    Assistant assistant = AiServices.create(Assistant.class, model);
+
+    Result<String> answer = assistant.chat(prompt.text());
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", answer.content());
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", answer.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", answer.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", answer.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+
+
+    return jsonObject.toString();
   }
 
 
@@ -72,7 +110,7 @@ public class LangchainLLMOperations {
   interface SentimentAnalyzer {
 
     @UserMessage("Analyze sentiment of {{it}}")
-    Sentiment analyzeSentimentOf(String text);
+    Result<Sentiment> analyzeSentimentOf(String text);
 
     @UserMessage("Does {{it}} have a positive sentiment?")
     boolean isPositive(String text);
@@ -85,20 +123,30 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("SENTIMENT-analyze")
-  public Sentiment extractSentiments(String data, @Config LangchainLLMConfiguration configuration) {
+  public String extractSentiments(String data, @Config LangchainLLMConfiguration configuration) {
 
     ChatLanguageModel model = configuration.getModel();
 
 
     SentimentAnalyzer sentimentAnalyzer = AiServices.create(SentimentAnalyzer.class, model);
 
-    Sentiment sentiment = sentimentAnalyzer.analyzeSentimentOf(data);
+    Result<Sentiment> sentiment = sentimentAnalyzer.analyzeSentimentOf(data);
     LOGGER.info("Analyzed sentiment: {}", sentiment); // POSITIVE
 
     boolean positive = sentimentAnalyzer.isPositive(data);
     LOGGER.info("Is sentiment positive: {}", positive); // false
 
-    return sentiment;
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("sentiment", sentiment.content());
+    jsonObject.put("isPositive", positive);
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", sentiment.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", sentiment.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", sentiment.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+
+    return jsonObject.toString();
   }
 
 

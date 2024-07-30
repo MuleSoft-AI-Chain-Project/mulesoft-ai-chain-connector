@@ -1,5 +1,6 @@
 package org.mule.extension.mulechain.internal.image.models;
 
+import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -11,8 +12,6 @@ import dev.langchain4j.model.openai.OpenAiImageModel;
 import dev.langchain4j.model.image.ImageModel;
 import dev.langchain4j.data.image.Image;
 import dev.langchain4j.model.output.Response;
-
-import java.net.URI;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ImageContent;
@@ -31,7 +30,7 @@ public class LangchainImageModelsOperations {
   private static final Logger LOGGER = LoggerFactory.getLogger(LangchainImageModelsOperations.class);
 
   /**
-   * Reads an image from an URL. 
+   * Reads an image from a URL.
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-read")
@@ -45,7 +44,19 @@ public class LangchainImageModelsOperations {
 
     Response<AiMessage> response = model.generate(userMessage);
 
-    return response.content().text();
+
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", response.content().text());
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", response.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", response.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", response.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+
+
+    return jsonObject.toString();
+
   }
 
 
@@ -54,7 +65,7 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-generate")
-  public URI drawImage(String data, @Config LangchainLLMConfiguration configuration) {
+  public String drawImage(String data, @Config LangchainLLMConfiguration configuration) {
     ConfigExtractor configExtractor = configuration.getConfigExtractor();
     ImageModel model = OpenAiImageModel.builder()
         .modelName(configuration.getModelName())
@@ -68,7 +79,19 @@ public class LangchainImageModelsOperations {
     */
     Response<Image> response = model.generate(data);
     LOGGER.info("Generated Image: {}", response.content().url());
-    return response.content().url();
+
+
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", response.content().url());
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", response.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", response.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", response.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+
+
+    return jsonObject.toString();
   }
 
 

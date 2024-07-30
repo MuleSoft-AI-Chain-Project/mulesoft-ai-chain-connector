@@ -2,8 +2,10 @@ package org.mule.extension.mulechain.internal.embedding.stores;
 
 import dev.langchain4j.data.document.BlankDocumentException;
 import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.rag.content.Content;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
@@ -18,6 +20,9 @@ import java.util.stream.Stream;
 import java.util.concurrent.atomic.AtomicInteger;
 import dev.langchain4j.data.embedding.Embedding;
 import static java.util.stream.Collectors.joining;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
@@ -26,11 +31,11 @@ import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-
 import org.mule.runtime.extension.api.annotation.param.Config;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.service.MemoryId;
+import dev.langchain4j.service.Result;
 import dev.langchain4j.service.UserMessage;
 
 import java.util.ArrayList;
@@ -115,12 +120,26 @@ public class LangchainEmbeddingStoresOperations {
 
     ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
 
-    AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
+    AssistantSources assistant = AiServices.builder(AssistantSources.class)
         .chatLanguageModel(model)
         .contentRetriever(contentRetriever)
         .build();
 
-    return assistant.chat(data);
+    Result<String> answer = assistant.chat(data);
+    //    LOGGER.info("Answer: {}", answer);
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", answer.content());
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", answer.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", answer.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", answer.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+    jsonObject.put("filePath", contextPath);
+    jsonObject.put("fileType", fileType);
+    jsonObject.put("question", data);
+
+    return jsonObject.toString();
   }
 
   private void ingestDocument(FileTypeParameters fileType, String contextPath, EmbeddingStoreIngestor ingestor) {
@@ -154,14 +173,15 @@ public class LangchainEmbeddingStoresOperations {
   }
 
 
-  interface Assistant {
 
-    String chat(@MemoryId int memoryId, @UserMessage String userMessage);
-  }
+  // interface Assistant {
+
+  //   String chat(@MemoryId int memoryId, @UserMessage String userMessage);
+  // }
 
   interface AssistantMemory {
 
-    String chat(@MemoryId String memoryName, @UserMessage String userMessage);
+    Result<String> chat(@MemoryId String memoryName, @UserMessage String userMessage);
   }
 
 
@@ -194,7 +214,22 @@ public class LangchainEmbeddingStoresOperations {
         .chatMemoryProvider(chatMemoryProvider)
         .build();
 
-    return assistant.chat(memoryName, data);
+    Result<String> response = assistant.chat(memoryName, data);
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", response.content());
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", response.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", response.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", response.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+
+    jsonObject.put("memoryName", memoryName);
+    jsonObject.put("dbFilePath", dbFilePath);
+    jsonObject.put("maxMessages", maxMessages);
+
+
+    return jsonObject.toString();
 
   }
 
@@ -273,30 +308,18 @@ public class LangchainEmbeddingStoresOperations {
         .build();
 
 
-
+    boolean toolsUsed = false;
     String intermediateAnswer = chain.execute(data);
     String response = model.generate(data);
     List<String> findURL = extractUrls(intermediateAnswer);
     if (findURL != null) {
 
-      //String name = chain.execute("What is the name from: " + intermediateAnswer + ". Reply only with the value.");
-      //String description = chain.execute("What is the description from: " + intermediateAnswer+ ". Reply only with the value.");
-      //String apiEndpoint = chain.execute("What is the url from: " + intermediateAnswer+ ". Reply only with the value.");
-      //System.out.println("intermediate Answer: " + intermediateAnswer); 
-      //System.out.println("apiEndpoint: " + apiEndpoint); 
-
+      toolsUsed = true;
 
       // Create an instance of the custom tool with parameters
       GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 
-      //   ChatLanguageModel agent = OpenAiChatModel.builder()
-      //   		  .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-      //           .modelName(LangchainParams.getModelName())
-      //           .temperature(0.1)
-      //           .timeout(ofSeconds(60))
-      //           .logRequests(true)
-      //           .logResponses(true)
-      //           .build();
+      ChatLanguageModel agent = configuration.getModel();
       // Build the assistant with the custom tool
       AssistantC assistant = AiServices.builder(AssistantC.class)
           .chatLanguageModel(model)
@@ -311,7 +334,12 @@ public class LangchainEmbeddingStoresOperations {
     }
 
 
-    return response;
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", response);
+    jsonObject.put("toolsUsed", toolsUsed);
+
+
+    return jsonObject.toString();
   }
 
 
@@ -369,7 +397,11 @@ public class LangchainEmbeddingStoresOperations {
     embeddingStore.serializeToFile(storeName);
 
     embeddingStore = null;
-    return "Embedding-store created.";
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("storeName", storeName);
+    jsonObject.put("status", "created");
+
+    return jsonObject.toString();
   }
 
 
@@ -408,7 +440,13 @@ public class LangchainEmbeddingStoresOperations {
     deserializedStore.serializeToFile(storeName);
     deserializedStore = null;
 
-    return "Embedding-store updated.";
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("fileType", fileType.getFileType());
+    jsonObject.put("filePath", contextPath);
+    jsonObject.put("storeName", storeName);
+    jsonObject.put("status", "updated");
+
+    return jsonObject.toString();
   }
 
 
@@ -443,7 +481,15 @@ public class LangchainEmbeddingStoresOperations {
     //deserializedStore = null;
     questionEmbedding = null;
 
-    return information;
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("maxResults", maxResults);
+    jsonObject.put("minScore", minScore);
+    jsonObject.put("question", question);
+    jsonObject.put("storeName", storeName);
+    jsonObject.put("information", information);
+
+    return jsonObject.toString();
   }
 
 
@@ -455,10 +501,6 @@ public class LangchainEmbeddingStoresOperations {
   @Alias("EMBEDDING-get-info-from-store")
   public String promptFromEmbedding(String storeName, String data, boolean getLatest,
                                     @Config LangchainLLMConfiguration configuration) {
-    //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-
-    //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
-    //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
     InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
@@ -467,27 +509,62 @@ public class LangchainEmbeddingStoresOperations {
 
     ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(store, this.embeddingModel);
 
-    AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
+    Result<String> results;
+    JSONObject jsonObject = new JSONObject();
+
+
+    AssistantSources assistantSources = AiServices.builder(AssistantSources.class)
         .chatLanguageModel(model)
         .contentRetriever(contentRetriever)
         .build();
 
-    //		      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
-    //		              .chatLanguageModel(model)
-    //		              .retriever(EmbeddingStoreRetriever.from(deserializedStore, embeddingModel))
-    //		              // .chatMemory() // you can override default chat memory
-    //		              // .promptTemplate() // you can override default prompt template
-    //		              .build();
-    //
-    //		      String answer = chain.execute(data);
-    String response = assistant.chat(data);
-    //System.out.println(answer); 
 
-    //deserializedStore.serializeToFile(storeName);
-    //deserializedStore = null; // Set the deserializedStore variable to null
+    results = assistantSources.chat(data);
+    List<Content> contents = results.sources();
 
-    return response;
+    jsonObject.put("response", results.content());
+    jsonObject.put("storeName", storeName);
+    jsonObject.put("question", data);
+    jsonObject.put("getLatest", getLatest);
+    JSONArray sources = new JSONArray();
+    String absoluteDirectoryPath;
+    String fileName;
+    Metadata metadata;
+
+    JSONObject contentObject;
+    for (Content content : contents) {
+      /*Map<String, Object> metadata = (Map<String, Object>) content.textSegment().metadata();
+      String absoluteDirectoryPath = (String) metadata.get("absolute_directory_path");
+      String fileName = (String) metadata.get("file_name");*/
+
+      metadata = content.textSegment().metadata();
+      absoluteDirectoryPath = (String) metadata.getString("absolute_directory_path");
+      fileName = (String) metadata.getString("file_name");
+
+      contentObject = new JSONObject();
+      contentObject.put("absoluteDirectoryPath", absoluteDirectoryPath);
+      contentObject.put("fileName", fileName);
+      contentObject.put("textSegment", content.textSegment().text());
+      sources.put(contentObject);
+    }
+
+    jsonObject.put("sources", sources);
+
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", results.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", results.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", results.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+
+    return jsonObject.toString();
   }
+
+
+  interface AssistantSources {
+
+    Result<String> chat(String userMessage);
+  }
+
 
 
   /**
@@ -497,36 +574,26 @@ public class LangchainEmbeddingStoresOperations {
   @Alias("EMBEDDING-get-info-from-store-legacy")
   public String promptFromEmbeddingLegacy(String storeName, String data, boolean getLatest,
                                           @Config LangchainLLMConfiguration configuration) {
-    //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-
-    //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
-    //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
     InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
     ChatLanguageModel model = configuration.getModel();
 
 
-    //   ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(deserializedStore, embeddingModel);
-
-    //   AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
-    // 		    .chatLanguageModel(model)
-    // 		    .contentRetriever(contentRetriever)
-    // 		    .build();
 
     ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
         .chatLanguageModel(model)
         .retriever(EmbeddingStoreRetriever.from(store, this.embeddingModel))
-        // .chatMemory() // you can override default chat memory
-        // .promptTemplate() // you can override default prompt template
         .build();
 
     String answer = chain.execute(data);
-    //String response = assistant.chat(data);
-    //System.out.println(answer); 
 
-    //deserializedStore.serializeToFile(storeName);
-    //deserializedStore = null;
-    return answer;
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", answer);
+    jsonObject.put("storeName", storeName);
+    jsonObject.put("getLatest", getLatest);
+
+
+    return jsonObject.toString();
   }
 
 
@@ -561,7 +628,6 @@ public class LangchainEmbeddingStoresOperations {
     ChatLanguageModel model = configuration.getModel();
 
 
-
     ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
 
 
@@ -570,6 +636,7 @@ public class LangchainEmbeddingStoresOperations {
         .contentRetriever(contentRetriever)
         .build();
 
+    boolean toolsUsed = false;
 
     String intermediateAnswer = assistant.chat(data);
     String response = model.generate(data);
@@ -577,7 +644,7 @@ public class LangchainEmbeddingStoresOperations {
     //System.out.println("find URL : " + findURL.get(0));
     if (findURL != null) {
 
-
+      toolsUsed = true;
       // Create an instance of the custom tool with parameters
       GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 
@@ -585,7 +652,7 @@ public class LangchainEmbeddingStoresOperations {
       AssistantC assistantC = AiServices.builder(AssistantC.class)
           .chatLanguageModel(model)
           .tools(restApiTool)
-          .chatMemory(MessageWindowChatMemory.withMaxMessages(100))
+          .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
           .build();
       // Use the assistant to make a query
       response = assistantC.chat(intermediateAnswer);
@@ -594,8 +661,12 @@ public class LangchainEmbeddingStoresOperations {
         response =  intermediateAnswer; */
     }
 
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", response);
+    jsonObject.put("toolsUsed", toolsUsed);
 
-    return response;
+
+    return jsonObject.toString();
   }
 
 
@@ -659,7 +730,14 @@ public class LangchainEmbeddingStoresOperations {
 
     deserializedStore.serializeToFile(storeName);
     deserializedStore = null;
-    return "Embedding-store updated.";
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("filesCount", totalFiles);
+    jsonObject.put("folderPath", contextPath);
+    jsonObject.put("storeName", storeName);
+    jsonObject.put("status", "updated");
+
+
+    return jsonObject.toString();
   }
 
 }
