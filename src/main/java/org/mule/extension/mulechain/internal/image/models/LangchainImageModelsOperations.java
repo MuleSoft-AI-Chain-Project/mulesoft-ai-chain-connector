@@ -214,7 +214,19 @@ public class LangchainImageModelsOperations {
 
     Response<AiMessage> response = model.generate(userMessage);
 
-    return response.content().text();
+
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", response.content().text());
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", response.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", response.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", response.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+
+
+    return jsonObject.toString();
+
   }
 
 
@@ -223,8 +235,8 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-generate")
-  public URI drawImage(String data, @Config LangchainLLMConfiguration configuration,
-                       @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
+  public String drawImage(String data, @Config LangchainLLMConfiguration configuration,
+                          @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
     ImageModel model = null;
     JSONObject config = readConfigFile(configuration.getFilePath());
     if (configuration.getConfigType().equals("Environment Variables")) {
@@ -248,7 +260,19 @@ public class LangchainImageModelsOperations {
     */
     Response<Image> response = model.generate(data);
     System.out.println(response.content().url());
-    return response.content().url();
+
+
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", response.content().url());
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", response.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", response.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", response.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+
+
+    return jsonObject.toString();
   }
 
 
