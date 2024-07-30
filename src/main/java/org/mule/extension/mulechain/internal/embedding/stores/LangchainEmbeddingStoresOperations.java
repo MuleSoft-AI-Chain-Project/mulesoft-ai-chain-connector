@@ -5,7 +5,6 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.rag.content.Content;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
@@ -21,32 +20,27 @@ import java.util.stream.Stream;
 import java.util.concurrent.atomic.AtomicInteger;
 import dev.langchain4j.data.embedding.Embedding;
 import static java.util.stream.Collectors.joining;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import org.mapdb.Atomic.Boolean;
-import org.mule.extension.mulechain.internal.helpers.fileTypeParameters;
+import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
-import org.mule.extension.mulechain.internal.llm.LangchainLLMParameters;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.internal.MuleDsqlParser.bool_return;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.model.anthropic.AnthropicChatModel;
-import dev.langchain4j.model.azure.AzureOpenAiChatModel;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.Result;
 import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.model.mistralai.MistralAiChatModel;
-import dev.langchain4j.model.ollama.OllamaChatModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static java.time.Duration.ofSeconds;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.document.loader.UrlDocumentLoader;
 import dev.langchain4j.data.document.parser.TextDocumentParser;
@@ -71,19 +65,15 @@ import static dev.langchain4j.data.message.ChatMessageDeserializer.messagesFromJ
 import static dev.langchain4j.data.message.ChatMessageSerializer.messagesToJson;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
  */
 public class LangchainEmbeddingStoresOperations {
 
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(LangchainEmbeddingStoresOperations.class);
 
   private EmbeddingModel embeddingModel;
 
@@ -101,199 +91,10 @@ public class LangchainEmbeddingStoresOperations {
     this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
   }
 
-  private static JSONObject readConfigFile(String filePath) {
-    Path path = Paths.get(filePath);
-    if (Files.exists(path)) {
-      try {
-        String content = new String(Files.readAllBytes(path));
-        return new JSONObject(content);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    } else {
-      System.out.println("File does not exist: " + filePath);
-    }
-    return null;
-  }
-
-  private static OpenAiChatModel createOpenAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
-    return OpenAiChatModel.builder()
-        .apiKey(apiKey)
-        .modelName(LangchainParams.getModelName())
-        .maxTokens(LangchainParams.getMaxToken())
-        .temperature(LangchainParams.getTemperature())
-        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
-        .logRequests(true)
-        .logResponses(true)
-        .build();
-
-  }
-
-  private static OpenAiChatModel createGroqOpenAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
-    return OpenAiChatModel.builder()
-        .baseUrl("https://api.groq.com/openai/v1")
-        .apiKey(apiKey)
-        .modelName(LangchainParams.getModelName())
-        .maxTokens(LangchainParams.getMaxToken())
-        .temperature(LangchainParams.getTemperature())
-        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
-        .logRequests(true)
-        .logResponses(true)
-        .build();
-
-  }
-
-
-  private static MistralAiChatModel createMistralAiChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
-    return MistralAiChatModel.builder()
-        //.apiKey(configuration.getLlmApiKey())
-        .apiKey(apiKey)
-        .modelName(LangchainParams.getModelName())
-        .maxTokens(LangchainParams.getMaxToken())
-        .temperature(LangchainParams.getTemperature())
-        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
-        .logRequests(true)
-        .logResponses(true)
-        .build();
-  }
-
-  private static OllamaChatModel createOllamaChatModel(String baseURL, LangchainLLMParameters LangchainParams) {
-    return OllamaChatModel.builder()
-        //.baseUrl(configuration.getLlmApiKey())
-        .baseUrl(baseURL)
-        .modelName(LangchainParams.getModelName())
-        .temperature(LangchainParams.getTemperature())
-        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
-        .build();
-  }
-
-
-  private static AnthropicChatModel createAnthropicChatModel(String apiKey, LangchainLLMParameters LangchainParams) {
-    return AnthropicChatModel.builder()
-        //.apiKey(configuration.getLlmApiKey())
-        .apiKey(apiKey)
-        .modelName(LangchainParams.getModelName())
-        .maxTokens(LangchainParams.getMaxToken())
-        .temperature(LangchainParams.getTemperature())
-        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
-        .logRequests(true)
-        .logResponses(true)
-        .build();
-  }
-
-
-  private static AzureOpenAiChatModel createAzureOpenAiChatModel(String apiKey, String llmEndpoint, String deploymentName,
-                                                                 LangchainLLMParameters LangchainParams) {
-    return AzureOpenAiChatModel.builder()
-        .apiKey(apiKey)
-        .endpoint(llmEndpoint)
-        .deploymentName(deploymentName)
-        .maxTokens(LangchainParams.getMaxToken())
-        .temperature(LangchainParams.getTemperature())
-        .timeout(ofSeconds(LangchainParams.getTimeoutInSeconds()))
-        .logRequestsAndResponses(true)
-        .build();
-  }
-
-
-
-  private ChatLanguageModel createModel(LangchainLLMConfiguration configuration, LangchainLLMParameters LangchainParams) {
-    ChatLanguageModel model = null;
-    JSONObject config = readConfigFile(configuration.getFilePath());
-
-    switch (configuration.getLlmType()) {
-      case "OPENAI":
-        if (configuration.getConfigType().equals("Environment Variables")) {
-          model = createOpenAiChatModel(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
-        } else {
-          JSONObject llmType = config.getJSONObject("OPENAI");
-          String llmTypeKey = llmType.getString("OPENAI_API_KEY");
-          model = createOpenAiChatModel(llmTypeKey, LangchainParams);
-
-        }
-        break;
-
-      case "GROQAI_OPENAI":
-        if (configuration.getConfigType().equals("Environment Variables")) {
-          model = createGroqOpenAiChatModel(System.getenv("GROQ_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
-        } else {
-          JSONObject llmType = config.getJSONObject("GROQAI_OPENAI");
-          String llmTypeKey = llmType.getString("GROQ_API_KEY");
-          model = createGroqOpenAiChatModel(llmTypeKey, LangchainParams);
-
-        }
-        break;
-
-      case "MISTRAL_AI":
-        if (configuration.getConfigType().equals("Environment Variables")) {
-          model =
-              createMistralAiChatModel(System.getenv("MISTRAL_AI_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
-        } else {
-          JSONObject llmType = config.getJSONObject("MISTRAL_AI");
-          String llmTypeKey = llmType.getString("MISTRAL_AI_API_KEY");
-          model = createMistralAiChatModel(llmTypeKey, LangchainParams);
-
-        }
-        break;
-      case "OLLAMA":
-        if (configuration.getConfigType().equals("Environment Variables")) {
-          model = createOllamaChatModel(System.getenv("OLLAMA_BASE_URL").replace("\n", "").replace("\r", ""), LangchainParams);
-        } else {
-          JSONObject llmType = config.getJSONObject("OLLAMA");
-          String llmTypeUrl = llmType.getString("OLLAMA_BASE_URL");
-          model = createOllamaChatModel(llmTypeUrl, LangchainParams);
-
-        }
-        break;
-      case "ANTHROPIC":
-        if (configuration.getConfigType().equals("Environment Variables")) {
-          model =
-              createAnthropicChatModel(System.getenv("ANTHROPIC_API_KEY").replace("\n", "").replace("\r", ""), LangchainParams);
-        } else {
-          JSONObject llmType = config.getJSONObject("ANTHROPIC");
-          String llmTypeKey = llmType.getString("ANTHROPIC_API_KEY");
-          model = createAnthropicChatModel(llmTypeKey, LangchainParams);
-        }
-        break;
-      /* 			case "AWS_BEDROCK":
-      				//String[] creds = configuration.getLlmApiKey().split("mulechain"); 
-      				// For authentication, set the following environment variables:
-        		// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-       				model = BedrockAnthropicMessageChatModel.builder()
-      						.region(Region.US_EAST_1)
-      						.temperature(0.30f)
-      						.maxTokens(300)
-      						.model(LangchainParams.getModelName())
-      						.maxRetries(1)
-      						.build();
-      				break;
-       */ case "AZURE_OPENAI":
-        if (configuration.getConfigType().equals("Environment Variables")) {
-          model = createAzureOpenAiChatModel(System.getenv("AZURE_OPENAI_KEY").replace("\n", "").replace("\r", ""),
-                                             System.getenv("AZURE_OPENAI_ENDPOINT").replace("\n", "").replace("\r", ""),
-                                             System.getenv("AZURE_OPENAI_DEPLOYMENT_NAME").replace("\n", "").replace("\r", ""),
-                                             LangchainParams);
-        } else {
-          JSONObject llmType = config.getJSONObject("AZURE_OPENAI");
-          String llmTypeKey = llmType.getString("AZURE_OPENAI_KEY");
-          String llmEndpoint = llmType.getString("AZURE_OPENAI_ENDPOINT");
-          String llmDeploymentName = llmType.getString("AZURE_OPENAI_DEPLOYMENT_NAME");
-          model = createAzureOpenAiChatModel(llmTypeKey, llmEndpoint, llmDeploymentName, LangchainParams);
-        }
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported LLM type: " + configuration.getLlmType());
-    }
-    return model;
-  }
-
-
-
   @MediaType(value = ANY, strict = false)
   @Alias("RAG-load-document")
-  public String loadDocumentFile(String data, String contextPath, @ParameterGroup(name = "Context") fileTypeParameters fileType,
-                                 @Config LangchainLLMConfiguration configuration,
-                                 @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
+  public String loadDocumentFile(String data, String contextPath, @ParameterGroup(name = "Context") FileTypeParameters fileType,
+                                 @Config LangchainLLMConfiguration configuration) {
 
     EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -305,9 +106,43 @@ public class LangchainEmbeddingStoresOperations {
         .embeddingStore(embeddingStore)
         .build();
 
-    System.out.println(fileType.getFileType());
+    LOGGER.info("RAG loading document with file type: {}", fileType.getFileType());
 
     // ChatLanguageModel model = null;
+    ingestDocument(fileType, contextPath, ingestor);
+
+    ChatLanguageModel model = configuration.getModel();
+
+
+    // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+    // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+    //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
+
+    ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
+
+    AssistantSources assistant = AiServices.builder(AssistantSources.class)
+        .chatLanguageModel(model)
+        .contentRetriever(contentRetriever)
+        .build();
+
+    Result<String> answer = assistant.chat(data);
+    //    LOGGER.info("Answer: {}", answer);
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("response", answer.content());
+    JSONObject tokenUsage = new JSONObject();
+    tokenUsage.put("inputCount", answer.tokenUsage().inputTokenCount());
+    tokenUsage.put("outputCount", answer.tokenUsage().outputTokenCount());
+    tokenUsage.put("totalCount", answer.tokenUsage().totalTokenCount());
+    jsonObject.put("tokenUsage", tokenUsage);
+    jsonObject.put("filePath", contextPath);
+    jsonObject.put("fileType", fileType);
+    jsonObject.put("question", data);
+
+    return jsonObject.toString();
+  }
+
+  private void ingestDocument(FileTypeParameters fileType, String contextPath, EmbeddingStoreIngestor ingestor) {
     Document document = null;
     switch (fileType.getFileType()) {
       case "text":
@@ -323,8 +158,7 @@ public class LangchainEmbeddingStoresOperations {
         try {
           url = new URL(contextPath);
         } catch (MalformedURLException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
+          LOGGER.error("Error while loading the document: " + contextPath, e);
         }
 
         Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
@@ -336,38 +170,6 @@ public class LangchainEmbeddingStoresOperations {
       default:
         throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
     }
-
-
-    ChatLanguageModel model = createModel(configuration, LangchainParams);
-
-
-    // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
-    // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
-    //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
-
-    ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
-
-    AssistantSources assistant = AiServices.builder(AssistantSources.class)
-        .chatLanguageModel(model)
-        .contentRetriever(contentRetriever)
-        .build();
-
-    Result<String> answer = assistant.chat(data);
-    //System.out.println(answer); 
-
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", answer.content());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put("inputCount", answer.tokenUsage().inputTokenCount());
-    tokenUsage.put("outputCount", answer.tokenUsage().outputTokenCount());
-    tokenUsage.put("totalCount", answer.tokenUsage().totalTokenCount());
-    jsonObject.put("tokenUsage", tokenUsage);
-    jsonObject.put("filePath", contextPath);
-    jsonObject.put("fileType", fileType);
-    jsonObject.put("question", data);
-
-
-    return jsonObject.toString();
   }
 
 
@@ -390,10 +192,9 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("CHAT-answer-prompt-with-memory")
   public String chatWithPersistentMemory(String data, String memoryName, String dbFilePath, int maxMessages,
-                                         @Config LangchainLLMConfiguration configuration,
-                                         @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
+                                         @Config LangchainLLMConfiguration configuration) {
 
-    ChatLanguageModel model = createModel(configuration, LangchainParams);
+    ChatLanguageModel model = configuration.getModel();
 
     //String dbFilePath = "/Users/amir.khan/Documents/langchain4mule resources/multi-user-chat-memory.db";
     PersistentChatMemoryStore.initialize(dbFilePath);
@@ -475,8 +276,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("TOOLS-use-ai-service-legacy")
-  public String useTools(String data, String toolConfig, @Config LangchainLLMConfiguration configuration,
-                         @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
+  public String useTools(String data, String toolConfig, @Config LangchainLLMConfiguration configuration) {
 
     EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -493,7 +293,7 @@ public class LangchainEmbeddingStoresOperations {
     ingestor.ingest(document);
 
 
-    ChatLanguageModel model = createModel(configuration, LangchainParams);
+    ChatLanguageModel model = configuration.getModel();
 
 
 
@@ -519,16 +319,15 @@ public class LangchainEmbeddingStoresOperations {
       // Create an instance of the custom tool with parameters
       GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 
-      ChatLanguageModel agent = createModel(configuration, LangchainParams);
       // Build the assistant with the custom tool
       AssistantC assistant = AiServices.builder(AssistantC.class)
-          .chatLanguageModel(agent)
+          .chatLanguageModel(model)
           .tools(restApiTool)
           .chatMemory(MessageWindowChatMemory.withMaxMessages(100))
           .build();
       // Use the assistant to make a query
       response = assistant.chat(intermediateAnswer);
-      System.out.println(response);
+      LOGGER.info("Response: {}", response);
       /*  } else{
         response =  intermediateAnswer; */
     }
@@ -594,9 +393,7 @@ public class LangchainEmbeddingStoresOperations {
 
     InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-    //embeddingStore.serializeToFile(storeName);
     embeddingStore.serializeToFile(storeName);
-
 
     embeddingStore = null;
     JSONObject jsonObject = new JSONObject();
@@ -614,7 +411,7 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-add-document-to-store")
   public String addFileEmbedding(String storeName, String contextPath,
-                                 @ParameterGroup(name = "Context") fileTypeParameters fileType) {
+                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -636,35 +433,8 @@ public class LangchainEmbeddingStoresOperations {
 
 
     // ChatLanguageModel model = null;
-    Document document = null;
-    switch (fileType.getFileType()) {
-      case "text":
-        document = loadDocument(contextPath, new TextDocumentParser());
-        ingestor.ingest(document);
-        break;
-      case "pdf":
-        document = loadDocument(contextPath, new ApacheTikaDocumentParser());
-        ingestor.ingest(document);
-        break;
-      case "url":
-        URL url = null;
-        try {
-          url = new URL(contextPath);
-        } catch (MalformedURLException e) {
-          e.printStackTrace();
-        }
 
-        Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
-        HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
-        document = transformer.transform(htmlDocument);
-        document.metadata().add("url", contextPath);
-        ingestor.ingest(document);
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
-    }
-
-
+    ingestDocument(fileType, contextPath, ingestor);
 
     deserializedStore.serializeToFile(storeName);
     deserializedStore = null;
@@ -729,12 +499,11 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
   public String promptFromEmbedding(String storeName, String data, boolean getLatest,
-                                    @Config LangchainLLMConfiguration configuration,
-                                    @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
+                                    @Config LangchainLLMConfiguration configuration) {
 
     InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
-    ChatLanguageModel model = createModel(configuration, LangchainParams);
+    ChatLanguageModel model = configuration.getModel();
 
 
     ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(store, this.embeddingModel);
@@ -786,8 +555,6 @@ public class LangchainEmbeddingStoresOperations {
     tokenUsage.put("totalCount", results.tokenUsage().totalTokenCount());
     jsonObject.put("tokenUsage", tokenUsage);
 
-
-
     return jsonObject.toString();
   }
 
@@ -805,12 +572,10 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
   public String promptFromEmbeddingLegacy(String storeName, String data, boolean getLatest,
-                                          @Config LangchainLLMConfiguration configuration,
-                                          @ParameterGroup(
-                                              name = "Additional properties") LangchainLLMParameters LangchainParams) {
+                                          @Config LangchainLLMConfiguration configuration) {
     InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
-    ChatLanguageModel model = createModel(configuration, LangchainParams);
+    ChatLanguageModel model = configuration.getModel();
 
 
 
@@ -842,8 +607,7 @@ public class LangchainEmbeddingStoresOperations {
   */
   @MediaType(value = ANY, strict = false)
   @Alias("TOOLS-use-ai-service")
-  public String useAIServiceTools(String data, String toolConfig, @Config LangchainLLMConfiguration configuration,
-                                  @ParameterGroup(name = "Additional properties") LangchainLLMParameters LangchainParams) {
+  public String useAIServiceTools(String data, String toolConfig, @Config LangchainLLMConfiguration configuration) {
 
     EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -860,7 +624,7 @@ public class LangchainEmbeddingStoresOperations {
     ingestor.ingest(document);
 
 
-    ChatLanguageModel model = createModel(configuration, LangchainParams);
+    ChatLanguageModel model = configuration.getModel();
 
 
     ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
@@ -883,16 +647,15 @@ public class LangchainEmbeddingStoresOperations {
       // Create an instance of the custom tool with parameters
       GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 
-      ChatLanguageModel agent = createModel(configuration, LangchainParams);
       // Build the assistant with the custom tool
       AssistantC assistantC = AiServices.builder(AssistantC.class)
-          .chatLanguageModel(agent)
+          .chatLanguageModel(model)
           .tools(restApiTool)
           .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
           .build();
       // Use the assistant to make a query
       response = assistantC.chat(intermediateAnswer);
-      System.out.println(response);
+      LOGGER.info("Response: {}", response);
       /*  } else{
         response =  intermediateAnswer; */
     }
@@ -912,7 +675,7 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-add-folder-to-store")
   public String addFilesFromFolderEmbedding(String storeName, String contextPath,
-                                            @ParameterGroup(name = "Context") fileTypeParameters fileType) {
+                                            @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
     InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
@@ -928,15 +691,15 @@ public class LangchainEmbeddingStoresOperations {
     try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
       totalFiles = paths.filter(Files::isRegularFile).count();
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.error("Unable to load files in the path: " + contextPath, e);
     }
 
-    System.out.println("Total number of files to process: " + totalFiles);
+    LOGGER.info("Total number of files to process: {}", totalFiles);
     AtomicInteger fileCounter = new AtomicInteger(0);
     try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
       paths.filter(Files::isRegularFile).forEach(file -> {
         int currentFileCounter = fileCounter.incrementAndGet();
-        System.out.println("Processing file " + currentFileCounter + ": " + file.getFileName());
+        LOGGER.info("Processing file {}: {}", currentFileCounter, file.getFileName());
         Document document = null;
         try {
           switch (fileType.getFileType()) {
@@ -955,11 +718,11 @@ public class LangchainEmbeddingStoresOperations {
               throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
           }
         } catch (BlankDocumentException e) {
-          System.out.println("Skipping file due to BlankDocumentException: " + file.getFileName());
+          LOGGER.warn("Skipping file due to BlankDocumentException: {}", file.getFileName());
         }
       });
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.error("Exception occurred while loading files: " + contextPath, e);
     }
 
 

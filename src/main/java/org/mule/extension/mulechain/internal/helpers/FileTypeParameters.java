@@ -6,11 +6,11 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 
-public class fileTypeParameters {
+public class FileTypeParameters {
 
   @Parameter
   @Expression(ExpressionSupport.SUPPORTED)
-  @OfValues(fileTypeEmbedding.class)
+  @OfValues(FileTypeEmbedding.class)
   @Optional(defaultValue = "text")
   private String fileType;
 

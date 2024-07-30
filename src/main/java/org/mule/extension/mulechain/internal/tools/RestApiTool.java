@@ -1,6 +1,8 @@
 package org.mule.extension.mulechain.internal.tools;
 
 import dev.langchain4j.agent.tool.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.nio.charset.StandardCharsets;
 
 
 public class RestApiTool implements Tool {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(RestApiTool.class);
 
   private final String apiEndpoint;
   private final String name;
@@ -47,9 +51,9 @@ public class RestApiTool implements Tool {
       conn.setRequestProperty("Accept", "application/json");
       String payload = "{\n \"materialNo\": \"MULETEST0\"}";
 
-      System.out.println("Using tools");
-      System.out.println(payload);
-      System.out.println(url);
+      LOGGER.info("Using tools");
+      LOGGER.info(payload);
+      LOGGER.info("URL: {}", url);
 
       conn.setDoOutput(true);
       byte[] inputBytes = payload.getBytes(StandardCharsets.UTF_8);
@@ -59,7 +63,7 @@ public class RestApiTool implements Tool {
 
       int responseCode = conn.getResponseCode();
       if (responseCode == 200) {
-        System.out.println("200");
+        LOGGER.info("200");
 
         BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         StringBuilder sb = new StringBuilder();
@@ -79,11 +83,11 @@ public class RestApiTool implements Tool {
         //                scanner.close();
         //                return response.toString();
       } else {
-        System.out.println(responseCode);
+        LOGGER.info("Response Code: {}", responseCode);
         return "Error: Received response code " + responseCode;
       }
     } catch (IOException e) {
-      System.out.println(e.getMessage());
+      LOGGER.warn("Error while executing requests for tool: ", e);
       return "Error: " + e.getMessage();
     }
   }
