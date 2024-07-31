@@ -532,10 +532,6 @@ public class LangchainEmbeddingStoresOperations {
 
     JSONObject contentObject;
     for (Content content : contents) {
-      /*Map<String, Object> metadata = (Map<String, Object>) content.textSegment().metadata();
-      String absoluteDirectoryPath = (String) metadata.get("absolute_directory_path");
-      String fileName = (String) metadata.get("file_name");*/
-
       metadata = content.textSegment().metadata();
       absoluteDirectoryPath = (String) metadata.getString("absolute_directory_path");
       fileName = (String) metadata.getString("file_name");
