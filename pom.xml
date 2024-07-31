@@ -95,7 +95,7 @@
 			<plugin>
 				<groupId>com.mulesoft.munit</groupId>
 				<artifactId>munit-extensions-maven-plugin</artifactId>
-				<version>1.2.0</version>
+				<version>${munit.extensions.maven.plugin.version}</version>
 			</plugin>
 		</plugins>
 	</build>
