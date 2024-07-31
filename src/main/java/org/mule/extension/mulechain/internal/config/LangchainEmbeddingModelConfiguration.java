@@ -1,6 +1,7 @@
-package org.mule.extension.mulechain.internal.embedding.models;
+package org.mule.extension.mulechain.internal.config;
 
-import org.mule.extension.mulechain.internal.LangchainConnectionProvider;
+import org.mule.extension.mulechain.internal.connection.provider.LangchainConnectionProvider;
+import org.mule.extension.mulechain.internal.operation.LangchainEmbeddingModelsOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;

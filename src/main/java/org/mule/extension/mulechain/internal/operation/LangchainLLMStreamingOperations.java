@@ -1,8 +1,9 @@
-package org.mule.extension.mulechain.internal.streaming;
+package org.mule.extension.mulechain.internal.operation;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
-import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.streaming.TokenStreamOutputResolver;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.MediaType;

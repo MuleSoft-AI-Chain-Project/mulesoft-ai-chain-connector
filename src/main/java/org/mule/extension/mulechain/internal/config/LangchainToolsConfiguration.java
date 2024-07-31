@@ -1,4 +1,4 @@
-package org.mule.extension.mulechain.internal.tools;
+package org.mule.extension.mulechain.internal.config;
 
 
 

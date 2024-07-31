@@ -1,10 +1,11 @@
-package org.mule.extension.mulechain.internal.llm;
+package org.mule.extension.mulechain.internal.config.util;
 
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.azure.AzureOpenAiChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 
 import static java.time.Duration.ofSeconds;

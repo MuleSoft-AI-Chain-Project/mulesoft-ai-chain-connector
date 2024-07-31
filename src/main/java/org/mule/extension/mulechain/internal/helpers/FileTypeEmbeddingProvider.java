@@ -10,11 +10,10 @@ import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 
-public class FileTypeEmbedding implements ValueProvider {
+public class FileTypeEmbeddingProvider implements ValueProvider {
 
   @Override
   public Set<Value> resolve() throws ValueResolvingException {
-    // TODO Auto-generated method stub
     return ValueBuilder.getValuesFor(Arrays.stream(FileType.values()).map(FileType::name));
   }
 

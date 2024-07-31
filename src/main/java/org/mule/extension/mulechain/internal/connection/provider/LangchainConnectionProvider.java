@@ -1,10 +1,10 @@
-package org.mule.extension.mulechain.internal;
+package org.mule.extension.mulechain.internal.connection.provider;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.extension.mulechain.internal.llm.LangchainLLMConnection;
+import org.mule.extension.mulechain.internal.connection.LangchainLLMConnection;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 
 

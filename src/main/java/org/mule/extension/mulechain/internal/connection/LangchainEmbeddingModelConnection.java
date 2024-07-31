@@ -1,14 +1,14 @@
-package org.mule.extension.mulechain.internal.llm;
+package org.mule.extension.mulechain.internal.connection;
 
 
 /**
  * This class represents an extension connection just as example (there is no real connection with anything here c:).
  */
-public final class LangchainLLMConnection {
+public final class LangchainEmbeddingModelConnection {
 
   private final String id;
 
-  public LangchainLLMConnection(String id) {
+  public LangchainEmbeddingModelConnection(String id) {
     this.id = id;
   }
 

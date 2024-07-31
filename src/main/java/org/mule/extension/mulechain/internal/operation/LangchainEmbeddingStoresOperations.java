@@ -1,4 +1,4 @@
-package org.mule.extension.mulechain.internal.embedding.stores;
+package org.mule.extension.mulechain.internal.operation;
 
 import dev.langchain4j.data.document.BlankDocumentException;
 import dev.langchain4j.data.document.Document;
@@ -26,7 +26,7 @@ import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
-import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;

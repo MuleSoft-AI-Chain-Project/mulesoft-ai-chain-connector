@@ -1,14 +1,14 @@
-package org.mule.extension.mulechain.internal.embedding.models;
+package org.mule.extension.mulechain.internal.connection;
 
 
 /**
  * This class represents an extension connection just as example (there is no real connection with anything here c:).
  */
-public final class LangchainEmbeddingModelConnection {
+public final class LangchainEmbeddingStoreConnection {
 
   private final String id;
 
-  public LangchainEmbeddingModelConnection(String id) {
+  public LangchainEmbeddingStoreConnection(String id) {
     this.id = id;
   }
 

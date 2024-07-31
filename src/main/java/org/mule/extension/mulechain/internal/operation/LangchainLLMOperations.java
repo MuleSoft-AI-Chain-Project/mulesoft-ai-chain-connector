@@ -1,4 +1,4 @@
-package org.mule.extension.mulechain.internal.llm;
+package org.mule.extension.mulechain.internal.operation;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 
@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONObject;
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;

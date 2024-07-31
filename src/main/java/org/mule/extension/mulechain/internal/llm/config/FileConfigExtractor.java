@@ -1,7 +1,7 @@
 package org.mule.extension.mulechain.internal.llm.config;
 
 import org.json.JSONObject;
-import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 
 import static org.mule.extension.mulechain.internal.util.JsonUtils.readConfigFile;
 

@@ -1,4 +1,4 @@
-package org.mule.extension.mulechain.internal.tools;
+package org.mule.extension.mulechain.internal.operation;
 
 /**
  * This class is a container for operations, every public method in this class will be taken as an extension operation.

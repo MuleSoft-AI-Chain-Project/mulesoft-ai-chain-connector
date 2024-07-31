@@ -1,8 +1,14 @@
-package org.mule.extension.mulechain.internal.llm;
+package org.mule.extension.mulechain.internal.config;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import org.mule.extension.mulechain.internal.embedding.stores.LangchainEmbeddingStoresOperations;
-import org.mule.extension.mulechain.internal.image.models.LangchainImageModelsOperations;
+import org.mule.extension.mulechain.internal.operation.LangchainEmbeddingStoresOperations;
+import org.mule.extension.mulechain.internal.operation.LangchainImageModelsOperations;
+import org.mule.extension.mulechain.internal.llm.LangchainLLMType;
+import org.mule.extension.mulechain.internal.llm.ConfigTypeProvider;
+import org.mule.extension.mulechain.internal.config.util.LangchainLLMInitializerUtil;
+import org.mule.extension.mulechain.internal.operation.LangchainLLMOperations;
+import org.mule.extension.mulechain.internal.llm.LangchainLLMModelNameProvider;
+import org.mule.extension.mulechain.internal.llm.LangchainLLMTypeProvider;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.extension.mulechain.internal.llm.config.ConfigType;
 import org.mule.extension.mulechain.internal.llm.config.EnvConfigExtractor;
@@ -31,7 +37,7 @@ import java.util.function.Function;
 @Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class, LangchainImageModelsOperations.class})
 public class LangchainLLMConfiguration implements Initialisable {
 
-  private static final Map<LLMType, BiFunction<ConfigExtractor, LangchainLLMConfiguration, ChatLanguageModel>> llmMap;
+  private static final Map<LangchainLLMType, BiFunction<ConfigExtractor, LangchainLLMConfiguration, ChatLanguageModel>> llmMap;
   private static final Map<ConfigType, Function<LangchainLLMConfiguration, ConfigExtractor>> configExtractorMap;
 
   static {
@@ -40,12 +46,12 @@ public class LangchainLLMConfiguration implements Initialisable {
     configExtractorMap.put(ConfigType.CONFIG_JSON, FileConfigExtractor::new);
 
     llmMap = new HashMap<>();
-    llmMap.put(LLMType.OPENAI, (LangchainLLMInitializerUtil::createOpenAiChatModel));
-    llmMap.put(LLMType.GROQAI_OPENAI, (LangchainLLMInitializerUtil::createGroqOpenAiChatModel));
-    llmMap.put(LLMType.MISTRAL_AI, (LangchainLLMInitializerUtil::createMistralAiChatModel));
-    llmMap.put(LLMType.OLLAMA, (LangchainLLMInitializerUtil::createOllamaChatModel));
-    llmMap.put(LLMType.ANTHROPIC, (LangchainLLMInitializerUtil::createAnthropicChatModel));
-    llmMap.put(LLMType.AZURE_OPENAI, (LangchainLLMInitializerUtil::createAzureOpenAiChatModel));
+    llmMap.put(LangchainLLMType.OPENAI, (LangchainLLMInitializerUtil::createOpenAiChatModel));
+    llmMap.put(LangchainLLMType.GROQAI_OPENAI, (LangchainLLMInitializerUtil::createGroqOpenAiChatModel));
+    llmMap.put(LangchainLLMType.MISTRAL_AI, (LangchainLLMInitializerUtil::createMistralAiChatModel));
+    llmMap.put(LangchainLLMType.OLLAMA, (LangchainLLMInitializerUtil::createOllamaChatModel));
+    llmMap.put(LangchainLLMType.ANTHROPIC, (LangchainLLMInitializerUtil::createAnthropicChatModel));
+    llmMap.put(LangchainLLMType.AZURE_OPENAI, (LangchainLLMInitializerUtil::createAzureOpenAiChatModel));
   }
 
   @Parameter
@@ -53,7 +59,7 @@ public class LangchainLLMConfiguration implements Initialisable {
   private String llmType;
 
   @Parameter
-  @OfValues(LangchainLLMConfigType.class)
+  @OfValues(ConfigTypeProvider.class)
   private String configType;
 
   @Parameter
@@ -61,7 +67,7 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   @Parameter
   @Expression(ExpressionSupport.SUPPORTED)
-  @OfValues(LangchainLLMParameterModelNameProvider.class)
+  @OfValues(LangchainLLMModelNameProvider.class)
   @Optional(defaultValue = "gpt-3.5-turbo")
   private String modelName = "gpt-3.5-turbo";
 
@@ -120,7 +126,7 @@ public class LangchainLLMConfiguration implements Initialisable {
   }
 
   private ChatLanguageModel createModel(ConfigExtractor configExtractor) {
-    LLMType type = LLMType.valueOf(llmType);
+    LangchainLLMType type = LangchainLLMType.valueOf(llmType);
     if (llmMap.containsKey(type)) {
       return llmMap.get(type).apply(configExtractor, this);
     }

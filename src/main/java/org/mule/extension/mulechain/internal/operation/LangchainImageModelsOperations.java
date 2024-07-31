@@ -1,7 +1,7 @@
-package org.mule.extension.mulechain.internal.image.models;
+package org.mule.extension.mulechain.internal.operation;
 
 import org.json.JSONObject;
-import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;

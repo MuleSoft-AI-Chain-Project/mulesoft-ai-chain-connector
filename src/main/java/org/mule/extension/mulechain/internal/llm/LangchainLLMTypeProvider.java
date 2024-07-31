@@ -12,8 +12,7 @@ public class LangchainLLMTypeProvider implements ValueProvider {
 
   @Override
   public Set<Value> resolve() throws ValueResolvingException {
-    // TODO Auto-generated method stub
-    return ValueBuilder.getValuesFor(Arrays.stream(LLMType.values()).map(LLMType::name));
+    return ValueBuilder.getValuesFor(Arrays.stream(LangchainLLMType.values()).map(LangchainLLMType::name));
   }
 
 }

@@ -9,11 +9,10 @@ import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 
-public class LangchainLLMConfigType implements ValueProvider {
+public class ConfigTypeProvider implements ValueProvider {
 
   @Override
   public Set<Value> resolve() throws ValueResolvingException {
-    // TODO Auto-generated method stub
     return ValueBuilder.getValuesFor(Arrays.stream(ConfigType.values()).map(ConfigType::getValue));
   }
 
