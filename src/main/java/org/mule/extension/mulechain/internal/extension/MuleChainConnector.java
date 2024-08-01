@@ -1,10 +1,14 @@
 package org.mule.extension.mulechain.internal.extension;
 
+import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.sdk.api.annotation.JavaVersionSupport;
+
+
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
@@ -14,9 +18,10 @@ import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
  * and sources are going to be declared.
  */
 @Xml(prefix = "mulechain")
-@Extension(name = "MuleChain AI")
+@Extension(name = "MuleChain AI", category = Category.CERTIFIED)
 @Configurations({LangchainLLMConfiguration.class})
+@RequiresEnterpriseLicense(allowEvaluationLicense = true)
 @JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
-public class LangchainExtension {
+public class MuleChainConnector {
 
 }
