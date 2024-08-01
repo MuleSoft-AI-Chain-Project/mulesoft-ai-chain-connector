@@ -38,7 +38,7 @@ public class LangchainLLMStreamingOperations {
   @Alias("Stream-prompt-answer")
   @OutputResolver(output = TokenStreamMetadataResolver.class)
   @Streaming
-  public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration) {
+  public TokenStream streamingPrompt(@Config LangchainLLMConfiguration configuration, String prompt) {
 
     StreamingChatLanguageModel model = OpenAiStreamingChatModel.builder()
         .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))

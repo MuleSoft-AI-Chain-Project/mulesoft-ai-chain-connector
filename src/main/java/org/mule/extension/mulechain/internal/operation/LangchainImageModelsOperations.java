@@ -34,7 +34,7 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-read")
-  public String readFromImage(String data, String contextURL, @Config LangchainLLMConfiguration configuration) {
+  public String readFromImage(@Config LangchainLLMConfiguration configuration, String data, String contextURL) {
 
     ChatLanguageModel model = configuration.getModel();
 
@@ -65,7 +65,7 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-generate")
-  public String drawImage(String data, @Config LangchainLLMConfiguration configuration) {
+  public String drawImage(@Config LangchainLLMConfiguration configuration, String data) {
     ConfigExtractor configExtractor = configuration.getConfigExtractor();
     ImageModel model = OpenAiImageModel.builder()
         .modelName(configuration.getModelName())

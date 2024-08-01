@@ -25,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
@@ -93,8 +94,8 @@ public class LangchainEmbeddingStoresOperations {
 
   @MediaType(value = ANY, strict = false)
   @Alias("RAG-load-document")
-  public String loadDocumentFile(String data, String contextPath, @ParameterGroup(name = "Context") FileTypeParameters fileType,
-                                 @Config LangchainLLMConfiguration configuration) {
+  public String loadDocumentFile(@Config LangchainLLMConfiguration configuration, String data, String contextPath,
+                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -144,16 +145,16 @@ public class LangchainEmbeddingStoresOperations {
 
   private void ingestDocument(FileTypeParameters fileType, String contextPath, EmbeddingStoreIngestor ingestor) {
     Document document = null;
-    switch (fileType.getFileType()) {
-      case "text":
+    switch (FileType.valueOf(fileType.getFileType())) {
+      case TEXT:
         document = loadDocument(contextPath, new TextDocumentParser());
         ingestor.ingest(document);
         break;
-      case "pdf":
+      case PDF:
         document = loadDocument(contextPath, new ApacheTikaDocumentParser());
         ingestor.ingest(document);
         break;
-      case "url":
+      case URL:
         URL url = null;
         try {
           url = new URL(contextPath);
@@ -191,8 +192,8 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("CHAT-answer-prompt-with-memory")
-  public String chatWithPersistentMemory(String data, String memoryName, String dbFilePath, int maxMessages,
-                                         @Config LangchainLLMConfiguration configuration) {
+  public String chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration, String data, String memoryName,
+                                         String dbFilePath, int maxMessages) {
 
     ChatLanguageModel model = configuration.getModel();
 
@@ -276,7 +277,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("TOOLS-use-ai-service-legacy")
-  public String useTools(String data, String toolConfig, @Config LangchainLLMConfiguration configuration) {
+  public String useTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
 
     EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -498,8 +499,8 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
-  public String promptFromEmbedding(String storeName, String data, boolean getLatest,
-                                    @Config LangchainLLMConfiguration configuration) {
+  public String promptFromEmbedding(@Config LangchainLLMConfiguration configuration, String storeName, String data,
+                                    boolean getLatest) {
 
     InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
@@ -567,8 +568,8 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
-  public String promptFromEmbeddingLegacy(String storeName, String data, boolean getLatest,
-                                          @Config LangchainLLMConfiguration configuration) {
+  public String promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration, String storeName, String data,
+                                          boolean getLatest) {
     InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
     ChatLanguageModel model = configuration.getModel();
@@ -603,7 +604,7 @@ public class LangchainEmbeddingStoresOperations {
   */
   @MediaType(value = ANY, strict = false)
   @Alias("TOOLS-use-ai-service")
-  public String useAIServiceTools(String data, String toolConfig, @Config LangchainLLMConfiguration configuration) {
+  public String useAIServiceTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
 
     EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 
@@ -698,16 +699,16 @@ public class LangchainEmbeddingStoresOperations {
         LOGGER.info("Processing file {}: {}", currentFileCounter, file.getFileName());
         Document document = null;
         try {
-          switch (fileType.getFileType()) {
-            case "text":
+          switch (FileType.valueOf(fileType.getFileType())) {
+            case TEXT:
               document = loadDocument(file.toString(), new TextDocumentParser());
               ingestor.ingest(document);
               break;
-            case "pdf":
+            case PDF:
               document = loadDocument(file.toString(), new ApacheTikaDocumentParser());
               ingestor.ingest(document);
               break;
-            case "url":
+            case URL:
               // Handle URLs separately if needed
               break;
             default:

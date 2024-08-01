@@ -37,7 +37,7 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("CHAT-answer-prompt")
-  public String answerPromptByModelName(String prompt, @Config LangchainLLMConfiguration configuration) {
+  public String answerPromptByModelName(@Config LangchainLLMConfiguration configuration, String prompt) {
     // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
 
     ChatLanguageModel model = configuration.getModel();
@@ -66,8 +66,8 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("AGENT-define-prompt-template")
-  public String definePromptTemplate(String template, String instructions, String dataset,
-                                     @Config LangchainLLMConfiguration configuration) {
+  public String definePromptTemplate(@Config LangchainLLMConfiguration configuration, String template, String instructions,
+                                     String dataset) {
 
     ChatLanguageModel model = configuration.getModel();
 
@@ -124,7 +124,7 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("SENTIMENT-analyze")
-  public String extractSentiments(String data, @Config LangchainLLMConfiguration configuration) {
+  public String extractSentiments(@Config LangchainLLMConfiguration configuration, String data) {
 
     ChatLanguageModel model = configuration.getModel();
 

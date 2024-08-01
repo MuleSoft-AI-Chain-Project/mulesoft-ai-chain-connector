@@ -11,7 +11,7 @@ public class FileTypeParameters {
   @Parameter
   @Expression(ExpressionSupport.SUPPORTED)
   @OfValues(FileTypeEmbeddingProvider.class)
-  @Optional(defaultValue = "text")
+  @Optional(defaultValue = "TEXT")
   private String fileType;
 
   public String getFileType() {
