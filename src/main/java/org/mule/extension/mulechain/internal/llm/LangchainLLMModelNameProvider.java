@@ -10,6 +10,7 @@ import dev.langchain4j.model.anthropic.AnthropicChatModelName;
 import dev.langchain4j.model.mistralai.MistralAiChatModelName;
 import dev.langchain4j.model.openai.OpenAiChatModelName;
 import dev.langchain4j.model.openai.OpenAiImageModelName;
+import org.mule.extension.mulechain.internal.llm.type.LangchainLLMType;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.values.ValueBuilder;

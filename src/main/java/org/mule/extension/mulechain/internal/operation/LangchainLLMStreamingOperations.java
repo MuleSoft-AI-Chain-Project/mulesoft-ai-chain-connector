@@ -3,7 +3,7 @@ package org.mule.extension.mulechain.internal.operation;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
-import org.mule.extension.mulechain.internal.streaming.TokenStreamOutputResolver;
+import org.mule.extension.mulechain.internal.metadata.TokenStreamMetadataResolver;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -36,7 +36,7 @@ public class LangchainLLMStreamingOperations {
 
   @MediaType(value = ANY, strict = false)
   @Alias("Stream-prompt-answer")
-  @OutputResolver(output = TokenStreamOutputResolver.class)
+  @OutputResolver(output = TokenStreamMetadataResolver.class)
   @Streaming
   public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration) {
 

@@ -3,6 +3,7 @@ package org.mule.extension.mulechain.internal.llm;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.mule.extension.mulechain.internal.llm.type.LangchainLLMType;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValueProvider;

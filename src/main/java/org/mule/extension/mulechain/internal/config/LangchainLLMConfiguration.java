@@ -3,7 +3,7 @@ package org.mule.extension.mulechain.internal.config;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import org.mule.extension.mulechain.internal.operation.LangchainEmbeddingStoresOperations;
 import org.mule.extension.mulechain.internal.operation.LangchainImageModelsOperations;
-import org.mule.extension.mulechain.internal.llm.LangchainLLMType;
+import org.mule.extension.mulechain.internal.llm.type.LangchainLLMType;
 import org.mule.extension.mulechain.internal.llm.ConfigTypeProvider;
 import org.mule.extension.mulechain.internal.config.util.LangchainLLMInitializerUtil;
 import org.mule.extension.mulechain.internal.operation.LangchainLLMOperations;
