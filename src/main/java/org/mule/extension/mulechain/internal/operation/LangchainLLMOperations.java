@@ -1,4 +1,7 @@
-package org.mule.extension.mulechain.internal.llm;
+/**
+ * (c) 2003-2024 MuleSoft, Inc. The software in this package is published under the terms of the Commercial Free Software license V.1 a copy of which has been included with this distribution in the LICENSE.md file.
+ */
+package org.mule.extension.mulechain.internal.operation;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 
@@ -8,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONObject;
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -36,7 +40,7 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("CHAT-answer-prompt")
-  public String answerPromptByModelName(String prompt, @Config LangchainLLMConfiguration configuration) {
+  public String answerPromptByModelName(@Config LangchainLLMConfiguration configuration, String prompt) {
     // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
 
     ChatLanguageModel model = configuration.getModel();
@@ -65,8 +69,8 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("AGENT-define-prompt-template")
-  public String definePromptTemplate(String template, String instructions, String dataset,
-                                     @Config LangchainLLMConfiguration configuration) {
+  public String definePromptTemplate(@Config LangchainLLMConfiguration configuration, String template, String instructions,
+                                     String dataset) {
 
     ChatLanguageModel model = configuration.getModel();
 
@@ -123,7 +127,7 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("SENTIMENT-analyze")
-  public String extractSentiments(String data, @Config LangchainLLMConfiguration configuration) {
+  public String extractSentiments(@Config LangchainLLMConfiguration configuration, String data) {
 
     ChatLanguageModel model = configuration.getModel();
 

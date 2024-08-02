@@ -1,7 +1,10 @@
-package org.mule.extension.mulechain.internal.image.models;
+/**
+ * (c) 2003-2024 MuleSoft, Inc. The software in this package is published under the terms of the Commercial Free Software license V.1 a copy of which has been included with this distribution in the LICENSE.md file.
+ */
+package org.mule.extension.mulechain.internal.operation;
 
 import org.json.JSONObject;
-import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -34,7 +37,7 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-read")
-  public String readFromImage(String data, String contextURL, @Config LangchainLLMConfiguration configuration) {
+  public String readFromImage(@Config LangchainLLMConfiguration configuration, String data, String contextURL) {
 
     ChatLanguageModel model = configuration.getModel();
 
@@ -65,7 +68,7 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-generate")
-  public String drawImage(String data, @Config LangchainLLMConfiguration configuration) {
+  public String drawImage(@Config LangchainLLMConfiguration configuration, String data) {
     ConfigExtractor configExtractor = configuration.getConfigExtractor();
     ImageModel model = OpenAiImageModel.builder()
         .modelName(configuration.getModelName())

@@ -1,8 +1,12 @@
-package org.mule.extension.mulechain.internal.streaming;
+/**
+ * (c) 2003-2024 MuleSoft, Inc. The software in this package is published under the terms of the Commercial Free Software license V.1 a copy of which has been included with this distribution in the LICENSE.md file.
+ */
+package org.mule.extension.mulechain.internal.operation;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
-import org.mule.extension.mulechain.internal.llm.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.metadata.TokenStreamMetadataResolver;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -35,9 +39,9 @@ public class LangchainLLMStreamingOperations {
 
   @MediaType(value = ANY, strict = false)
   @Alias("Stream-prompt-answer")
-  @OutputResolver(output = TokenStreamOutputResolver.class)
+  @OutputResolver(output = TokenStreamMetadataResolver.class)
   @Streaming
-  public TokenStream streamingPrompt(String prompt, @Config LangchainLLMConfiguration configuration) {
+  public TokenStream streamingPrompt(@Config LangchainLLMConfiguration configuration, String prompt) {
 
     StreamingChatLanguageModel model = OpenAiStreamingChatModel.builder()
         .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
