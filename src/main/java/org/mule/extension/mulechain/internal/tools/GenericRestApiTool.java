@@ -128,6 +128,6 @@ public class GenericRestApiTool implements Tool {
   @Override
   public String[] value() {
     // TODO Auto-generated method stub
-    return null;
+    return new String[0];
   }
 }

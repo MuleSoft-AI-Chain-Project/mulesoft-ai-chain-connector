@@ -25,8 +25,8 @@ public class JsonUtilsTest {
     Path jsonFile = Paths.get("src", "test", "resources", "sample-json.txt");
     JSONObject object = JsonUtils.readConfigFile(jsonFile.toFile().getAbsoluteFile().toString());
     Assert.assertNotNull("Returned object is null", object);
-    Assert.assertEquals("String are not equal", object.toString(),
-                        "{\"employee\":{\"name\":\"John Doe\",\"salary\":56000,\"married\":true}}");
+    Assert.assertEquals("String are not equal", "{\"employee\":{\"name\":\"John Doe\",\"salary\":56000,\"married\":true}}",
+                        object.toString());
   }
 
   @Test
