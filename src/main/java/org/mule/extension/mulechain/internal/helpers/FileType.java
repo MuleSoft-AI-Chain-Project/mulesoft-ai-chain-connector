@@ -3,6 +3,27 @@
  */
 package org.mule.extension.mulechain.internal.helpers;
 
+import java.util.Arrays;
+
 public enum FileType {
-  PDF, TEXT, URL
+
+  PDF("pdf"), TEXT("text"), URL("url");
+
+  private final String value;
+
+  FileType(String value) {
+    this.value = value;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public static FileType fromValue(String value) {
+    return Arrays.stream(FileType.values())
+        .filter(fileType -> fileType.value.equals(value))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Unsupported File Type: " + value));
+  }
+
 }

@@ -148,7 +148,7 @@ public class LangchainEmbeddingStoresOperations {
 
   private void ingestDocument(FileTypeParameters fileType, String contextPath, EmbeddingStoreIngestor ingestor) {
     Document document = null;
-    switch (FileType.valueOf(fileType.getFileType())) {
+    switch (FileType.fromValue(fileType.getFileType())) {
       case TEXT:
         document = loadDocument(contextPath, new TextDocumentParser());
         ingestor.ingest(document);
@@ -702,7 +702,7 @@ public class LangchainEmbeddingStoresOperations {
         LOGGER.info("Processing file {}: {}", currentFileCounter, file.getFileName());
         Document document = null;
         try {
-          switch (FileType.valueOf(fileType.getFileType())) {
+          switch (FileType.fromValue(fileType.getFileType())) {
             case TEXT:
               document = loadDocument(file.toString(), new TextDocumentParser());
               ingestor.ingest(document);

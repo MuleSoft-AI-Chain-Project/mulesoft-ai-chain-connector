@@ -16,7 +16,7 @@ public class FileTypeEmbeddingProvider implements ValueProvider {
 
   @Override
   public Set<Value> resolve() throws ValueResolvingException {
-    return ValueBuilder.getValuesFor(Arrays.stream(FileType.values()).map(FileType::name));
+    return ValueBuilder.getValuesFor(Arrays.stream(FileType.values()).map(FileType::getValue));
   }
 
 }
