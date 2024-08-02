@@ -96,6 +96,15 @@
 				<groupId>com.mulesoft.munit</groupId>
 				<artifactId>munit-extensions-maven-plugin</artifactId>
 				<version>${munit.extensions.maven.plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<sharedLibraries>
+						<sharedLibrary>
+							<groupId>org.jsoup</groupId>
+							<artifactId>jsoup</artifactId>
+						</sharedLibrary>
+					</sharedLibraries>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
