@@ -200,7 +200,6 @@ public class LangchainEmbeddingStoresOperations {
 
     ChatLanguageModel model = configuration.getModel();
 
-    //String dbFilePath = "/Users/amir.khan/Documents/langchain4mule resources/multi-user-chat-memory.db";
     PersistentChatMemoryStore.initialize(dbFilePath);
 
     PersistentChatMemoryStore store = new PersistentChatMemoryStore();
@@ -563,6 +562,7 @@ public class LangchainEmbeddingStoresOperations {
     JSONArray sources = new JSONArray();
     String absoluteDirectoryPath;
     String fileName;
+    String url;
     Metadata metadata;
 
     JSONObject contentObject;
@@ -570,10 +570,12 @@ public class LangchainEmbeddingStoresOperations {
       metadata = content.textSegment().metadata();
       absoluteDirectoryPath = (String) metadata.getString("absolute_directory_path");
       fileName = (String) metadata.getString("file_name");
+      url = (String) metadata.getString("url");
 
       contentObject = new JSONObject();
       contentObject.put("absoluteDirectoryPath", absoluteDirectoryPath);
       contentObject.put("fileName", fileName);
+      contentObject.put("url", url);
       contentObject.put("textSegment", content.textSegment().text());
       sources.put(contentObject);
     }
@@ -656,7 +658,6 @@ public class LangchainEmbeddingStoresOperations {
 
 
     ChatLanguageModel model = configuration.getModel();
-
 
     ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
 
