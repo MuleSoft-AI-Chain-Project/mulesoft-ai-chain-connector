@@ -491,6 +491,38 @@ public class LangchainEmbeddingStoresOperations {
     jsonObject.put("storeName", storeName);
     jsonObject.put("information", information);
 
+    JSONArray sources = new JSONArray();
+    String absoluteDirectoryPath;
+    String fileName;
+    String url;
+    String textSegment;
+
+    JSONObject contentObject;
+    String fullPath;
+    for (EmbeddingMatch<TextSegment> match : relevantEmbeddings) {
+      Metadata matchMetadata = match.embedded().metadata();
+
+      fileName = matchMetadata.getString("file_name");
+      url = matchMetadata.getString("url");
+      fullPath = matchMetadata.getString("full_path");
+      absoluteDirectoryPath = matchMetadata.getString("absolute_directory_path");
+      textSegment = matchMetadata.getString("textSegment");
+
+      contentObject = new JSONObject();
+      contentObject.put("absoluteDirectoryPath", absoluteDirectoryPath);
+      contentObject.put("full_path", fullPath);
+      contentObject.put("file_name", fileName);
+      contentObject.put("url", url);
+      contentObject.put("individualScore", match.score());
+
+      contentObject.put("textSegment", match.embedded().text());
+      sources.put(contentObject);
+    }
+
+    jsonObject.put("sources", sources);
+
+
+
     return jsonObject.toString();
   }
 
