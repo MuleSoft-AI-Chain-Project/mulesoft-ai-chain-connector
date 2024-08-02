@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.values.ValueResolvingException;
 public class LangchainLLMModelNameProvider implements ValueProvider {
 
   @Parameter
-  @Placement(order = 1)
+  @Placement(order = 1, tab = Placement.DEFAULT_TAB)
   private String llmType;
 
   @Override

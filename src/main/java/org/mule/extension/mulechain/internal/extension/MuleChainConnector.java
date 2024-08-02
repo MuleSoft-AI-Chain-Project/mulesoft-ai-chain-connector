@@ -3,11 +3,13 @@
  */
 package org.mule.extension.mulechain.internal.extension;
 
+import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.sdk.api.annotation.JavaVersionSupport;
 
@@ -23,6 +25,7 @@ import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 @Extension(name = "MuleChain AI", category = Category.CERTIFIED)
 @Configurations({LangchainLLMConfiguration.class})
 @RequiresEnterpriseLicense(allowEvaluationLicense = true)
+@ErrorTypes(MuleChainErrorType.class)
 @JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 public class MuleChainConnector {
 
