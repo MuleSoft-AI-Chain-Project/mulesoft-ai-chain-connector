@@ -458,9 +458,8 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-query-from-store")
-  public String queryFromEmbedding(String storeName, String question, Number maxResults, Double minScore, boolean getLatest) {
-    int maximumResults = (int) maxResults;
-    if (minScore == null || minScore == 0) {
+  public String queryFromEmbedding(String storeName, String question, int maxResults, double minScore, boolean getLatest) {
+    if (minScore == 0) {
       minScore = 0.7;
     }
 
@@ -474,7 +473,7 @@ public class LangchainEmbeddingStoresOperations {
 
     Embedding questionEmbedding = this.embeddingModel.embed(question).content();
 
-    List<EmbeddingMatch<TextSegment>> relevantEmbeddings = store.findRelevant(questionEmbedding, maximumResults, minScore);
+    List<EmbeddingMatch<TextSegment>> relevantEmbeddings = store.findRelevant(questionEmbedding, maxResults, minScore);
 
     String information = relevantEmbeddings.stream()
         .map(match -> match.embedded().text())

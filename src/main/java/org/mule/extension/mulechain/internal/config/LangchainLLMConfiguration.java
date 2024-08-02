@@ -25,6 +25,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 
 import java.util.HashMap;
@@ -58,32 +59,39 @@ public class LangchainLLMConfiguration implements Initialisable {
   }
 
   @Parameter
+  @Placement(order = 1)
   @OfValues(LangchainLLMTypeProvider.class)
   private String llmType;
 
   @Parameter
+  @Placement(order = 2)
   @OfValues(ConfigTypeProvider.class)
   private String configType;
 
   @Parameter
+  @Placement(order = 3)
   private String filePath;
 
   @Parameter
   @Expression(ExpressionSupport.SUPPORTED)
   @OfValues(LangchainLLMModelNameProvider.class)
   @Optional(defaultValue = "gpt-3.5-turbo")
+  @Placement(order = 4)
   private String modelName = "gpt-3.5-turbo";
 
   @Parameter
+  @Placement(order = 5)
   @Optional(defaultValue = "0.7")
   private double temperature = 0.7;
 
   @Parameter
+  @Placement(order = 6)
   @Optional(defaultValue = "60")
   @DisplayName("Duration in sec")
   private long durationInSeconds;
 
   @Parameter
+  @Placement(order = 7)
   @Expression(ExpressionSupport.SUPPORTED)
   @Optional(defaultValue = "500")
   private int maxTokens;
