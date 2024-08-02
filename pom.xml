@@ -4,7 +4,6 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.mulechain</groupId>
-	<!-- <groupId>aa7af6ad-839e-4607-a6f8-986e4e8166a4</groupId>  -->
 	<artifactId>mulechain-ai-connector</artifactId>
 	<version>0.2.0</version>
 	<packaging>mule-extension</packaging>
