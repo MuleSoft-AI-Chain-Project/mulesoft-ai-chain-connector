@@ -1,6 +1,6 @@
 About MuleSoft Certified Connectors
 
-Mulesoft Certified Connectors are developed by MuleSoft's partners and developers community. These connectors have been reviewed and certified by Mulesoft. To purchase the MuleChain AI Connector or to receive assistance or support for it, contact MuleChain Project team. MuleSoft disclaims any support obligation for MuleSoft Connectors.
+Mulesoft Certified Connectors are developed by MuleSoft's partners and developers community. To purchase the MuleChain AI Connector or to receive assistance or support for it, contact MuleChain Project team. MuleSoft disclaims any support obligation for MuleSoft Connectors.
 By installing this connector, you consent the MuleSoft sharing your contact information with the developer of this connector so that you can receive more information about it directly from the developer.
 
 MIT License
