@@ -43,6 +43,7 @@ import dev.langchain4j.service.Result;
 import dev.langchain4j.service.UserMessage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
@@ -177,12 +178,6 @@ public class LangchainEmbeddingStoresOperations {
   }
 
 
-
-  // interface Assistant {
-
-  //   String chat(@MemoryId int memoryId, @UserMessage String userMessage);
-  // }
-
   interface AssistantMemory {
 
     Result<String> chat(@MemoryId String memoryName, @UserMessage String userMessage);
@@ -204,13 +199,12 @@ public class LangchainEmbeddingStoresOperations {
 
     PersistentChatMemoryStore store = new PersistentChatMemoryStore();
 
-
-
     ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
         .id(memoryName)
         .maxMessages(maxMessages)
         .chatMemoryStore(store)
         .build();
+
 
     AssistantMemory assistant = AiServices.builder(AssistantMemory.class)
         .chatLanguageModel(model)
@@ -218,6 +212,7 @@ public class LangchainEmbeddingStoresOperations {
         .build();
 
     Result<String> response = assistant.chat(memoryName, data);
+
 
     JSONObject jsonObject = new JSONObject();
     jsonObject.put("response", response.content());
@@ -298,8 +293,6 @@ public class LangchainEmbeddingStoresOperations {
 
     ChatLanguageModel model = configuration.getModel();
 
-
-
     // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
     // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
     //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
@@ -326,7 +319,7 @@ public class LangchainEmbeddingStoresOperations {
       AssistantC assistant = AiServices.builder(AssistantC.class)
           .chatLanguageModel(model)
           .tools(restApiTool)
-          .chatMemory(MessageWindowChatMemory.withMaxMessages(100))
+          //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
           .build();
       // Use the assistant to make a query
       response = assistant.chat(intermediateAnswer);
@@ -662,6 +655,7 @@ public class LangchainEmbeddingStoresOperations {
     ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
 
 
+
     AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
         .chatLanguageModel(model)
         .contentRetriever(contentRetriever)
@@ -683,7 +677,7 @@ public class LangchainEmbeddingStoresOperations {
       AssistantC assistantC = AiServices.builder(AssistantC.class)
           .chatLanguageModel(model)
           .tools(restApiTool)
-          .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+          //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
           .build();
       // Use the assistant to make a query
       response = assistantC.chat(intermediateAnswer);
