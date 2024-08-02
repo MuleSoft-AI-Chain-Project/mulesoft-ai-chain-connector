@@ -59,17 +59,17 @@ public class LangchainLLMConfiguration implements Initialisable {
   }
 
   @Parameter
-  @Placement(order = 1)
+  @Placement(order = 1, tab = Placement.DEFAULT_TAB)
   @OfValues(LangchainLLMTypeProvider.class)
   private String llmType;
 
   @Parameter
-  @Placement(order = 2)
+  @Placement(order = 2, tab = Placement.DEFAULT_TAB)
   @OfValues(ConfigTypeProvider.class)
   private String configType;
 
   @Parameter
-  @Placement(order = 3)
+  @Placement(order = 3, tab = Placement.DEFAULT_TAB)
   private String filePath;
 
   @Parameter
