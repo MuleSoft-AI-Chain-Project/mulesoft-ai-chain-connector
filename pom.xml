@@ -6,7 +6,7 @@
 	<groupId>com.mule.mulechain</groupId>
 	<!-- <groupId>aa7af6ad-839e-4607-a6f8-986e4e8166a4</groupId>  -->
 	<artifactId>mulechain-ai-connector</artifactId>
-	<version>0.1.41-SNAPSHOT</version>
+	<version>0.2.0</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleChain</name>
 
@@ -207,5 +207,17 @@
 			<name>Nexus Public Releases</name>
 			<url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>
 		</repository>
+
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>mulesoft-releases</id>
+			<name>mulesoft release repository</name>
+			<layout>default</layout>
+			<url>https://repository.mulesoft.org/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
