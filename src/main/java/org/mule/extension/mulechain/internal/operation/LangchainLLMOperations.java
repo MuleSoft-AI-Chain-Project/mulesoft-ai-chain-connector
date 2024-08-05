@@ -71,7 +71,7 @@ public class LangchainLLMOperations {
         + System.lineSeparator() + "Dataset: {{dataset}}");
 
     Map<String, Object> variables = new HashMap<>();
-    variables.put(MuleChainConstants.INFORMATION, instructions);
+    variables.put(MuleChainConstants.INSTRUCTIONS, instructions);
     variables.put(MuleChainConstants.DATASET, dataset);
 
     Prompt prompt = promptTemplate.apply(variables);

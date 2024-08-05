@@ -1,3 +1,6 @@
+/**
+ * (c) 2003-2024 MuleSoft, Inc. The software in this package is published under the terms of the Commercial Free Software license V.1 a copy of which has been included with this distribution in the LICENSE.md file.
+ */
 package org.mule.extension.mulechain.internal.constants;
 
 public class MuleChainConstants {
@@ -24,7 +27,7 @@ public class MuleChainConstants {
   public static final String MIN_SCORE = "minScore";
   public static final String INFORMATION = "information";
   public static final String GET_LATEST = "getLatest";
-  public static final String ABSOLUTE_DIRECTORY_PATH = "absoluteDirectoryPath"; // Check This
+  public static final String ABSOLUTE_DIRECTORY_PATH = "absoluteDirectoryPath";
   public static final String FULL_PATH = "fullPath";
   public static final String FILE_NAME = "fileName";
   public static final String URL = "url";
@@ -39,6 +42,8 @@ public class MuleChainConstants {
   public static final String IS_POSITIVE = "isPositive";
 
   public static class EmbeddingConstants {
+
+    private EmbeddingConstants() {}
 
     public static final String FILE_NAME = "file_name";
     public static final String FULL_PATH = "full_path";
