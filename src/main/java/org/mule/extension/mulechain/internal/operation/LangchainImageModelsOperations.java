@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
+import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -50,11 +51,7 @@ public class LangchainImageModelsOperations {
 
     JSONObject jsonObject = new JSONObject();
     jsonObject.put(MuleChainConstants.RESPONSE, response.content().text());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put(MuleChainConstants.INPUT_COUNT, response.tokenUsage().inputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, response.tokenUsage().outputTokenCount());
-    tokenUsage.put(MuleChainConstants.TOTAL_COUNT, response.tokenUsage().totalTokenCount());
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, tokenUsage);
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
 
     return jsonObject.toString();
   }

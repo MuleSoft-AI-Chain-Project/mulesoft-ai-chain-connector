@@ -13,6 +13,7 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -52,12 +53,7 @@ public class LangchainLLMOperations {
 
     JSONObject jsonObject = new JSONObject();
     jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put(MuleChainConstants.INPUT_COUNT, answer.tokenUsage().inputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, answer.tokenUsage().outputTokenCount());
-    tokenUsage.put(MuleChainConstants.TOTAL_COUNT, answer.tokenUsage().totalTokenCount());
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, tokenUsage);
-
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
     return jsonObject.toString();
   }
 
@@ -87,11 +83,7 @@ public class LangchainLLMOperations {
 
     JSONObject jsonObject = new JSONObject();
     jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put(MuleChainConstants.INPUT_COUNT, answer.tokenUsage().inputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, answer.tokenUsage().outputTokenCount());
-    tokenUsage.put(MuleChainConstants.TOTAL_COUNT, answer.tokenUsage().totalTokenCount());
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, tokenUsage);
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
 
     return jsonObject.toString();
   }
@@ -129,15 +121,10 @@ public class LangchainLLMOperations {
     boolean positive = sentimentAnalyzer.isPositive(data);
     LOGGER.info("Is sentiment positive: {}", positive); // false
 
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put(MuleChainConstants.INPUT_COUNT, sentiment.tokenUsage().inputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, sentiment.tokenUsage().outputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, sentiment.tokenUsage().totalTokenCount());
-
     JSONObject jsonObject = new JSONObject();
     jsonObject.put(MuleChainConstants.SENTIMENT, sentiment.content());
     jsonObject.put(MuleChainConstants.IS_POSITIVE, positive);
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, tokenUsage);
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(sentiment));
 
     return jsonObject.toString();
   }

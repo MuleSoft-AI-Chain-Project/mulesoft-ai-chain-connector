@@ -24,9 +24,9 @@ public class MuleChainConstants {
   public static final String MIN_SCORE = "minScore";
   public static final String INFORMATION = "information";
   public static final String GET_LATEST = "getLatest";
-  public static final String ABSOLUTE_DIRECTORY_PATH = "absolute_directory_path"; // Check This
-  public static final String FULL_PATH = "full_path";
-  public static final String FILE_NAME = "file_name";
+  public static final String ABSOLUTE_DIRECTORY_PATH = "absoluteDirectoryPath"; // Check This
+  public static final String FULL_PATH = "fullPath";
+  public static final String FILE_NAME = "fileName";
   public static final String URL = "url";
   public static final String INDIVIDUAL_SCORE = "individualScore";
   public static final String TEXT_SEGMENT = "textSegment";
@@ -37,4 +37,11 @@ public class MuleChainConstants {
   public static final String DATASET = "dataset";
   public static final String SENTIMENT = "sentiment";
   public static final String IS_POSITIVE = "isPositive";
+
+  public static class EmbeddingConstants {
+
+    public static final String FILE_NAME = "file_name";
+    public static final String FULL_PATH = "full_path";
+    public static final String ABSOLUTE_DIRECTORY_PATH = "absolute_directory_path";
+  }
 }

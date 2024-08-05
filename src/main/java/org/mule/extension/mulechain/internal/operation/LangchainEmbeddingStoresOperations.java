@@ -33,6 +33,7 @@ import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
+import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -132,11 +133,7 @@ public class LangchainEmbeddingStoresOperations {
 
     JSONObject jsonObject = new JSONObject();
     jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put(MuleChainConstants.INPUT_COUNT, answer.tokenUsage().inputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, answer.tokenUsage().outputTokenCount());
-    tokenUsage.put(MuleChainConstants.TOTAL_COUNT, answer.tokenUsage().totalTokenCount());
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, tokenUsage);
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
     jsonObject.put(MuleChainConstants.FILE_PATH, contextPath);
     jsonObject.put(MuleChainConstants.FILE_TYPE, fileType);
     jsonObject.put(MuleChainConstants.QUESTION, data);
@@ -174,7 +171,6 @@ public class LangchainEmbeddingStoresOperations {
     }
   }
 
-
   interface AssistantMemory {
 
     Result<String> chat(@MemoryId String memoryName, @UserMessage String userMessage);
@@ -202,7 +198,6 @@ public class LangchainEmbeddingStoresOperations {
         .chatMemoryStore(store)
         .build();
 
-
     AssistantMemory assistant = AiServices.builder(AssistantMemory.class)
         .chatLanguageModel(model)
         .chatMemoryProvider(chatMemoryProvider)
@@ -210,21 +205,14 @@ public class LangchainEmbeddingStoresOperations {
 
     Result<String> response = assistant.chat(memoryName, data);
 
-
     JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", response.content());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put(MuleChainConstants.INPUT_COUNT, response.tokenUsage().inputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, response.tokenUsage().outputTokenCount());
-    tokenUsage.put(MuleChainConstants.TOTAL_COUNT, response.tokenUsage().totalTokenCount());
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, tokenUsage);
-
+    jsonObject.put(MuleChainConstants.RESPONSE, response.content());
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
     jsonObject.put(MuleChainConstants.MEMORY_NAME, memoryName);
     jsonObject.put(MuleChainConstants.DB_FILE_PATH, dbFilePath);
     jsonObject.put(MuleChainConstants.MAX_MESSAGES, maxMessages);
 
     return jsonObject.toString();
-
   }
 
   static class PersistentChatMemoryStore implements ChatMemoryStore {
@@ -454,10 +442,10 @@ public class LangchainEmbeddingStoresOperations {
     for (EmbeddingMatch<TextSegment> match : relevantEmbeddings) {
       Metadata matchMetadata = match.embedded().metadata();
 
-      fileName = matchMetadata.getString(MuleChainConstants.FILE_NAME);
+      fileName = matchMetadata.getString(MuleChainConstants.EmbeddingConstants.FILE_NAME);
       url = matchMetadata.getString(MuleChainConstants.URL);
-      fullPath = matchMetadata.getString(MuleChainConstants.FULL_PATH);
-      absoluteDirectoryPath = matchMetadata.getString(MuleChainConstants.ABSOLUTE_DIRECTORY_PATH);
+      fullPath = matchMetadata.getString(MuleChainConstants.EmbeddingConstants.FULL_PATH);
+      absoluteDirectoryPath = matchMetadata.getString(MuleChainConstants.EmbeddingConstants.ABSOLUTE_DIRECTORY_PATH);
 
       contentObject = new JSONObject();
       contentObject.put(MuleChainConstants.ABSOLUTE_DIRECTORY_PATH, absoluteDirectoryPath);
@@ -469,7 +457,6 @@ public class LangchainEmbeddingStoresOperations {
 
       sources.put(contentObject);
     }
-
     jsonObject.put(MuleChainConstants.SOURCES, sources);
 
     return jsonObject.toString();
@@ -513,8 +500,8 @@ public class LangchainEmbeddingStoresOperations {
     JSONObject contentObject;
     for (Content content : contents) {
       metadata = content.textSegment().metadata();
-      absoluteDirectoryPath = (String) metadata.getString(MuleChainConstants.ABSOLUTE_DIRECTORY_PATH);
-      fileName = (String) metadata.getString(MuleChainConstants.FILE_NAME);
+      absoluteDirectoryPath = (String) metadata.getString(MuleChainConstants.EmbeddingConstants.ABSOLUTE_DIRECTORY_PATH);
+      fileName = (String) metadata.getString(MuleChainConstants.EmbeddingConstants.FILE_NAME);
       url = (String) metadata.getString(MuleChainConstants.URL);
 
       contentObject = new JSONObject();
@@ -524,14 +511,8 @@ public class LangchainEmbeddingStoresOperations {
       contentObject.put(MuleChainConstants.TEXT_SEGMENT, content.textSegment().text());
       sources.put(contentObject);
     }
-
     jsonObject.put(MuleChainConstants.SOURCES, sources);
-
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put(MuleChainConstants.INPUT_COUNT, results.tokenUsage().inputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, results.tokenUsage().outputTokenCount());
-    tokenUsage.put(MuleChainConstants.TOTAL_COUNT, results.tokenUsage().totalTokenCount());
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, tokenUsage);
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(results));
 
     return jsonObject.toString();
   }
