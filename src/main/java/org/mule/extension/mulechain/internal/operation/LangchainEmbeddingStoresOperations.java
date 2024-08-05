@@ -135,7 +135,7 @@ public class LangchainEmbeddingStoresOperations {
     jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
     jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
     jsonObject.put(MuleChainConstants.FILE_PATH, contextPath);
-    jsonObject.put(MuleChainConstants.FILE_TYPE, fileType);
+    jsonObject.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
     jsonObject.put(MuleChainConstants.QUESTION, data);
 
     return jsonObject.toString();
