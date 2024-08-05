@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -49,18 +51,9 @@ public class LangchainLLMOperations {
 
     Result<String> answer = assistant.chat(prompt);
 
-
-    //String response = model.generate(prompt);
-
-
     JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", answer.content());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put("inputCount", answer.tokenUsage().inputTokenCount());
-    tokenUsage.put("outputCount", answer.tokenUsage().outputTokenCount());
-    tokenUsage.put("totalCount", answer.tokenUsage().totalTokenCount());
-    jsonObject.put("tokenUsage", tokenUsage);
-
+    jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
     return jsonObject.toString();
   }
 
@@ -78,8 +71,8 @@ public class LangchainLLMOperations {
         + System.lineSeparator() + "Dataset: {{dataset}}");
 
     Map<String, Object> variables = new HashMap<>();
-    variables.put("instructions", instructions);
-    variables.put("dataset", dataset);
+    variables.put(MuleChainConstants.INSTRUCTIONS, instructions);
+    variables.put(MuleChainConstants.DATASET, dataset);
 
     Prompt prompt = promptTemplate.apply(variables);
 
@@ -89,27 +82,18 @@ public class LangchainLLMOperations {
     Result<String> answer = assistant.chat(prompt.text());
 
     JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", answer.content());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put("inputCount", answer.tokenUsage().inputTokenCount());
-    tokenUsage.put("outputCount", answer.tokenUsage().outputTokenCount());
-    tokenUsage.put("totalCount", answer.tokenUsage().totalTokenCount());
-    jsonObject.put("tokenUsage", tokenUsage);
-
+    jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
 
     return jsonObject.toString();
   }
 
-
-
   /**
    * Supporting ENUM and Interface for Sentimetns
    */
-
   enum Sentiment {
     POSITIVE, NEUTRAL, NEGATIVE;
   }
-
 
   interface SentimentAnalyzer {
 
@@ -120,8 +104,6 @@ public class LangchainLLMOperations {
     boolean isPositive(String text);
   }
 
-
-
   /**
    * Example of a sentiment analyzer, which accepts text as input.
    */
@@ -131,7 +113,6 @@ public class LangchainLLMOperations {
 
     ChatLanguageModel model = configuration.getModel();
 
-
     SentimentAnalyzer sentimentAnalyzer = AiServices.create(SentimentAnalyzer.class, model);
 
     Result<Sentiment> sentiment = sentimentAnalyzer.analyzeSentimentOf(data);
@@ -140,15 +121,10 @@ public class LangchainLLMOperations {
     boolean positive = sentimentAnalyzer.isPositive(data);
     LOGGER.info("Is sentiment positive: {}", positive); // false
 
-
     JSONObject jsonObject = new JSONObject();
-    jsonObject.put("sentiment", sentiment.content());
-    jsonObject.put("isPositive", positive);
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put("inputCount", sentiment.tokenUsage().inputTokenCount());
-    tokenUsage.put("outputCount", sentiment.tokenUsage().outputTokenCount());
-    tokenUsage.put("totalCount", sentiment.tokenUsage().totalTokenCount());
-    jsonObject.put("tokenUsage", tokenUsage);
+    jsonObject.put(MuleChainConstants.SENTIMENT, sentiment.content());
+    jsonObject.put(MuleChainConstants.IS_POSITIVE, positive);
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(sentiment));
 
     return jsonObject.toString();
   }

@@ -5,7 +5,9 @@ package org.mule.extension.mulechain.internal.operation;
 
 import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
+import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -47,21 +49,12 @@ public class LangchainImageModelsOperations {
 
     Response<AiMessage> response = model.generate(userMessage);
 
-
-
     JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", response.content().text());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put("inputCount", response.tokenUsage().inputTokenCount());
-    tokenUsage.put("outputCount", response.tokenUsage().outputTokenCount());
-    tokenUsage.put("totalCount", response.tokenUsage().totalTokenCount());
-    jsonObject.put("tokenUsage", tokenUsage);
-
+    jsonObject.put(MuleChainConstants.RESPONSE, response.content().text());
+    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
 
     return jsonObject.toString();
-
   }
-
 
   /**
    * Generates an image based on the prompt in data
@@ -75,24 +68,12 @@ public class LangchainImageModelsOperations {
         .apiKey(configExtractor.extractValue("OPENAI_API_KEY"))
         .build();
 
-    /* ImageModel model = OpenAiImageModel.builder()
-            .modelName(LangchainParams.getModelName())
-            .apiKey(System.getenv("OPENAI_API_KEY").replace("\n", "").replace("\r", ""))
-            .build();
-    */
     Response<Image> response = model.generate(data);
     LOGGER.info("Generated Image: {}", response.content().url());
 
-
-
     JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", response.content().url());
-
-
+    jsonObject.put(MuleChainConstants.RESPONSE, response.content().url());
 
     return jsonObject.toString();
   }
-
-
-
 }

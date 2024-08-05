@@ -3,7 +3,7 @@
  */
 package org.mule.extension.mulechain.internal.tools;
 
-import dev.langchain4j.agent.tool.*;
+import dev.langchain4j.agent.tool.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,6 @@ import java.lang.annotation.Annotation;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-
 
 public class RestApiTool implements Tool {
 

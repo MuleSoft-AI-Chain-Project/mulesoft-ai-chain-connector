@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class EnvironmentVariables {
 
+  private EnvironmentVariables() {}
+
   public static void setVar(String varNam, String varValue) throws IOException {
     ProcessBuilder processBuilder = new ProcessBuilder();
     Map<String, String> environment = processBuilder.environment();
