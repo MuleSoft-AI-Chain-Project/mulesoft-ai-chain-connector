@@ -40,6 +40,9 @@ public class MuleChainConstants {
   public static final String DATASET = "dataset";
   public static final String SENTIMENT = "sentiment";
   public static final String IS_POSITIVE = "isPositive";
+  public static final String PAGE = "page";
+  public static final String TOTAL_PAGES = "total_pages";
+  public static final String PAGES = "pages";
 
   public static class EmbeddingConstants {
 

@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.mulechain</groupId>
 	<artifactId>mulechain-ai-connector</artifactId>
-	<version>0.2.6</version>
+	<version>0.2.10</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleChain</name>
 
@@ -167,6 +167,11 @@
 			<groupId>io.reactivex.rxjava2</groupId>
 			<artifactId>rxjava</artifactId>
 			<version>2.2.21</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>3.0.2</version>
 		</dependency>
 	</dependencies>
 	<repositories>
