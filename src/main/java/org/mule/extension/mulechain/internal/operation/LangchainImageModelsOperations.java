@@ -29,15 +29,13 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.List;
 
 import javax.imageio.ImageIO;
-
+import java.io.InputStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
 
@@ -95,54 +93,57 @@ public class LangchainImageModelsOperations {
    * Reads an scanned document.
    */
 
-  /*
+
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-read-scanned-documents")
   public String readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration, String data, String filePath) {
-  
+
     ChatLanguageModel model = configuration.getModel();
-  
+
     String sourceDir = filePath;
-  
+
     JSONObject jsonObject = new JSONObject();
     JSONArray docPages = new JSONArray();
-    
-    try (PDDocument document = Loader.loadPDF(new File(sourceDir))) {
-  
+
+    //try (PDDocument document = Loader.loadPDF(new File(sourceDir))) {
+    try (InputStream inputStream = new FileInputStream(sourceDir);
+        PDDocument document = PDDocument.load(inputStream);) {
+
+
       PDFRenderer pdfRenderer = new PDFRenderer(document);
       int totalPages = document.getNumberOfPages();
       LOGGER.info("Total files to be converted -> " + totalPages);
       jsonObject.put(MuleChainConstants.TOTAL_PAGES, totalPages);
-  
+
       JSONObject docPage;
       for (int pageNumber = 0; pageNumber < totalPages; pageNumber++) {
-  
+
         BufferedImage image = pdfRenderer.renderImageWithDPI(pageNumber, 300);
         LOGGER.info("Reading page -> " + pageNumber);
-  
+
         String imageBase64 = convertToBase64String(image);
         UserMessage userMessage = UserMessage.from(
                                                    TextContent.from(data),
                                                    ImageContent.from(imageBase64, "image/png"));
-  
+
         Response<AiMessage> response = model.generate(userMessage);
-  
+
         docPage = new JSONObject();
         docPage.put(MuleChainConstants.PAGE, pageNumber + 1);
         docPage.put(MuleChainConstants.RESPONSE, response.content().text());
         docPage.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
         docPages.put(docPage);
       }
-  
+
     } catch (IOException e) {
       LOGGER.info("Error occurred while processing the file: " + e.getMessage());
     }
-  
+
     jsonObject.put(MuleChainConstants.PAGES, docPages);
-  
+
     return jsonObject.toString();
   }
-  
+
   private String convertToBase64String(BufferedImage image) {
     String base64String;
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -155,5 +156,5 @@ public class LangchainImageModelsOperations {
       LOGGER.info("Error occurred while processing the file: " + e.getMessage());
       return "Error";
     }
-  } */
+  }
 }
