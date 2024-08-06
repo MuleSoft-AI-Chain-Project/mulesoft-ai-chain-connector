@@ -273,57 +273,61 @@ public class LangchainEmbeddingStoresOperations {
   @Alias("TOOLS-use-ai-service-legacy")
   public String useTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
 
-    EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+    try {
+      EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-    EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-        .documentSplitter(DocumentSplitters.recursive(30000, 200))
-        .embeddingModel(embeddingModel)
-        .embeddingStore(embeddingStore)
-        .build();
+      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+              .documentSplitter(DocumentSplitters.recursive(30000, 200))
+              .embeddingModel(embeddingModel)
+              .embeddingStore(embeddingStore)
+              .build();
 
-    Document document = loadDocument(toolConfig, new TextDocumentParser());
-    ingestor.ingest(document);
+      Document document = loadDocument(toolConfig, new TextDocumentParser());
+      ingestor.ingest(document);
 
-    ChatLanguageModel model = configuration.getModel();
+      ChatLanguageModel model = configuration.getModel();
 
-    // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
-    // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
-    //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
-    ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
-        .chatLanguageModel(model)
-        .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
-        // .chatMemory() // you can override default chat memory
-        // .promptTemplate() // you can override default prompt template
-        .build();
+      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
+      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+              .chatLanguageModel(model)
+              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
+              // .chatMemory() // you can override default chat memory
+              // .promptTemplate() // you can override default prompt template
+              .build();
 
-    String intermediateAnswer = chain.execute(data);
-    String response = model.generate(data);
-    List<String> findURL = extractUrls(intermediateAnswer);
-    boolean toolsUsed = false;
+      String intermediateAnswer = chain.execute(data);
+      String response = model.generate(data);
+      List<String> findURL = extractUrls(intermediateAnswer);
+      boolean toolsUsed = false;
 
-    if (findURL != null) {
+      if (findURL != null) {
 
-      toolsUsed = true;
+        toolsUsed = true;
 
-      // Create an instance of the custom tool with parameters
-      GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
+        // Create an instance of the custom tool with parameters
+        GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
 
-      // Build the assistant with the custom tool
-      AssistantC assistant = AiServices.builder(AssistantC.class)
-          .chatLanguageModel(model)
-          .tools(restApiTool)
-          //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
-          .build();
-      // Use the assistant to make a query
-      response = assistant.chat(intermediateAnswer);
-      LOGGER.info("Response: {}", response);
+        // Build the assistant with the custom tool
+        AssistantC assistant = AiServices.builder(AssistantC.class)
+                .chatLanguageModel(model)
+                .tools(restApiTool)
+                //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+                .build();
+        // Use the assistant to make a query
+        response = assistant.chat(intermediateAnswer);
+        LOGGER.info("Response: {}", response);
+      }
+
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, response);
+      jsonObject.put(MuleChainConstants.TOOLS_USED, toolsUsed);
+
+      return jsonObject.toString();
+    } catch (Exception e) {
+      throw new ToolsOperationException("Error occurred while executing AI Tools with the provided config", e);
     }
-
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put(MuleChainConstants.RESPONSE, response);
-    jsonObject.put(MuleChainConstants.TOOLS_USED, toolsUsed);
-
-    return jsonObject.toString();
   }
 
 
