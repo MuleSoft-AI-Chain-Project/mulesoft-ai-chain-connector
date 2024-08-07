@@ -7,9 +7,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.error.provider.ImageErrorTypeProvider;
+import org.mule.extension.mulechain.internal.exception.FileHandlingException;
+import org.mule.extension.mulechain.internal.exception.image.ImageAnalyzerException;
+import org.mule.extension.mulechain.internal.exception.image.ImageGenerationException;
+import org.mule.extension.mulechain.internal.exception.image.ImageProcessingException;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 
@@ -24,13 +30,15 @@ import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.data.message.TextContent;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import org.mule.sdk.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
@@ -51,21 +59,27 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-read")
+  @Throws(ImageErrorTypeProvider.class)
   public String readFromImage(@Config LangchainLLMConfiguration configuration, String data, String contextURL) {
+    try {
+      ChatLanguageModel model = configuration.getModel();
 
-    ChatLanguageModel model = configuration.getModel();
+      UserMessage userMessage = UserMessage.from(
+                                                 TextContent.from(data),
+                                                 ImageContent.from(contextURL));
 
-    UserMessage userMessage = UserMessage.from(
-                                               TextContent.from(data),
-                                               ImageContent.from(contextURL));
+      Response<AiMessage> response = model.generate(userMessage);
 
-    Response<AiMessage> response = model.generate(userMessage);
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, response.content().text());
+      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
 
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put(MuleChainConstants.RESPONSE, response.content().text());
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
-
-    return jsonObject.toString();
+      return jsonObject.toString();
+    } catch (Exception e) {
+      throw new ImageAnalyzerException(String.format("Unable to analyze the provided image %s with the text: %s", contextURL,
+                                                     data),
+                                       e);
+    }
   }
 
   /**
@@ -73,53 +87,56 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-generate")
+  @Throws(ImageErrorTypeProvider.class)
   public String drawImage(@Config LangchainLLMConfiguration configuration, String data) {
-    ConfigExtractor configExtractor = configuration.getConfigExtractor();
-    ImageModel model = OpenAiImageModel.builder()
-        .modelName(configuration.getModelName())
-        .apiKey(configExtractor.extractValue("OPENAI_API_KEY"))
-        .build();
+    try {
+      ConfigExtractor configExtractor = configuration.getConfigExtractor();
+      ImageModel model = OpenAiImageModel.builder()
+          .modelName(configuration.getModelName())
+          .apiKey(configExtractor.extractValue("OPENAI_API_KEY"))
+          .build();
 
-    Response<Image> response = model.generate(data);
-    LOGGER.info("Generated Image: {}", response.content().url());
+      Response<Image> response = model.generate(data);
+      LOGGER.info("Generated Image: {}", response.content().url());
 
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put(MuleChainConstants.RESPONSE, response.content().url());
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, response.content().url());
 
-    return jsonObject.toString();
+      return jsonObject.toString();
+    } catch (Exception e) {
+      throw new ImageGenerationException("Error while generating the required image: " + data, e);
+    }
   }
 
   /**
-   * Reads an scanned document.
+   * Reads a scanned document.
    */
 
 
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-read-scanned-documents")
+  @Throws(ImageErrorTypeProvider.class)
   public String readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration, String data, String filePath) {
 
     ChatLanguageModel model = configuration.getModel();
-
-    String sourceDir = filePath;
 
     JSONObject jsonObject = new JSONObject();
     JSONArray docPages = new JSONArray();
 
     //try (PDDocument document = Loader.loadPDF(new File(sourceDir))) {
-    try (InputStream inputStream = new FileInputStream(sourceDir);
+    try (InputStream inputStream = Files.newInputStream(Paths.get(filePath));
         PDDocument document = PDDocument.load(inputStream);) {
-
 
       PDFRenderer pdfRenderer = new PDFRenderer(document);
       int totalPages = document.getNumberOfPages();
-      LOGGER.info("Total files to be converted -> " + totalPages);
+      LOGGER.info("Total files to be converted -> {}", totalPages);
       jsonObject.put(MuleChainConstants.TOTAL_PAGES, totalPages);
 
       JSONObject docPage;
       for (int pageNumber = 0; pageNumber < totalPages; pageNumber++) {
 
         BufferedImage image = pdfRenderer.renderImageWithDPI(pageNumber, 300);
-        LOGGER.info("Reading page -> " + pageNumber);
+        LOGGER.info("Reading page -> {}", pageNumber);
 
         String imageBase64 = convertToBase64String(image);
         UserMessage userMessage = UserMessage.from(
@@ -136,7 +153,14 @@ public class LangchainImageModelsOperations {
       }
 
     } catch (IOException e) {
-      LOGGER.info("Error occurred while processing the file: " + e.getMessage());
+      LOGGER.error("Error occurred in processing the document: " + filePath, e);
+      throw new FileHandlingException("Error occurred while processing the document file: " + filePath, e);
+    } catch (ModuleException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ImageAnalyzerException(String.format("Unable to analyze the provided document %s with the text: %s", filePath,
+                                                     data),
+                                       e);
     }
 
     jsonObject.put(MuleChainConstants.PAGES, docPages);
@@ -152,9 +176,7 @@ public class LangchainImageModelsOperations {
       base64String = Base64.getEncoder().encodeToString(imageBytes);
       return base64String;
     } catch (IOException e) {
-      e.printStackTrace();
-      LOGGER.info("Error occurred while processing the file: " + e.getMessage());
-      return "Error";
+      throw new ImageProcessingException("Error occurred while processing the image", e);
     }
   }
 }

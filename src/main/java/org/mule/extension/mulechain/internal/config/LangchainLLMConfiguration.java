@@ -4,6 +4,7 @@
 package org.mule.extension.mulechain.internal.config;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import org.mule.extension.mulechain.internal.exception.config.ConfigValidationException;
 import org.mule.extension.mulechain.internal.operation.LangchainEmbeddingStoresOperations;
 import org.mule.extension.mulechain.internal.operation.LangchainImageModelsOperations;
 import org.mule.extension.mulechain.internal.llm.type.LangchainLLMType;
@@ -141,7 +142,7 @@ public class LangchainLLMConfiguration implements Initialisable {
     if (llmMap.containsKey(type)) {
       return llmMap.get(type).apply(configExtractor, this);
     }
-    throw new IllegalArgumentException("LLM Type not supported: " + llmType);
+    throw new ConfigValidationException("LLM Type not supported: " + llmType);
   }
 
   @Override
@@ -151,7 +152,7 @@ public class LangchainLLMConfiguration implements Initialisable {
       configExtractor = configExtractorMap.get(config).apply(this);
       model = createModel(configExtractor);
     } else {
-      throw new IllegalArgumentException("Config Type not supported: " + configType);
+      throw new ConfigValidationException("Config Type not supported: " + configType);
     }
   }
 }

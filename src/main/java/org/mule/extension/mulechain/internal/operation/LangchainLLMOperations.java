@@ -13,8 +13,13 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
+import org.mule.extension.mulechain.internal.exception.ChatException;
+import org.mule.extension.mulechain.internal.exception.PromptTemplateException;
+import org.mule.extension.mulechain.internal.exception.SentimentAnalyzerException;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import dev.langchain4j.model.input.Prompt;
@@ -42,50 +47,58 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("CHAT-answer-prompt")
+  @Throws(AiServiceErrorTypeProvider.class)
   public String answerPromptByModelName(@Config LangchainLLMConfiguration configuration, String prompt) {
     // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
 
-    ChatLanguageModel model = configuration.getModel();
+    try {
+      ChatLanguageModel model = configuration.getModel();
+      Assistant assistant = AiServices.create(Assistant.class, model);
+      Result<String> answer = assistant.chat(prompt);
 
-    Assistant assistant = AiServices.create(Assistant.class, model);
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
+      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
 
-    Result<String> answer = assistant.chat(prompt);
-
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
-    return jsonObject.toString();
+      return jsonObject.toString();
+    } catch (Exception e) {
+      throw new ChatException("Unable to respond with the chat provided", e);
+    }
   }
 
   /**
-   * Helps defining an AI Agent with a prompt template
+   * Helps in defining an AI Agent with a prompt template
    */
   @MediaType(value = ANY, strict = false)
   @Alias("AGENT-define-prompt-template")
+  @Throws(AiServiceErrorTypeProvider.class)
   public String definePromptTemplate(@Config LangchainLLMConfiguration configuration, String template, String instructions,
                                      String dataset) {
 
-    ChatLanguageModel model = configuration.getModel();
+    try {
+      ChatLanguageModel model = configuration.getModel();
 
-    PromptTemplate promptTemplate = PromptTemplate.from(template + System.lineSeparator() + "Instructions: {{instructions}}"
-        + System.lineSeparator() + "Dataset: {{dataset}}");
+      PromptTemplate promptTemplate = PromptTemplate.from(template + System.lineSeparator() + "Instructions: {{instructions}}"
+          + System.lineSeparator() + "Dataset: {{dataset}}");
 
-    Map<String, Object> variables = new HashMap<>();
-    variables.put(MuleChainConstants.INSTRUCTIONS, instructions);
-    variables.put(MuleChainConstants.DATASET, dataset);
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(MuleChainConstants.INSTRUCTIONS, instructions);
+      variables.put(MuleChainConstants.DATASET, dataset);
 
-    Prompt prompt = promptTemplate.apply(variables);
+      Prompt prompt = promptTemplate.apply(variables);
 
-    //String response = model.generate(prompt.text());
-    Assistant assistant = AiServices.create(Assistant.class, model);
+      Assistant assistant = AiServices.create(Assistant.class, model);
 
-    Result<String> answer = assistant.chat(prompt.text());
+      Result<String> answer = assistant.chat(prompt.text());
 
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
+      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
 
-    return jsonObject.toString();
+      return jsonObject.toString();
+    } catch (Exception e) {
+      throw new PromptTemplateException("Unable to reply with the correct prompt template", e);
+    }
   }
 
   /**
@@ -109,24 +122,29 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("SENTIMENT-analyze")
+  @Throws(AiServiceErrorTypeProvider.class)
   public String extractSentiments(@Config LangchainLLMConfiguration configuration, String data) {
 
-    ChatLanguageModel model = configuration.getModel();
+    try {
+      ChatLanguageModel model = configuration.getModel();
 
-    SentimentAnalyzer sentimentAnalyzer = AiServices.create(SentimentAnalyzer.class, model);
+      SentimentAnalyzer sentimentAnalyzer = AiServices.create(SentimentAnalyzer.class, model);
 
-    Result<Sentiment> sentiment = sentimentAnalyzer.analyzeSentimentOf(data);
-    LOGGER.info("Analyzed sentiment: {}", sentiment); // POSITIVE
+      Result<Sentiment> sentiment = sentimentAnalyzer.analyzeSentimentOf(data);
+      LOGGER.info("Analyzed sentiment: {}", sentiment); // POSITIVE
 
-    boolean positive = sentimentAnalyzer.isPositive(data);
-    LOGGER.info("Is sentiment positive: {}", positive); // false
+      boolean positive = sentimentAnalyzer.isPositive(data);
+      LOGGER.info("Is sentiment positive: {}", positive); // false
 
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put(MuleChainConstants.SENTIMENT, sentiment.content());
-    jsonObject.put(MuleChainConstants.IS_POSITIVE, positive);
-    jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(sentiment));
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.SENTIMENT, sentiment.content());
+      jsonObject.put(MuleChainConstants.IS_POSITIVE, positive);
+      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(sentiment));
 
-    return jsonObject.toString();
+      return jsonObject.toString();
+    } catch (Exception e) {
+      throw new SentimentAnalyzerException("Unable to provide the correct sentiments", e);
+    }
   }
 
 
