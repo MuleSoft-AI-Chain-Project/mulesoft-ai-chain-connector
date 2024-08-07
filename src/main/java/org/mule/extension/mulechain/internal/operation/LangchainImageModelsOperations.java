@@ -120,7 +120,7 @@ public class LangchainImageModelsOperations {
 
     //try (PDDocument document = Loader.loadPDF(new File(sourceDir))) {
     try (InputStream inputStream = Files.newInputStream(Paths.get(filePath));
-         PDDocument document = PDDocument.load(inputStream);) {
+        PDDocument document = PDDocument.load(inputStream);) {
 
       PDFRenderer pdfRenderer = new PDFRenderer(document);
       int totalPages = document.getNumberOfPages();

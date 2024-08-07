@@ -277,10 +277,10 @@ public class LangchainEmbeddingStoresOperations {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
       EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-              .documentSplitter(DocumentSplitters.recursive(30000, 200))
-              .embeddingModel(embeddingModel)
-              .embeddingStore(embeddingStore)
-              .build();
+          .documentSplitter(DocumentSplitters.recursive(30000, 200))
+          .embeddingModel(embeddingModel)
+          .embeddingStore(embeddingStore)
+          .build();
 
       Document document = loadDocument(toolConfig, new TextDocumentParser());
       ingestor.ingest(document);
@@ -291,11 +291,11 @@ public class LangchainEmbeddingStoresOperations {
       // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
       //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
       ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
-              .chatLanguageModel(model)
-              .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
-              // .chatMemory() // you can override default chat memory
-              // .promptTemplate() // you can override default prompt template
-              .build();
+          .chatLanguageModel(model)
+          .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
+          // .chatMemory() // you can override default chat memory
+          // .promptTemplate() // you can override default prompt template
+          .build();
 
       String intermediateAnswer = chain.execute(data);
       String response = model.generate(data);
@@ -311,10 +311,10 @@ public class LangchainEmbeddingStoresOperations {
 
         // Build the assistant with the custom tool
         AssistantC assistant = AiServices.builder(AssistantC.class)
-                .chatLanguageModel(model)
-                .tools(restApiTool)
-                //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
-                .build();
+            .chatLanguageModel(model)
+            .tools(restApiTool)
+            //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+            .build();
         // Use the assistant to make a query
         response = assistant.chat(intermediateAnswer);
         LOGGER.info("Response: {}", response);
