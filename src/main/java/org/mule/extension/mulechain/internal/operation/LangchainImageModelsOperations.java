@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.error.provider.ImageErrorTypeProvider;
 import org.mule.extension.mulechain.internal.exception.FileHandlingException;
 import org.mule.extension.mulechain.internal.exception.image.ImageAnalyzerException;
 import org.mule.extension.mulechain.internal.exception.image.ImageGenerationException;
@@ -14,6 +15,7 @@ import org.mule.extension.mulechain.internal.exception.image.ImageProcessingExce
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 
@@ -57,6 +59,7 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-read")
+  @Throws(ImageErrorTypeProvider.class)
   public String readFromImage(@Config LangchainLLMConfiguration configuration, String data, String contextURL) {
     try {
       ChatLanguageModel model = configuration.getModel();
@@ -84,6 +87,7 @@ public class LangchainImageModelsOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-generate")
+  @Throws(ImageErrorTypeProvider.class)
   public String drawImage(@Config LangchainLLMConfiguration configuration, String data) {
     try {
       ConfigExtractor configExtractor = configuration.getConfigExtractor();
@@ -111,6 +115,7 @@ public class LangchainImageModelsOperations {
 
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-read-scanned-documents")
+  @Throws(ImageErrorTypeProvider.class)
   public String readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration, String data, String filePath) {
 
     ChatLanguageModel model = configuration.getModel();

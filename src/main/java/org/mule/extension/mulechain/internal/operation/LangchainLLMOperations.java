@@ -13,11 +13,13 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
 import org.mule.extension.mulechain.internal.exception.ChatException;
 import org.mule.extension.mulechain.internal.exception.PromptTemplateException;
 import org.mule.extension.mulechain.internal.exception.SentimentAnalyzerException;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import dev.langchain4j.model.input.Prompt;
@@ -45,6 +47,7 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("CHAT-answer-prompt")
+  @Throws(AiServiceErrorTypeProvider.class)
   public String answerPromptByModelName(@Config LangchainLLMConfiguration configuration, String prompt) {
     // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
 
@@ -68,6 +71,7 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("AGENT-define-prompt-template")
+  @Throws(AiServiceErrorTypeProvider.class)
   public String definePromptTemplate(@Config LangchainLLMConfiguration configuration, String template, String instructions,
                                      String dataset) {
 
@@ -118,6 +122,7 @@ public class LangchainLLMOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("SENTIMENT-analyze")
+  @Throws(AiServiceErrorTypeProvider.class)
   public String extractSentiments(@Config LangchainLLMConfiguration configuration, String data) {
 
     try {

@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.error.provider.EmbeddingErrorTypeProvider;
 import org.mule.extension.mulechain.internal.exception.ChatException;
 import org.mule.extension.mulechain.internal.exception.embedding.EmbeddingStoreOperationsException;
 import org.mule.extension.mulechain.internal.exception.FileHandlingException;
@@ -40,6 +41,7 @@ import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -106,6 +108,7 @@ public class LangchainEmbeddingStoresOperations {
 
   @MediaType(value = ANY, strict = false)
   @Alias("RAG-load-document")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String loadDocumentFile(@Config LangchainLLMConfiguration configuration, String data, String contextPath,
                                  @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
@@ -195,6 +198,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("CHAT-answer-prompt-with-memory")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration, String data, String memoryName,
                                          String dbFilePath, int maxMessages) {
 
@@ -271,6 +275,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("TOOLS-use-ai-service-legacy")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String useTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
 
     try {
@@ -378,6 +383,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-new-store")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String createEmbedding(String storeName) {
     try {
       InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -401,6 +407,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-add-document-to-store")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String addFileEmbedding(String storeName, String contextPath,
                                  @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
@@ -439,6 +446,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-query-from-store")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String queryFromEmbedding(String storeName, String question, int maxResults, double minScore, boolean getLatest) {
     try {
       if (minScore == 0) {
@@ -500,6 +508,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String promptFromEmbedding(@Config LangchainLLMConfiguration configuration, String storeName, String data,
                                     boolean getLatest) {
 
@@ -564,6 +573,7 @@ public class LangchainEmbeddingStoresOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration, String storeName, String data,
                                           boolean getLatest) {
     try {
@@ -602,6 +612,7 @@ public class LangchainEmbeddingStoresOperations {
   */
   @MediaType(value = ANY, strict = false)
   @Alias("TOOLS-use-ai-service")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String useAIServiceTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -661,6 +672,7 @@ public class LangchainEmbeddingStoresOperations {
   */
   @MediaType(value = ANY, strict = false)
   @Alias("EMBEDDING-add-folder-to-store")
+  @Throws(EmbeddingErrorTypeProvider.class)
   public String addFilesFromFolderEmbedding(String storeName, String contextPath,
                                             @ParameterGroup(name = "Context") FileTypeParameters fileType) {
     try {
