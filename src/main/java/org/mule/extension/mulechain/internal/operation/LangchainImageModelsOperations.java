@@ -34,15 +34,16 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
-
+import java.io.InputStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.apache.pdfbox.Loader;
+
 
 /**
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
@@ -106,6 +107,8 @@ public class LangchainImageModelsOperations {
   /**
    * Reads a scanned document.
    */
+
+
   @MediaType(value = ANY, strict = false)
   @Alias("IMAGE-read-scanned-documents")
   public String readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration, String data, String filePath) {
@@ -114,7 +117,10 @@ public class LangchainImageModelsOperations {
 
     JSONObject jsonObject = new JSONObject();
     JSONArray docPages = new JSONArray();
-    try (PDDocument document = Loader.loadPDF(new File(filePath))) {
+
+    //try (PDDocument document = Loader.loadPDF(new File(sourceDir))) {
+    try (InputStream inputStream = Files.newInputStream(Paths.get(filePath));
+         PDDocument document = PDDocument.load(inputStream);) {
 
       PDFRenderer pdfRenderer = new PDFRenderer(document);
       int totalPages = document.getNumberOfPages();
