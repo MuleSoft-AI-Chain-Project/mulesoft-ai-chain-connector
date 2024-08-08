@@ -25,6 +25,8 @@
 		<langchain4j.version>0.31.0</langchain4j.version>
 		<mapdb.version>3.1.0</mapdb.version>
 		<json.version>20240303</json.version>
+		<munit.input.directory>src/test/munit</munit.input.directory>
+		<munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
 		<munit.extensions.maven.plugin.version>1.2.0</munit.extensions.maven.plugin.version>
     </properties>
 
@@ -167,6 +169,26 @@
 			<groupId>io.reactivex.rxjava2</groupId>
 			<artifactId>rxjava</artifactId>
 			<version>2.2.21</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-runner</artifactId>
+			<version>3.2.1</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-tools</artifactId>
+			<version>3.2.1</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.weave</groupId>
+			<artifactId>assertions</artifactId>
+			<version>1.2.1</version>
+			<scope>test</scope>
 		</dependency>
 		<!--<dependency>
 			<groupId>dev.langchain4j</groupId>

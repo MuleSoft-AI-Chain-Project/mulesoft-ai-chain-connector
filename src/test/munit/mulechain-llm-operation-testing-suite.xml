@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mulechain="http://www.mulesoft.org/schema/mule/mulechain"
+	  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+	  http://www.mulesoft.org/schema/mule/mulechain http://www.mulesoft.org/schema/mule/mulechain/current/mule-mulechain.xsd">
+	<munit:config name="mulechain-llm-operation-testing-suite.xml" />
+	<mulechain:llm-configuration-config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="MuleChain AI Llm configuration"
+										doc:id="74b85066-1569-4f10-a06b-e49e854eeef2"
+										filePath='/Users/dipeshkumar.dutta/src/open/mulechain-ai-connector/src/test/resources/envVars.json'
+	temperature="0.1"/>
+	<munit:test name="ChatAnswerPrompt-test" doc:id="772d135a-26b0-43d1-8acf-7000815da82f" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="7cc98574-6c6f-4306-89d3-7a64e1c8242e" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://ChatAnswerPrompttest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution>
+<!--			<set-variable-->
+<!--					value='#[%dw 2.0&#10;output application/json&#10;-&#45;&#45;&#10;readUrl("classpath://ChatAnswerPrompttest/set-event_payload.dwl",encoding="UTF-8","application/json")]'-->
+<!--					doc:name="Set Variable" doc:id="3a3c37c8-2647-4979-bfa8-a0aa258c9c79" variableName="userMessage"/>userMessage-->
+			<logger level="INFO" doc:name="Logger" message="#[vars.userMessage]"/>
+			<mulechain:chat-answer-prompt doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
+										config-ref="OPENAI" prompt="#[payload.data]">
+			</mulechain:chat-answer-prompt>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="fb6f5175-8f5a-442e-9a18-83a5785cdc9c" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import ChatAnswerPrompttest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+</mule>
