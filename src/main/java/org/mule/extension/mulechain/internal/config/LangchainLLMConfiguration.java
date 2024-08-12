@@ -27,10 +27,12 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -61,8 +63,10 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   @Parameter
   @Placement(order = 1, tab = Placement.DEFAULT_TAB)
+  @Optional(defaultValue = "OPENAI")
+  @DisplayName("LLM type")
   @OfValues(LangchainLLMTypeProvider.class)
-  private String llmType;
+  private String llmType = "OPENAI";
 
   @Parameter
   @Placement(order = 2, tab = Placement.DEFAULT_TAB)
@@ -71,6 +75,7 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   @Parameter
   @Placement(order = 3, tab = Placement.DEFAULT_TAB)
+  @Optional(defaultValue = "#[-]")
   private String filePath;
 
   @Parameter
@@ -88,11 +93,18 @@ public class LangchainLLMConfiguration implements Initialisable {
   @Parameter
   @Placement(order = 6)
   @Optional(defaultValue = "60")
-  @DisplayName("Duration in sec")
-  private long durationInSeconds = 60;
+  @DisplayName("LLM timeout")
+  private int llmTimeout = 60;
 
   @Parameter
+  @Optional(defaultValue = "SECONDS")
   @Placement(order = 7)
+  @DisplayName("LLM timeout unit")
+  @Summary("Time unit to be used in the LLM Timeout")
+  private TimeUnit llmTimeoutUnit = TimeUnit.SECONDS;
+
+  @Parameter
+  @Placement(order = 8)
   @Expression(ExpressionSupport.SUPPORTED)
   @Optional(defaultValue = "500")
   private int maxTokens = 500;
@@ -121,8 +133,12 @@ public class LangchainLLMConfiguration implements Initialisable {
     return temperature;
   }
 
-  public long getDurationInSeconds() {
-    return durationInSeconds;
+  public int getLlmTimeout() {
+    return llmTimeout;
+  }
+
+  public TimeUnit getLlmTimeoutUnit() {
+    return llmTimeoutUnit;
   }
 
   public int getMaxTokens() {
