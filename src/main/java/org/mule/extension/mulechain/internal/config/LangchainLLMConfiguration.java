@@ -89,13 +89,13 @@ public class LangchainLLMConfiguration implements Initialisable {
   @Placement(order = 6)
   @Optional(defaultValue = "60")
   @DisplayName("Duration in sec")
-  private long durationInSeconds;
+  private long durationInSeconds = 60;
 
   @Parameter
   @Placement(order = 7)
   @Expression(ExpressionSupport.SUPPORTED)
   @Optional(defaultValue = "500")
-  private int maxTokens;
+  private int maxTokens = 500;
 
   private ConfigExtractor configExtractor;
 
