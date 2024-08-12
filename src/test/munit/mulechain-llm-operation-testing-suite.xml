@@ -12,6 +12,7 @@
 	<mulechain:llm-configuration-config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="MuleChain AI Llm configuration"
 										doc:id="74b85066-1569-4f10-a06b-e49e854eeef2"
 										filePath='${app.home}/envVars.json'
+										modelName="gpt-3.5-turbo"
 										temperature="0.1"/>
 	<munit:test name="ChatAnswerPrompt-test" doc:id="772d135a-26b0-43d1-8acf-7000815da82f" >
 		<munit:execution>
