@@ -63,10 +63,9 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   @Parameter
   @Placement(order = 1, tab = Placement.DEFAULT_TAB)
-  @Optional(defaultValue = "OPENAI")
   @DisplayName("LLM type")
   @OfValues(LangchainLLMTypeProvider.class)
-  private String llmType = "OPENAI";
+  private String llmType;
 
   @Parameter
   @Placement(order = 2, tab = Placement.DEFAULT_TAB)
@@ -81,9 +80,8 @@ public class LangchainLLMConfiguration implements Initialisable {
   @Parameter
   @Expression(ExpressionSupport.SUPPORTED)
   @OfValues(LangchainLLMModelNameProvider.class)
-  @Optional(defaultValue = "gpt-3.5-turbo")
   @Placement(order = 4)
-  private String modelName = "gpt-3.5-turbo";
+  private String modelName;
 
   @Parameter
   @Placement(order = 5)
