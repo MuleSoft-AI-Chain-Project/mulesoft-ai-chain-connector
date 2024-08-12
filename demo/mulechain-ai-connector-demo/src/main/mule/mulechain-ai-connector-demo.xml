@@ -10,7 +10,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<mulechain:llm-configuration-config name="MISTRAL_AI" llmType="MISTRAL_AI" configType="Configuration Json" doc:name="MuleChain AI Llm configuration" doc:id="bf1ef7ec-4aa1-41c8-a184-a13ca165c925" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' modelName="mistral-large-latest" temperature="0.1"/>
-	<mulechain:llm-configuration-config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="MuleChain AI Llm configuration" doc:id="edb0d5a6-97c5-4d93-8098-4e197e563827" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' temperature="0.1"/>
+	<mulechain:llm-configuration-config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="MuleChain AI Llm configuration" doc:id="edb0d5a6-97c5-4d93-8098-4e197e563827" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' temperature="0.1" modelName="gpt-3.5-turbo"/>
 	<mulechain:llm-configuration-config name="OPENAI-GPT4-TURBO" llmType="OPENAI" configType="Configuration Json" doc:name="MuleChain AI Llm configuration" doc:id="74b85066-1569-4f10-a06b-e49e854eeef2" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' modelName="gpt-4o" />
 	<flow name="PromptTemplate" doc:id="cff3a8ed-3799-424a-becf-9d7387729bd0" >
 		<http:listener doc:name="Listener" doc:id="dd18126e-81f5-48ef-8f35-9dd19afdfaf0" config-ref="HTTP_Listener_config" path="/agent"/>
