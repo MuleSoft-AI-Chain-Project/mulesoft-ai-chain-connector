@@ -11,7 +11,7 @@
 	<munit:config name="mulechain-llm-operation-testing-suite.xml" />
 	<mulechain:llm-configuration-config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="MuleChain AI Llm configuration"
 										doc:id="74b85066-1569-4f10-a06b-e49e854eeef2"
-										filePath='/Users/dipeshkumar.dutta/src/open/mulechain-ai-connector/src/test/resources/envVars.json'
+										filePath="${app.home}/envVars.json"
 	temperature="0.1"/>
 	<munit:test name="ChatAnswerPrompt-test" doc:id="772d135a-26b0-43d1-8acf-7000815da82f" >
 		<munit:behavior >
