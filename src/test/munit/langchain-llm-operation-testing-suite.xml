@@ -48,6 +48,7 @@
 		<munit:behavior >
 			<munit:set-event doc:name="Set Input" doc:id="01b3a666-0856-440c-a499-c1374896a95b" >
 				<munit:payload value="#[output application/json --- readUrl('classpath://agentdefineprompttemplatetest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://agentdefineprompttemplatetest/set-event_attributes.dwl')]" />
 			</munit:set-event>
 		</munit:behavior>
 		<munit:execution >
