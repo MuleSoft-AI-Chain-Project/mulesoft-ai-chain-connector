@@ -100,6 +100,6 @@ public class RestApiTool implements Tool {
   @Override
   public String[] value() {
     // TODO Auto-generated method stub
-    return new String[]{};
+    return new String[] {};
   }
 }
