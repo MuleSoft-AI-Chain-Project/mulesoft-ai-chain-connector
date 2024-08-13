@@ -6,7 +6,7 @@
     "MISTRAL_AI_API_KEY": ""
   },
   "OLLAMA": {
-    "OLLAMA_BASE_URL": "http://baseurl.ollama.com"
+    "OLLAMA_BASE_URL": "http://localhost:11434"
   },
   "ANTHROPIC": {
     "ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY"
