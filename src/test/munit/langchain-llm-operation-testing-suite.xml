@@ -13,7 +13,7 @@
 										doc:id="74b85066-1569-4f10-a06b-e49e854eeef2"
 										filePath='${app.home}/envVars.json'
 										temperature="0.1"/>
-	<munit:test name="ChatAnswerPrompt-test" doc:id="772d135a-26b0-43d1-8acf-7000815da82f" >
+	<munit:test name="chat-answer-prompt-test" doc:id="772d135a-26b0-43d1-8acf-7000815da82f" >
 		<munit:execution>
 			<munit:set-event doc:name="Set Event" doc:id="ee8ce128-b7a9-4b57-ab9d-8a0daee2ddb9" >
 				<munit:payload value='#[{"data": "What is the capital of Switzerland"}]' />
@@ -27,6 +27,22 @@
 			<munit-tools:assert-that doc:name="Assert that" doc:id="f9ca3113-706b-49bd-9dc7-08f40b66f157" expression="#[MunitTools::containsString('Bern')]" is="#[MunitTools::notNullValue()]" message="Output response is not matching"/>
 		</munit:validation>
 	</munit:test>
+
+	<munit:test name="sentiment-test" doc:id="ddc7561d-c2e5-4816-aef9-b083c71ae829" >
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="cd512cfd-e0d0-49b0-91da-dbc21c23cc63" >
+				<munit:payload value='#[{"data": "Hello, I appreciate the opportunity to speak with you this morning about our new pricing model. Enclosed, you will find the presentation we discussed."}]' />
+			</munit:set-event>
+			<logger level="INFO" doc:name="Logger" message="#[payload.data]"/>
+			<mulechain:sentiment-analyze doc:name="sentiment-prompt" doc:id="cd512cfd-e0d0-49b0-91da-dbc21c23cc63"
+										 config-ref="OPENAI" data="#[payload.data]">
+		</mulechain:sentiment-analyze>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="72e5d1e2-148f-4873-b978-bb4772c07124" expression="#[MunitTools::containsString('POSITIVE')]" is="#[MunitTools::notNullValue()]" message="Output response is not matching"/>
+		</munit:validation>
+	</munit:test>
+
 
 	<munit:test name="agent-define-prompt-template-test" doc:id="3d111d5d-2ce9-464d-b4b2-114bac36b2e4" >
 		<munit:behavior >
