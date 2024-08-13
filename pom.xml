@@ -28,10 +28,27 @@
 		<munit.input.directory>src/test/munit</munit.input.directory>
 		<munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
 		<munit.extensions.maven.plugin.version>1.2.0</munit.extensions.maven.plugin.version>
+		<jacoco.version>0.8.10</jacoco.version>
     </properties>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jdeps-plugin</artifactId>
+				<version>3.1.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jdkinternals</goal> <!-- verify main classes -->
+							<goal>test-jdkinternals</goal> <!-- verify test classes -->
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<failOnWarning>true</failOnWarning>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>net.revelc.code.formatter</groupId>
 				<artifactId>formatter-maven-plugin</artifactId>
@@ -64,6 +81,11 @@
 				<version>${munit.extensions.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
+					<argLines>
+						<argLine>
+							-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco-munit.exec
+						</argLine>
+					</argLines>
 					<sharedLibraries>
 						<sharedLibrary>
 							<groupId>org.jsoup</groupId>
@@ -71,6 +93,14 @@
 						</sharedLibrary>
 					</sharedLibraries>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<phase>integration-test</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
