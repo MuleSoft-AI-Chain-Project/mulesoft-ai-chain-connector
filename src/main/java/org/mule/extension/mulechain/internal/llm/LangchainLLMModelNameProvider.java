@@ -21,7 +21,7 @@ public class LangchainLLMModelNameProvider implements ValueProvider {
 
   @Override
   public Set<Value> resolve() throws ValueResolvingException {
-    return ValueBuilder.getValuesFor(LangchainLLMType.valueOf(llmType).getModelNameStream());
+    return ValueBuilder.getValuesFor(LangchainLLMType.fromValue(llmType).getModelNameStream());
   }
 
 }
