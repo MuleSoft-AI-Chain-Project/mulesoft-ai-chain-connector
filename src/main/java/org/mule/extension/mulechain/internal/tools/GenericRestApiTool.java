@@ -22,13 +22,11 @@ public class GenericRestApiTool implements Tool {
   private static final Logger LOGGER = LoggerFactory.getLogger(GenericRestApiTool.class);
 
   private final String apiEndpoint;
-  //private final Map<String, String> defaultParams;
   private final String name;
   private final String description;
 
   public GenericRestApiTool(String apiEndpoint, String name, String description) {
     this.apiEndpoint = apiEndpoint;
-    //this.defaultParams = defaultParams;
     this.name = name;
     this.description = description;
   }

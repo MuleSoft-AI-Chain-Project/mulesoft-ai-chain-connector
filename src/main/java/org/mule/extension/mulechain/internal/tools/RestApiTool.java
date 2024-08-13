@@ -44,7 +44,6 @@ public class RestApiTool implements Tool {
     try {
       // Construct the full URL with parameters
       StringBuilder urlBuilder = new StringBuilder(apiEndpoint);
-      //urlBuilder.append(input);
 
       URL url = new URL(urlBuilder.toString());
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -76,14 +75,6 @@ public class RestApiTool implements Tool {
         br.close();
 
         return sb.toString();
-
-        //                Scanner scanner = new Scanner(url.openStream());
-        //                StringBuilder response = new StringBuilder();
-        //                while (scanner.hasNext()) {
-        //                    response.append(scanner.nextLine());
-        //                }
-        //                scanner.close();
-        //                return response.toString();
       } else {
         LOGGER.info("Response Code: {}", responseCode);
         return "Error: Received response code " + responseCode;
@@ -109,6 +100,6 @@ public class RestApiTool implements Tool {
   @Override
   public String[] value() {
     // TODO Auto-generated method stub
-    return null;
+    return new String[]{};
   }
 }

@@ -30,11 +30,11 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.error.provider.EmbeddingErrorTypeProvider;
-import org.mule.extension.mulechain.internal.exception.ChatException;
-import org.mule.extension.mulechain.internal.exception.embedding.EmbeddingStoreOperationsException;
-import org.mule.extension.mulechain.internal.exception.FileHandlingException;
-import org.mule.extension.mulechain.internal.exception.embedding.RagException;
-import org.mule.extension.mulechain.internal.exception.tools.ToolsOperationException;
+import org.mule.extension.mulechain.internal.error.exception.ChatException;
+import org.mule.extension.mulechain.internal.error.exception.embedding.EmbeddingStoreOperationsException;
+import org.mule.extension.mulechain.internal.error.exception.FileHandlingException;
+import org.mule.extension.mulechain.internal.error.exception.embedding.RagException;
+import org.mule.extension.mulechain.internal.error.exception.tools.ToolsOperationException;
 import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
@@ -304,15 +304,15 @@ public class LangchainEmbeddingStoresOperations {
 
       String intermediateAnswer = chain.execute(data);
       String response = model.generate(data);
-      List<String> findURL = extractUrls(intermediateAnswer);
+      List<String> findURLs = extractUrls(intermediateAnswer);
       boolean toolsUsed = false;
 
-      if (findURL != null) {
+      if (findURLs != null) {
 
         toolsUsed = true;
 
         // Create an instance of the custom tool with parameters
-        GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
+        GenericRestApiTool restApiTool = new GenericRestApiTool(findURLs.get(0), "API Call", "Execute GET or POST Requests");
 
         // Build the assistant with the custom tool
         AssistantC assistant = AiServices.builder(AssistantC.class)
@@ -636,14 +636,14 @@ public class LangchainEmbeddingStoresOperations {
 
       String intermediateAnswer = assistant.chat(data);
       String response = model.generate(data);
-      List<String> findURL = extractUrls(intermediateAnswer);
+      List<String> findURLs = extractUrls(intermediateAnswer);
       boolean toolsUsed = false;
 
-      if (findURL != null) {
+      if (findURLs != null) {
 
         toolsUsed = true;
         // Create an instance of the custom tool with parameters
-        GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
+        GenericRestApiTool restApiTool = new GenericRestApiTool(findURLs.get(0), "API Call", "Execute GET or POST Requests");
 
         // Build the assistant with the custom tool
         AssistantC assistantC = AiServices.builder(AssistantC.class)
@@ -719,7 +719,6 @@ public class LangchainEmbeddingStoresOperations {
           }
         });
       } catch (IOException e) {
-        LOGGER.error("Exception occurred while loading files: " + contextPath, e);
         throw new FileHandlingException("Exception occurred while loading files: " + contextPath, e);
       }
 
