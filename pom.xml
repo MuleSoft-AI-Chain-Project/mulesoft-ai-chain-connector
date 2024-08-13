@@ -28,7 +28,7 @@
 		<munit.input.directory>src/test/munit</munit.input.directory>
 		<munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
 		<munit.extensions.maven.plugin.version>1.2.0</munit.extensions.maven.plugin.version>
-		<jacoco.version>0.8.6</jacoco.version>
+		<jacoco.version>0.8.10</jacoco.version>
     </properties>
 
 	<build>
@@ -48,6 +48,19 @@
 				<configuration>
 					<failOnWarning>true</failOnWarning>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<id>report</id>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>net.revelc.code.formatter</groupId>
@@ -93,6 +106,13 @@
 						</sharedLibrary>
 					</sharedLibraries>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco.version}</version>
+					</dependency>
+				</dependencies>
 				<executions>
 					<execution>
 						<goals>
