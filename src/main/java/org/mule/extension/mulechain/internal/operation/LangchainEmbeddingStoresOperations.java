@@ -40,8 +40,6 @@ import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -680,7 +678,7 @@ public class LangchainEmbeddingStoresOperations {
           .embeddingStore(store)
           .build();
 
-      long totalFiles = logFilesCount(contextPath);
+      long totalFiles = getTotalFilesCount(contextPath);
       store.serializeToFile(storeName);
       ingestFolder(contextPath, fileType, ingestor);
 
@@ -700,7 +698,7 @@ public class LangchainEmbeddingStoresOperations {
     }
   }
 
-  private long logFilesCount(String contextPath) {
+  private long getTotalFilesCount(String contextPath) {
     long totalFiles = 0;
     try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
       totalFiles = paths.filter(Files::isRegularFile).count();
