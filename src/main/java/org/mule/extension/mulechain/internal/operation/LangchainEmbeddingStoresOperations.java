@@ -683,8 +683,8 @@ public class LangchainEmbeddingStoresOperations {
           .build();
 
       long totalFiles = getTotalFilesCount(contextPath);
-      store.serializeToFile(storeName);
       ingestFolder(contextPath, fileType, ingestor);
+      store.serializeToFile(storeName);
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.FILES_COUNT, totalFiles);
