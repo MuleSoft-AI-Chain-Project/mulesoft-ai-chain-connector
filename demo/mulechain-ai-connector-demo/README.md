@@ -1,6 +1,6 @@
-MuleChain AI Connector Demo
+MuleSoft AI Chain Connector Demo
 ====================================
-Anypoint Studio demo for MuleChain AI Connector.
+Anypoint Studio demo for MuleSoft AI Chain Connector.
 
 
 Prerequisites
@@ -43,4 +43,4 @@ You can use postman to trigger curls under the web server http://localhost:8081
 * POST - /toolsMemory (Tools implementation with memory)
 * POST - /chains (Tools implementation of Langchain with legacy chains)
 
-_Please refer to [MuleChain AI Connector_Postman Collection](000_mulechain-ai-connector.postman_collection.json) available in source of this demo. You may have to provide own paths for various files._
+_Please refer to [MuleSoft_AI_Chain_Connector_Postman_Collection](000_mulechain-ai-connector.postman_collection.json) available in source of this demo. You may have to provide own paths for various files._
