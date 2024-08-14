@@ -8,13 +8,13 @@ import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.TokenStream;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
-import org.mule.extension.mulechain.internal.error.exception.ChatException;
-import org.mule.extension.mulechain.internal.error.exception.StreamingException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,24 +66,23 @@ public class LangchainStreamingOperations {
         try {
           pipedOutputStream.write(value.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
-          throw new StreamingException("Error occurred while streaming output", e);
+          throw new ModuleException("Error occurred while streaming output", MuleChainErrorType.STREAMING_FAILURE, e);
         }
       })
           .onComplete(response -> {
             try {
               pipedOutputStream.close();
             } catch (IOException e) {
-              throw new StreamingException("Error occurred while closing the stream", e);
+              throw new ModuleException("Error occurred while closing the stream", MuleChainErrorType.STREAMING_FAILURE, e);
             }
           })
           .onError(throwable -> {
-            throw new StreamingException("Exception occurred onError()", throwable);
+            throw new ModuleException("Exception occurred onError()", MuleChainErrorType.STREAMING_FAILURE, throwable);
           })
           .start();
       return pipedInputStream;
     } catch (Exception e) {
-      LOGGER.error("Unable to respond with the chat", e);
-      throw new ChatException("Unable to respond with the chat provided");
+      throw new ModuleException("Unable to respond with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
   }
 

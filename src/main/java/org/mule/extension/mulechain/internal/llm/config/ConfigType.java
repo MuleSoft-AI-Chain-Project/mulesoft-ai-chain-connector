@@ -4,7 +4,7 @@
 package org.mule.extension.mulechain.internal.llm.config;
 
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
-import org.mule.extension.mulechain.internal.error.exception.config.ConfigValidationException;
+import org.mule.extension.mulechain.internal.error.exception.ConfigValidationException;
 
 import java.util.Arrays;
 import java.util.function.Function;

@@ -7,11 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.ImageErrorTypeProvider;
-import org.mule.extension.mulechain.internal.error.exception.FileHandlingException;
-import org.mule.extension.mulechain.internal.error.exception.image.ImageAnalyzerException;
-import org.mule.extension.mulechain.internal.error.exception.image.ImageGenerationException;
-import org.mule.extension.mulechain.internal.error.exception.image.ImageProcessingException;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -30,7 +27,7 @@ import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.data.message.TextContent;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import org.mule.sdk.api.exception.ModuleException;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,9 +73,10 @@ public class LangchainImageModelsOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ImageAnalyzerException(String.format("Unable to analyze the provided image %s with the text: %s", contextURL,
-                                                     data),
-                                       e);
+      throw new ModuleException(String.format("Unable to analyze the provided image %s with the text: %s", contextURL,
+                                              data),
+                                MuleChainErrorType.IMAGE_ANALYSIS_FAILURE,
+                                e);
     }
   }
 
@@ -104,7 +102,8 @@ public class LangchainImageModelsOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ImageGenerationException("Error while generating the required image: " + data, e);
+      throw new ModuleException("Error while generating the required image: " + data, MuleChainErrorType.IMAGE_GENERATION_FAILURE,
+                                e);
     }
   }
 
@@ -152,13 +151,15 @@ public class LangchainImageModelsOperations {
       }
 
     } catch (IOException e) {
-      throw new FileHandlingException("Error occurred while processing the document file: " + filePath, e);
+      throw new ModuleException("Error occurred while processing the document file: " + filePath,
+                                MuleChainErrorType.FILE_HANDLING_FAILURE, e);
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
-      throw new ImageAnalyzerException(String.format("Unable to analyze the provided document %s with the text: %s", filePath,
-                                                     data),
-                                       e);
+      throw new ModuleException(String.format("Unable to analyze the provided document %s with the text: %s", filePath,
+                                              data),
+                                MuleChainErrorType.IMAGE_ANALYSIS_FAILURE,
+                                e);
     }
 
     jsonObject.put(MuleChainConstants.PAGES, docPages);
@@ -174,7 +175,7 @@ public class LangchainImageModelsOperations {
       base64String = Base64.getEncoder().encodeToString(imageBytes);
       return base64String;
     } catch (IOException e) {
-      throw new ImageProcessingException("Error occurred while processing the image", e);
+      throw new ModuleException("Error occurred while processing the image", MuleChainErrorType.IMAGE_PROCESSING_FAILURE, e);
     }
   }
 }
