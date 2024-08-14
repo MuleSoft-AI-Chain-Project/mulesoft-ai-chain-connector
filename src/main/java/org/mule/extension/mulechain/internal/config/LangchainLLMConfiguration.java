@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * This class represents an extension configuration, values set in this class are commonly used across multiple
  * operations since they represent something core from the extension.
  */
-@Configuration(name = "llm-configuration")
+@Configuration(name = "config")
 @Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class, LangchainImageModelsOperations.class})
 public class LangchainLLMConfiguration implements Initialisable {
 
