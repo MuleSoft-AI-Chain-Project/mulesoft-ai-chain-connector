@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:mulechain="http://www.mulesoft.org/schema/mule/mulechain"
+<mule xmlns:ms-aichain="http://www.mulesoft.org/schema/mule/ms-aichain"
 	  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
 	  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
 	  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
-	  http://www.mulesoft.org/schema/mule/mulechain http://www.mulesoft.org/schema/mule/mulechain/current/mule-mulechain.xsd">
+	  http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd">
 	<munit:config name="langchain-llm-operation-testing-suite.xml" />
-	<mulechain:llm-configuration-config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="MuleChain AI Llm configuration"
+	<ms-aichain:config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="ms-aichain AI Llm configuration"
 										doc:id="74b85066-1569-4f10-a06b-e49e854eeef2"
 										filePath='${app.home}/envVars.json'
 										modelName="gpt-3.5-turbo"
@@ -20,9 +20,9 @@
 				<munit:payload value='#[{"data": "What is the capital of Switzerland"}]' />
 			</munit:set-event>
 			<logger level="INFO" doc:name="Logger" message="#[payload.data]"/>
-			<mulechain:chat-answer-prompt doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
+			<ms-aichain:chat-answer-prompt doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
 										  config-ref="OPENAI" prompt="#[payload.data]">
-			</mulechain:chat-answer-prompt>
+			</ms-aichain:chat-answer-prompt>
 		</munit:execution>
 		<munit:validation>
 			<munit-tools:assert-that doc:name="Assert that" doc:id="f9ca3113-706b-49bd-9dc7-08f40b66f157" expression="#[MunitTools::containsString('Bern')]" is="#[MunitTools::notNullValue()]" message="Output response is not matching"/>
@@ -35,9 +35,9 @@
 				<munit:payload value='#[{"data": "Hello, I appreciate the opportunity to speak with you this morning about our new pricing model. Enclosed, you will find the presentation we discussed."}]' />
 			</munit:set-event>
 			<logger level="INFO" doc:name="Logger" message="#[payload.data]"/>
-			<mulechain:sentiment-analyze doc:name="sentiment-prompt" doc:id="cd512cfd-e0d0-49b0-91da-dbc21c23cc63"
+			<ms-aichain:sentiment-analyze doc:name="sentiment-prompt" doc:id="cd512cfd-e0d0-49b0-91da-dbc21c23cc63"
 										 config-ref="OPENAI" data="#[payload.data]">
-		</mulechain:sentiment-analyze>
+		</ms-aichain:sentiment-analyze>
 		</munit:execution>
 		<munit:validation >
 			<munit-tools:assert-that doc:name="Assert that" doc:id="72e5d1e2-148f-4873-b978-bb4772c07124" expression="#[MunitTools::containsString('POSITIVE')]" is="#[MunitTools::notNullValue()]" message="Output response is not matching"/>
@@ -53,7 +53,7 @@
 			</munit:set-event>
 		</munit:behavior>
 		<munit:execution >
-			<mulechain:agent-define-prompt-template doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
+			<ms-aichain:agent-define-prompt-template doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
 													config-ref="OPENAI" template="#[payload.template]" instructions="#[payload.instructions]"
 													dataset="#[payload.data]"/>
 		</munit:execution>
