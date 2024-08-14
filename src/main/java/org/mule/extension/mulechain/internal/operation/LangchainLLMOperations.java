@@ -62,7 +62,8 @@ public class LangchainLLMOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ChatException("Unable to respond with the chat provided", e);
+      LOGGER.error("Unable to respond with the chat", e);
+      throw new ChatException("Unable to respond with the chat provided");
     }
   }
 

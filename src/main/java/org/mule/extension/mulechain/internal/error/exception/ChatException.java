@@ -8,7 +8,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 
 public class ChatException extends ModuleException {
 
-  public ChatException(String message, Exception exception) {
-    super(message, MuleChainErrorType.AI_SERVICES_FAILURE, exception);
+  public ChatException(String message) {
+    super(message, MuleChainErrorType.AI_SERVICES_FAILURE);
   }
 }

@@ -231,7 +231,8 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ChatException("Error while responding with the chat provided", e);
+      LOGGER.error("Error occurred with the chat provided", e);
+      throw new ChatException("Error while responding with the chat provided");
     }
   }
 
