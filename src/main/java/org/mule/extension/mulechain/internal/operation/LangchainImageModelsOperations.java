@@ -74,8 +74,9 @@ public class LangchainImageModelsOperations {
       return jsonObject.toString();
     } catch (Exception e) {
       throw new ModuleException(String.format("Unable to analyze the provided image %s with the text: %s", contextURL,
-                                                     data), MuleChainErrorType.IMAGE_ANALYSIS_FAILURE,
-              e);
+                                              data),
+                                MuleChainErrorType.IMAGE_ANALYSIS_FAILURE,
+                                e);
     }
   }
 
@@ -101,7 +102,8 @@ public class LangchainImageModelsOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ModuleException("Error while generating the required image: " + data, MuleChainErrorType.IMAGE_GENERATION_FAILURE, e);
+      throw new ModuleException("Error while generating the required image: " + data, MuleChainErrorType.IMAGE_GENERATION_FAILURE,
+                                e);
     }
   }
 
@@ -149,13 +151,15 @@ public class LangchainImageModelsOperations {
       }
 
     } catch (IOException e) {
-      throw new ModuleException("Error occurred while processing the document file: " + filePath, MuleChainErrorType.FILE_HANDLING_FAILURE, e);
+      throw new ModuleException("Error occurred while processing the document file: " + filePath,
+                                MuleChainErrorType.FILE_HANDLING_FAILURE, e);
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
       throw new ModuleException(String.format("Unable to analyze the provided document %s with the text: %s", filePath,
-                                                     data), MuleChainErrorType.IMAGE_ANALYSIS_FAILURE,
-              e);
+                                              data),
+                                MuleChainErrorType.IMAGE_ANALYSIS_FAILURE,
+                                e);
     }
 
     jsonObject.put(MuleChainConstants.PAGES, docPages);

@@ -148,7 +148,8 @@ public class LangchainEmbeddingStoresOperations {
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
-      throw new ModuleException("Error while loading and retrieving content from the document " + contextPath, MuleChainErrorType.RAG_FAILURE, e);
+      throw new ModuleException("Error while loading and retrieving content from the document " + contextPath,
+                                MuleChainErrorType.RAG_FAILURE, e);
     }
   }
 
@@ -168,7 +169,8 @@ public class LangchainEmbeddingStoresOperations {
         try {
           url = new URL(contextPath);
         } catch (MalformedURLException e) {
-          throw new ModuleException("Error while loading the document: " + contextPath, MuleChainErrorType.FILE_HANDLING_FAILURE, e);
+          throw new ModuleException("Error while loading the document: " + contextPath, MuleChainErrorType.FILE_HANDLING_FAILURE,
+                                    e);
         }
 
         Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
@@ -324,7 +326,8 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ModuleException("Error occurred while executing AI Tools with the provided config", MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
+      throw new ModuleException("Error occurred while executing AI Tools with the provided config",
+                                MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
     }
   }
 
@@ -385,7 +388,8 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ModuleException("Error while creating new Embedding store: " + storeName, MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
+      throw new ModuleException("Error while creating new Embedding store: " + storeName,
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
   }
 
@@ -424,8 +428,9 @@ public class LangchainEmbeddingStoresOperations {
       throw e;
     } catch (Exception e) {
       throw new ModuleException(String.format("Error while adding document %s to the Embedding store %s",
-                                                                contextPath, storeName), MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE,
-              e);
+                                              contextPath, storeName),
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE,
+                                e);
     }
   }
 
@@ -488,7 +493,8 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ModuleException("Error while querying from the embedding store " + storeName, MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
+      throw new ModuleException("Error while querying from the embedding store " + storeName,
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
   }
 
@@ -548,7 +554,8 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ModuleException(String.format("Error while getting info from the store %s", storeName), MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
+      throw new ModuleException(String.format("Error while getting info from the store %s", storeName),
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
   }
 
@@ -585,7 +592,8 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ModuleException(String.format("Error while getting info from the store %s", storeName), MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
+      throw new ModuleException(String.format("Error while getting info from the store %s", storeName),
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
   }
 
@@ -651,7 +659,8 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ModuleException("Error occurred while executing AI Tools with the provided config", MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
+      throw new ModuleException("Error occurred while executing AI Tools with the provided config",
+                                MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
     }
   }
 
@@ -688,8 +697,9 @@ public class LangchainEmbeddingStoresOperations {
       throw e;
     } catch (Exception e) {
       throw new ModuleException(String.format("Error while adding folder %s into the store %s", contextPath,
-                                                                storeName), MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE,
-              e);
+                                              storeName),
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE,
+                                e);
     }
   }
 
@@ -726,14 +736,16 @@ public class LangchainEmbeddingStoresOperations {
               // Handle URLs separately if needed
               break;
             default:
-              throw new ModuleException("Unsupported File Type: " + fileType.getFileType(), MuleChainErrorType.FILE_HANDLING_FAILURE);
+              throw new ModuleException("Unsupported File Type: " + fileType.getFileType(),
+                                        MuleChainErrorType.FILE_HANDLING_FAILURE);
           }
         } catch (BlankDocumentException e) {
           LOGGER.warn("Skipping file due to BlankDocumentException: {}", file.getFileName());
         }
       });
     } catch (IOException e) {
-      throw new ModuleException("Exception occurred while loading files: " + contextPath, MuleChainErrorType.FILE_HANDLING_FAILURE, e);
+      throw new ModuleException("Exception occurred while loading files: " + contextPath,
+                                MuleChainErrorType.FILE_HANDLING_FAILURE, e);
     }
   }
 

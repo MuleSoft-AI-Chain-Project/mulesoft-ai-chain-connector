@@ -61,7 +61,6 @@ public class LangchainLLMOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      LOGGER.error("Unable to respond with the chat", e);
       throw new ModuleException("Unable to respond with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
   }
