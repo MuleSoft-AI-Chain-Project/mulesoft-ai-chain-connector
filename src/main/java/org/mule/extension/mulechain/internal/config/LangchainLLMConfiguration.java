@@ -28,6 +28,8 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.mule.extension.mulechain.internal.constants.MuleChainConstants.DEFAULT_FILE_PATH;
+
 /**
  * This class represents an extension configuration, values set in this class are commonly used across multiple
  * operations since they represent something core from the extension.
@@ -49,7 +51,7 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   @Parameter
   @Placement(order = 3, tab = Placement.DEFAULT_TAB)
-  @Optional(defaultValue = "#[-]")
+  @Optional(defaultValue = DEFAULT_FILE_PATH)
   private String filePath;
 
   @Parameter

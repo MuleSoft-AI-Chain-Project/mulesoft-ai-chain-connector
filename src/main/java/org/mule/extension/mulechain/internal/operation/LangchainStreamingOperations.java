@@ -9,12 +9,14 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.TokenStream;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
-import org.mule.extension.mulechain.internal.exception.ChatException;
-import org.mule.extension.mulechain.internal.exception.StreamingException;
+import org.mule.extension.mulechain.internal.error.exception.ChatException;
+import org.mule.extension.mulechain.internal.error.exception.StreamingException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +31,8 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
  */
 public class LangchainStreamingOperations {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(LangchainStreamingOperations.class);
 
   interface Assistant {
 
@@ -78,7 +82,8 @@ public class LangchainStreamingOperations {
           .start();
       return pipedInputStream;
     } catch (Exception e) {
-      throw new ChatException("Unable to respond with the chat provided", e);
+      LOGGER.error("Unable to respond with the chat", e);
+      throw new ChatException("Unable to respond with the chat provided");
     }
   }
 

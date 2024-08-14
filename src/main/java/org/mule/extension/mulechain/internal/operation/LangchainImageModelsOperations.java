@@ -8,10 +8,10 @@ import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.error.provider.ImageErrorTypeProvider;
-import org.mule.extension.mulechain.internal.exception.FileHandlingException;
-import org.mule.extension.mulechain.internal.exception.image.ImageAnalyzerException;
-import org.mule.extension.mulechain.internal.exception.image.ImageGenerationException;
-import org.mule.extension.mulechain.internal.exception.image.ImageProcessingException;
+import org.mule.extension.mulechain.internal.error.exception.FileHandlingException;
+import org.mule.extension.mulechain.internal.error.exception.image.ImageAnalyzerException;
+import org.mule.extension.mulechain.internal.error.exception.image.ImageGenerationException;
+import org.mule.extension.mulechain.internal.error.exception.image.ImageProcessingException;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -123,7 +123,6 @@ public class LangchainImageModelsOperations {
     JSONObject jsonObject = new JSONObject();
     JSONArray docPages = new JSONArray();
 
-    //try (PDDocument document = Loader.loadPDF(new File(sourceDir))) {
     try (InputStream inputStream = Files.newInputStream(Paths.get(filePath));
         PDDocument document = PDDocument.load(inputStream);) {
 
@@ -153,7 +152,6 @@ public class LangchainImageModelsOperations {
       }
 
     } catch (IOException e) {
-      LOGGER.error("Error occurred in processing the document: " + filePath, e);
       throw new FileHandlingException("Error occurred while processing the document file: " + filePath, e);
     } catch (ModuleException e) {
       throw e;

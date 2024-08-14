@@ -30,11 +30,11 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.error.provider.EmbeddingErrorTypeProvider;
-import org.mule.extension.mulechain.internal.exception.ChatException;
-import org.mule.extension.mulechain.internal.exception.embedding.EmbeddingStoreOperationsException;
-import org.mule.extension.mulechain.internal.exception.FileHandlingException;
-import org.mule.extension.mulechain.internal.exception.embedding.RagException;
-import org.mule.extension.mulechain.internal.exception.tools.ToolsOperationException;
+import org.mule.extension.mulechain.internal.error.exception.ChatException;
+import org.mule.extension.mulechain.internal.error.exception.embedding.EmbeddingStoreOperationsException;
+import org.mule.extension.mulechain.internal.error.exception.FileHandlingException;
+import org.mule.extension.mulechain.internal.error.exception.embedding.RagException;
+import org.mule.extension.mulechain.internal.error.exception.tools.ToolsOperationException;
 import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
@@ -92,9 +92,9 @@ public class LangchainEmbeddingStoresOperations {
 
   private final EmbeddingModel embeddingModel;
 
-  private static InMemoryEmbeddingStore<TextSegment> deserializedStore;
+  private InMemoryEmbeddingStore<TextSegment> deserializedStore;
 
-  private static InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName, boolean getLatest) {
+  private InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName, boolean getLatest) {
     if (deserializedStore == null || getLatest) {
       deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
     }
@@ -205,9 +205,7 @@ public class LangchainEmbeddingStoresOperations {
     try {
       ChatLanguageModel model = configuration.getModel();
 
-      PersistentChatMemoryStore.initialize(dbFilePath);
-
-      PersistentChatMemoryStore store = new PersistentChatMemoryStore();
+      PersistentChatMemoryStore store = new PersistentChatMemoryStore(dbFilePath);
 
       ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
           .id(memoryName)
@@ -231,17 +229,17 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ChatException("Error while responding with the chat provided", e);
+      LOGGER.error("Error occurred with the chat provided", e);
+      throw new ChatException("Error while responding with the chat provided");
     }
   }
 
   static class PersistentChatMemoryStore implements ChatMemoryStore {
 
-    private static DB db;
-    //  private static Map<Integer, String> map;
-    private static Map<String, String> map;
+    private final DB db;
+    private final Map<String, String> map;
 
-    public static void initialize(String dbMFilePath) {
+    public PersistentChatMemoryStore(String dbMFilePath) {
       db = DBMaker.fileDB(dbMFilePath)
           .transactionEnable()
           .fileLockDisable()
@@ -304,15 +302,15 @@ public class LangchainEmbeddingStoresOperations {
 
       String intermediateAnswer = chain.execute(data);
       String response = model.generate(data);
-      List<String> findURL = extractUrls(intermediateAnswer);
+      List<String> findURLs = extractUrls(intermediateAnswer);
       boolean toolsUsed = false;
 
-      if (findURL != null) {
+      if (findURLs != null) {
 
         toolsUsed = true;
 
         // Create an instance of the custom tool with parameters
-        GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
+        GenericRestApiTool restApiTool = new GenericRestApiTool(findURLs.get(0), "API Call", "Execute GET or POST Requests");
 
         // Build the assistant with the custom tool
         AssistantC assistant = AiServices.builder(AssistantC.class)
@@ -347,10 +345,6 @@ public class LangchainEmbeddingStoresOperations {
 
   // TO DO TASKS SERIALIZATION AND DESERIALIZATION FOR STORE
   // In-memory embedding store can be serialized and deserialized to/from file
-  // String filePath = "/home/me/embedding.store";
-  // embeddingStore.serializeToFile(filePath);
-  // InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(filePath);
-
 
   private static List<String> extractUrls(String input) {
     // Define the URL pattern
@@ -412,17 +406,17 @@ public class LangchainEmbeddingStoresOperations {
                                  @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     try {
-      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+      InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
       EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
           .documentSplitter(DocumentSplitters.recursive(2000, 200))
           .embeddingModel(this.embeddingModel)
-          .embeddingStore(deserializedStore)
+          .embeddingStore(store)
           .build();
 
       ingestDocument(fileType, contextPath, ingestor);
 
-      deserializedStore.serializeToFile(storeName);
+      store.serializeToFile(storeName);
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
@@ -636,14 +630,14 @@ public class LangchainEmbeddingStoresOperations {
 
       String intermediateAnswer = assistant.chat(data);
       String response = model.generate(data);
-      List<String> findURL = extractUrls(intermediateAnswer);
+      List<String> findURLs = extractUrls(intermediateAnswer);
       boolean toolsUsed = false;
 
-      if (findURL != null) {
+      if (findURLs != null) {
 
         toolsUsed = true;
         // Create an instance of the custom tool with parameters
-        GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
+        GenericRestApiTool restApiTool = new GenericRestApiTool(findURLs.get(0), "API Call", "Execute GET or POST Requests");
 
         // Build the assistant with the custom tool
         AssistantC assistantC = AiServices.builder(AssistantC.class)
@@ -676,54 +670,17 @@ public class LangchainEmbeddingStoresOperations {
   public String addFilesFromFolderEmbedding(String storeName, String contextPath,
                                             @ParameterGroup(name = "Context") FileTypeParameters fileType) {
     try {
-      InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+      InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
       EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
           .documentSplitter(DocumentSplitters.recursive(2000, 200))
           .embeddingModel(this.embeddingModel)
-          .embeddingStore(deserializedStore)
+          .embeddingStore(store)
           .build();
 
-      long totalFiles = 0;
-      try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
-        totalFiles = paths.filter(Files::isRegularFile).count();
-      } catch (IOException e) {
-        LOGGER.error("Unable to load files in the path: " + contextPath, e);
-      }
-
-      LOGGER.info("Total number of files to process: {}", totalFiles);
-      AtomicInteger fileCounter = new AtomicInteger(0);
-      try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
-        paths.filter(Files::isRegularFile).forEach(file -> {
-          int currentFileCounter = fileCounter.incrementAndGet();
-          LOGGER.info("Processing file {}: {}", currentFileCounter, file.getFileName());
-          Document document = null;
-          try {
-            switch (FileType.fromValue(fileType.getFileType())) {
-              case TEXT:
-                document = loadDocument(file.toString(), new TextDocumentParser());
-                ingestor.ingest(document);
-                break;
-              case PDF:
-                document = loadDocument(file.toString(), new ApacheTikaDocumentParser());
-                ingestor.ingest(document);
-                break;
-              case URL:
-                // Handle URLs separately if needed
-                break;
-              default:
-                throw new FileHandlingException("Unsupported File Type: " + fileType.getFileType());
-            }
-          } catch (BlankDocumentException e) {
-            LOGGER.warn("Skipping file due to BlankDocumentException: {}", file.getFileName());
-          }
-        });
-      } catch (IOException e) {
-        LOGGER.error("Exception occurred while loading files: " + contextPath, e);
-        throw new FileHandlingException("Exception occurred while loading files: " + contextPath, e);
-      }
-
-      deserializedStore.serializeToFile(storeName);
+      long totalFiles = getTotalFilesCount(contextPath);
+      store.serializeToFile(storeName);
+      ingestFolder(contextPath, fileType, ingestor);
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.FILES_COUNT, totalFiles);
@@ -738,6 +695,50 @@ public class LangchainEmbeddingStoresOperations {
       throw new EmbeddingStoreOperationsException(String.format("Error while adding folder %s into the store %s", contextPath,
                                                                 storeName),
                                                   e);
+    }
+  }
+
+  private long getTotalFilesCount(String contextPath) {
+    long totalFiles = 0;
+    try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
+      totalFiles = paths.filter(Files::isRegularFile).count();
+    } catch (IOException e) {
+      LOGGER.error("Unable to load files in the path: " + contextPath, e);
+    }
+
+    LOGGER.info("Total number of files to process: {}", totalFiles);
+    return totalFiles;
+  }
+
+  private void ingestFolder(String contextPath, FileTypeParameters fileType, EmbeddingStoreIngestor ingestor) {
+    AtomicInteger fileCounter = new AtomicInteger(0);
+    try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
+      paths.filter(Files::isRegularFile).forEach(file -> {
+        int currentFileCounter = fileCounter.incrementAndGet();
+        LOGGER.info("Processing file {}: {}", currentFileCounter, file.getFileName());
+        Document document = null;
+        try {
+          switch (FileType.fromValue(fileType.getFileType())) {
+            case TEXT:
+              document = loadDocument(file.toString(), new TextDocumentParser());
+              ingestor.ingest(document);
+              break;
+            case PDF:
+              document = loadDocument(file.toString(), new ApacheTikaDocumentParser());
+              ingestor.ingest(document);
+              break;
+            case URL:
+              // Handle URLs separately if needed
+              break;
+            default:
+              throw new FileHandlingException("Unsupported File Type: " + fileType.getFileType());
+          }
+        } catch (BlankDocumentException e) {
+          LOGGER.warn("Skipping file due to BlankDocumentException: {}", file.getFileName());
+        }
+      });
+    } catch (IOException e) {
+      throw new FileHandlingException("Exception occurred while loading files: " + contextPath, e);
     }
   }
 

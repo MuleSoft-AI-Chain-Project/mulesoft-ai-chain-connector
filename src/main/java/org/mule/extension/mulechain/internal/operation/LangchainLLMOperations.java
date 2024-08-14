@@ -14,9 +14,9 @@ import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
-import org.mule.extension.mulechain.internal.exception.ChatException;
-import org.mule.extension.mulechain.internal.exception.PromptTemplateException;
-import org.mule.extension.mulechain.internal.exception.SentimentAnalyzerException;
+import org.mule.extension.mulechain.internal.error.exception.ChatException;
+import org.mule.extension.mulechain.internal.error.exception.PromptTemplateException;
+import org.mule.extension.mulechain.internal.error.exception.SentimentAnalyzerException;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -62,7 +62,8 @@ public class LangchainLLMOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ChatException("Unable to respond with the chat provided", e);
+      LOGGER.error("Unable to respond with the chat", e);
+      throw new ChatException("Unable to respond with the chat provided");
     }
   }
 

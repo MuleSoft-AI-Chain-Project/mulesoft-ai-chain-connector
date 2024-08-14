@@ -22,13 +22,11 @@ public class GenericRestApiTool implements Tool {
   private static final Logger LOGGER = LoggerFactory.getLogger(GenericRestApiTool.class);
 
   private final String apiEndpoint;
-  //private final Map<String, String> defaultParams;
   private final String name;
   private final String description;
 
   public GenericRestApiTool(String apiEndpoint, String name, String description) {
     this.apiEndpoint = apiEndpoint;
-    //this.defaultParams = defaultParams;
     this.name = name;
     this.description = description;
   }
@@ -93,11 +91,11 @@ public class GenericRestApiTool implements Tool {
           sb.append(line + "\n");
         }
         br.close();
-
-        LOGGER.info(sb.toString());
-        return sb.toString();
+        String value = sb.toString();
+        LOGGER.info("Response received: {}", value);
+        return value;
       } else {
-        LOGGER.info(String.valueOf(responseCode));
+        LOGGER.info("Response code received: {}", responseCode);
         return "Error: Received response code " + responseCode;
       }
     } catch (IOException e) {
