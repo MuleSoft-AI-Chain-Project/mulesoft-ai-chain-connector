@@ -29,12 +29,8 @@ import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.EmbeddingErrorTypeProvider;
-import org.mule.extension.mulechain.internal.error.exception.ChatException;
-import org.mule.extension.mulechain.internal.error.exception.embedding.EmbeddingStoreOperationsException;
-import org.mule.extension.mulechain.internal.error.exception.FileHandlingException;
-import org.mule.extension.mulechain.internal.error.exception.embedding.RagException;
-import org.mule.extension.mulechain.internal.error.exception.tools.ToolsOperationException;
 import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
@@ -79,7 +75,7 @@ import static dev.langchain4j.data.message.ChatMessageSerializer.messagesToJson;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mule.sdk.api.exception.ModuleException;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,7 +148,7 @@ public class LangchainEmbeddingStoresOperations {
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
-      throw new RagException("Error while loading and retrieving content from the document " + contextPath, e);
+      throw new ModuleException("Error while loading and retrieving content from the document " + contextPath, MuleChainErrorType.RAG_FAILURE, e);
     }
   }
 
@@ -172,7 +168,7 @@ public class LangchainEmbeddingStoresOperations {
         try {
           url = new URL(contextPath);
         } catch (MalformedURLException e) {
-          throw new FileHandlingException("Error while loading the document: " + contextPath, e);
+          throw new ModuleException("Error while loading the document: " + contextPath, MuleChainErrorType.FILE_HANDLING_FAILURE, e);
         }
 
         Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
@@ -182,7 +178,7 @@ public class LangchainEmbeddingStoresOperations {
         ingestor.ingest(document);
         break;
       default:
-        throw new FileHandlingException("Unsupported File Type: " + fileType.getFileType());
+        throw new ModuleException("Unsupported File Type: " + fileType.getFileType(), MuleChainErrorType.FILE_HANDLING_FAILURE);
     }
   }
 
@@ -229,8 +225,7 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      LOGGER.error("Error occurred with the chat provided", e);
-      throw new ChatException("Error while responding with the chat provided");
+      throw new ModuleException("Error while responding with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
   }
 
@@ -329,7 +324,7 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ToolsOperationException("Error occurred while executing AI Tools with the provided config", e);
+      throw new ModuleException("Error occurred while executing AI Tools with the provided config", MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
     }
   }
 
@@ -390,7 +385,7 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new EmbeddingStoreOperationsException("Error while creating new Embedding store: " + storeName, e);
+      throw new ModuleException("Error while creating new Embedding store: " + storeName, MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
   }
 
@@ -428,9 +423,9 @@ public class LangchainEmbeddingStoresOperations {
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
-      throw new EmbeddingStoreOperationsException(String.format("Error while adding document %s to the Embedding store %s",
-                                                                contextPath, storeName),
-                                                  e);
+      throw new ModuleException(String.format("Error while adding document %s to the Embedding store %s",
+                                                                contextPath, storeName), MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE,
+              e);
     }
   }
 
@@ -493,7 +488,7 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new EmbeddingStoreOperationsException("Error while querying from the embedding store " + storeName, e);
+      throw new ModuleException("Error while querying from the embedding store " + storeName, MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
   }
 
@@ -553,7 +548,7 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new EmbeddingStoreOperationsException(String.format("Error while getting info from the store %s", storeName), e);
+      throw new ModuleException(String.format("Error while getting info from the store %s", storeName), MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
   }
 
@@ -590,7 +585,7 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new EmbeddingStoreOperationsException(String.format("Error while getting info from the store %s", storeName), e);
+      throw new ModuleException(String.format("Error while getting info from the store %s", storeName), MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
   }
 
@@ -656,7 +651,7 @@ public class LangchainEmbeddingStoresOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new ToolsOperationException("Error occurred while executing AI Tools with the provided config", e);
+      throw new ModuleException("Error occurred while executing AI Tools with the provided config", MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
     }
   }
 
@@ -692,9 +687,9 @@ public class LangchainEmbeddingStoresOperations {
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
-      throw new EmbeddingStoreOperationsException(String.format("Error while adding folder %s into the store %s", contextPath,
-                                                                storeName),
-                                                  e);
+      throw new ModuleException(String.format("Error while adding folder %s into the store %s", contextPath,
+                                                                storeName), MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE,
+              e);
     }
   }
 
@@ -731,14 +726,14 @@ public class LangchainEmbeddingStoresOperations {
               // Handle URLs separately if needed
               break;
             default:
-              throw new FileHandlingException("Unsupported File Type: " + fileType.getFileType());
+              throw new ModuleException("Unsupported File Type: " + fileType.getFileType(), MuleChainErrorType.FILE_HANDLING_FAILURE);
           }
         } catch (BlankDocumentException e) {
           LOGGER.warn("Skipping file due to BlankDocumentException: {}", file.getFileName());
         }
       });
     } catch (IOException e) {
-      throw new FileHandlingException("Exception occurred while loading files: " + contextPath, e);
+      throw new ModuleException("Exception occurred while loading files: " + contextPath, MuleChainErrorType.FILE_HANDLING_FAILURE, e);
     }
   }
 

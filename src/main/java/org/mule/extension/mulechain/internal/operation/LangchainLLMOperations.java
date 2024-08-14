@@ -13,10 +13,8 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
-import org.mule.extension.mulechain.internal.error.exception.ChatException;
-import org.mule.extension.mulechain.internal.error.exception.PromptTemplateException;
-import org.mule.extension.mulechain.internal.error.exception.SentimentAnalyzerException;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -27,6 +25,7 @@ import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.Result;
 import dev.langchain4j.service.UserMessage;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +62,7 @@ public class LangchainLLMOperations {
       return jsonObject.toString();
     } catch (Exception e) {
       LOGGER.error("Unable to respond with the chat", e);
-      throw new ChatException("Unable to respond with the chat provided");
+      throw new ModuleException("Unable to respond with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
   }
 
@@ -98,7 +97,7 @@ public class LangchainLLMOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new PromptTemplateException("Unable to reply with the correct prompt template", e);
+      throw new ModuleException("Unable to reply with the correct prompt template", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
   }
 
@@ -144,7 +143,7 @@ public class LangchainLLMOperations {
 
       return jsonObject.toString();
     } catch (Exception e) {
-      throw new SentimentAnalyzerException("Unable to provide the correct sentiments", e);
+      throw new ModuleException("Unable to provide the correct sentiments", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
   }
 

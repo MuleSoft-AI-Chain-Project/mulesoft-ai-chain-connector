@@ -10,7 +10,7 @@ import dev.langchain4j.model.openai.OpenAiChatModelName;
 import dev.langchain4j.model.openai.OpenAiImageModelName;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.config.util.LangchainLLMInitializerUtil;
-import org.mule.extension.mulechain.internal.error.exception.config.ConfigValidationException;
+import org.mule.extension.mulechain.internal.error.exception.ConfigValidationException;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 
 import java.util.Arrays;

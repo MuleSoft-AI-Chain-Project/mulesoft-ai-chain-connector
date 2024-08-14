@@ -6,9 +6,9 @@ package org.mule.extension.mulechain.internal.error.exception;
 import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
-public class StreamingException extends ModuleException {
+public class ConfigValidationException extends ModuleException {
 
-  public StreamingException(String message, Throwable throwable) {
-    super(message, MuleChainErrorType.STREAMING_FAILURE, throwable);
+  public ConfigValidationException(String message) {
+    super(message, MuleChainErrorType.VALIDATION_FAILURE);
   }
 }
