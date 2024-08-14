@@ -91,11 +91,11 @@ public class GenericRestApiTool implements Tool {
           sb.append(line + "\n");
         }
         br.close();
-
-        LOGGER.info(sb.toString());
-        return sb.toString();
+        String value = sb.toString();
+        LOGGER.info("Response received: {}", value);
+        return value;
       } else {
-        LOGGER.info(String.valueOf(responseCode));
+        LOGGER.info("Response code received: {}", responseCode);
         return "Error: Received response code " + responseCode;
       }
     } catch (IOException e) {
