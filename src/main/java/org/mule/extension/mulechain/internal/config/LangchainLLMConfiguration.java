@@ -25,10 +25,10 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
-
-import static org.mule.extension.mulechain.internal.constants.MuleChainConstants.DEFAULT_FILE_PATH;
 
 /**
  * This class represents an extension configuration, values set in this class are commonly used across multiple
@@ -37,6 +37,8 @@ import static org.mule.extension.mulechain.internal.constants.MuleChainConstants
 @Configuration(name = "config")
 @Operations({LangchainLLMOperations.class, LangchainEmbeddingStoresOperations.class, LangchainImageModelsOperations.class})
 public class LangchainLLMConfiguration implements Initialisable {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(LangchainLLMConfiguration.class);
 
   @Parameter
   @Placement(order = 1, tab = Placement.DEFAULT_TAB)
@@ -51,7 +53,6 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   @Parameter
   @Placement(order = 3, tab = Placement.DEFAULT_TAB)
-  @Optional(defaultValue = DEFAULT_FILE_PATH)
   private String filePath;
 
   @Parameter
@@ -135,8 +136,12 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
-    ConfigType config = ConfigType.fromValue(configType);
-    configExtractor = config.getConfigExtractorFunction().apply(this);
-    model = createModel(configExtractor);
+    if (configType != null) {
+      ConfigType config = ConfigType.fromValue(configType);
+      configExtractor = config.getConfigExtractorFunction().apply(this);
+      model = createModel(configExtractor);
+    } else {
+      LOGGER.warn("Initialisation is called before the values are populated");
+    }
   }
 }

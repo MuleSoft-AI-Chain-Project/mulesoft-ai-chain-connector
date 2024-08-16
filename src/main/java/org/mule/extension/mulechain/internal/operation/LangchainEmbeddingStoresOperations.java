@@ -204,7 +204,7 @@ public class LangchainEmbeddingStoresOperations {
   @Alias("CHAT-answer-prompt-with-memory")
   @Throws(EmbeddingErrorTypeProvider.class)
   public InputStream chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration, String data, String memoryName,
-                                         String dbFilePath, int maxMessages) {
+                                              String dbFilePath, int maxMessages) {
 
     try {
       ChatLanguageModel model = configuration.getModel();
@@ -408,7 +408,7 @@ public class LangchainEmbeddingStoresOperations {
   @Alias("EMBEDDING-add-document-to-store")
   @Throws(EmbeddingErrorTypeProvider.class)
   public InputStream addFileEmbedding(String storeName, String contextPath,
-                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+                                      @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     try {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
@@ -511,7 +511,7 @@ public class LangchainEmbeddingStoresOperations {
   @Alias("EMBEDDING-get-info-from-store")
   @Throws(EmbeddingErrorTypeProvider.class)
   public InputStream promptFromEmbedding(@Config LangchainLLMConfiguration configuration, String storeName, String data,
-                                    boolean getLatest) {
+                                         boolean getLatest) {
 
     try {
       InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
@@ -577,7 +577,7 @@ public class LangchainEmbeddingStoresOperations {
   @Alias("EMBEDDING-get-info-from-store-legacy")
   @Throws(EmbeddingErrorTypeProvider.class)
   public InputStream promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration, String storeName, String data,
-                                          boolean getLatest) {
+                                               boolean getLatest) {
     try {
       InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
@@ -678,7 +678,7 @@ public class LangchainEmbeddingStoresOperations {
   @Alias("EMBEDDING-add-folder-to-store")
   @Throws(EmbeddingErrorTypeProvider.class)
   public InputStream addFilesFromFolderEmbedding(String storeName, String contextPath,
-                                            @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+                                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
     try {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
