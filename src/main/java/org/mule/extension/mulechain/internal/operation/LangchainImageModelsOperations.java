@@ -16,7 +16,8 @@ import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 
-import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
+
 import dev.langchain4j.model.openai.OpenAiImageModel;
 import dev.langchain4j.model.image.ImageModel;
 import dev.langchain4j.data.image.Image;
@@ -54,7 +55,7 @@ public class LangchainImageModelsOperations {
   /**
    * Reads an image from a URL.
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-read")
   @Throws(ImageErrorTypeProvider.class)
   public String readFromImage(@Config LangchainLLMConfiguration configuration, String data, String contextURL) {
@@ -83,7 +84,7 @@ public class LangchainImageModelsOperations {
   /**
    * Generates an image based on the prompt in data
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-generate")
   @Throws(ImageErrorTypeProvider.class)
   public String drawImage(@Config LangchainLLMConfiguration configuration, String data) {
@@ -112,7 +113,7 @@ public class LangchainImageModelsOperations {
    */
 
 
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-read-scanned-documents")
   @Throws(ImageErrorTypeProvider.class)
   public String readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration, String data, String filePath) {
