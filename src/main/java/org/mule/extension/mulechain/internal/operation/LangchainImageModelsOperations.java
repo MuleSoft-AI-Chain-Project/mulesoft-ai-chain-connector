@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 
+import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 
 import dev.langchain4j.model.openai.OpenAiImageModel;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -58,7 +60,7 @@ public class LangchainImageModelsOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-read")
   @Throws(ImageErrorTypeProvider.class)
-  public String readFromImage(@Config LangchainLLMConfiguration configuration, String data, String contextURL) {
+  public InputStream readFromImage(@Config LangchainLLMConfiguration configuration, String data, String contextURL) {
     try {
       ChatLanguageModel model = configuration.getModel();
 
@@ -72,7 +74,7 @@ public class LangchainImageModelsOperations {
       jsonObject.put(MuleChainConstants.RESPONSE, response.content().text());
       jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new ModuleException(String.format("Unable to analyze the provided image %s with the text: %s", contextURL,
                                               data),
@@ -87,7 +89,7 @@ public class LangchainImageModelsOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-generate")
   @Throws(ImageErrorTypeProvider.class)
-  public String drawImage(@Config LangchainLLMConfiguration configuration, String data) {
+  public InputStream drawImage(@Config LangchainLLMConfiguration configuration, String data) {
     try {
       ConfigExtractor configExtractor = configuration.getConfigExtractor();
       ImageModel model = OpenAiImageModel.builder()
@@ -101,7 +103,7 @@ public class LangchainImageModelsOperations {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response.content().url());
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new ModuleException("Error while generating the required image: " + data, MuleChainErrorType.IMAGE_GENERATION_FAILURE,
                                 e);
@@ -116,7 +118,7 @@ public class LangchainImageModelsOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-read-scanned-documents")
   @Throws(ImageErrorTypeProvider.class)
-  public String readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration, String data, String filePath) {
+  public InputStream readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration, String data, String filePath) {
 
     ChatLanguageModel model = configuration.getModel();
 
@@ -165,7 +167,7 @@ public class LangchainImageModelsOperations {
 
     jsonObject.put(MuleChainConstants.PAGES, docPages);
 
-    return jsonObject.toString();
+    return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
   }
 
   private String convertToBase64String(BufferedImage image) {
