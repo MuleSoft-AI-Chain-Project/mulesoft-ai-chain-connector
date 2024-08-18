@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 public enum ConfigType {
 
-  ENV_VARIABLE("Environment Variables", (configuration) -> new EnvConfigExtractor()), CONFIG_JSON("Configuration Json",
+  ENV_VARIABLE("Environment Variables", configuration -> new EnvConfigExtractor()), CONFIG_JSON("Configuration Json",
       FileConfigExtractor::new);
 
   private final String value;

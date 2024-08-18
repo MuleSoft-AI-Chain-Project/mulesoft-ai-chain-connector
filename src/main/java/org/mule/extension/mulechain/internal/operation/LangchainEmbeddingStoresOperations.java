@@ -14,8 +14,12 @@ import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+
+import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.mapdb.Serializer.STRING;
-import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,6 +76,8 @@ import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser
 import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
 import static dev.langchain4j.data.message.ChatMessageDeserializer.messagesFromJson;
 import static dev.langchain4j.data.message.ChatMessageSerializer.messagesToJson;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,11 +108,11 @@ public class LangchainEmbeddingStoresOperations {
     this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
   }
 
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("RAG-load-document")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String loadDocumentFile(@Config LangchainLLMConfiguration configuration, String data, String contextPath,
-                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+  public InputStream loadDocumentFile(@Config LangchainLLMConfiguration configuration, String data, String contextPath,
+                                      @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -144,7 +150,7 @@ public class LangchainEmbeddingStoresOperations {
       jsonObject.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
       jsonObject.put(MuleChainConstants.QUESTION, data);
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
@@ -194,11 +200,11 @@ public class LangchainEmbeddingStoresOperations {
   /**
    * Implements a chat memory for a defined LLM as an AI Agent. The memoryName is allows the multi-channel / profile design.
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("CHAT-answer-prompt-with-memory")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration, String data, String memoryName,
-                                         String dbFilePath, int maxMessages) {
+  public InputStream chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration, String data, String memoryName,
+                                              String dbFilePath, int maxMessages) {
 
     try {
       ChatLanguageModel model = configuration.getModel();
@@ -225,7 +231,7 @@ public class LangchainEmbeddingStoresOperations {
       jsonObject.put(MuleChainConstants.DB_FILE_PATH, dbFilePath);
       jsonObject.put(MuleChainConstants.MAX_MESSAGES, maxMessages);
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new ModuleException("Error while responding with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
@@ -268,10 +274,10 @@ public class LangchainEmbeddingStoresOperations {
   /**
    * (Legacy) Usage of tools by a defined AI Agent. Provide a list of tools (APIs) with all required informations (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("TOOLS-use-ai-service-legacy")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String useTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
+  public InputStream useTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
 
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -324,7 +330,7 @@ public class LangchainEmbeddingStoresOperations {
       jsonObject.put(MuleChainConstants.RESPONSE, response);
       jsonObject.put(MuleChainConstants.TOOLS_USED, toolsUsed);
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new ModuleException("Error occurred while executing AI Tools with the provided config",
                                 MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
@@ -373,10 +379,10 @@ public class LangchainEmbeddingStoresOperations {
   /**
    * Create a new embedding store (in-memory), which is exported to the defined storeName (full path)
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-new-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String createEmbedding(String storeName) {
+  public InputStream createEmbedding(String storeName) {
     try {
       InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
@@ -386,7 +392,7 @@ public class LangchainEmbeddingStoresOperations {
       jsonObject.put(MuleChainConstants.STORE_NAME, storeName);
       jsonObject.put(MuleChainConstants.STATUS, MuleChainConstants.CREATED);
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new ModuleException("Error while creating new Embedding store: " + storeName,
                                 MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
@@ -398,11 +404,11 @@ public class LangchainEmbeddingStoresOperations {
   /**
    * Add document of type text, pdf and url to embedding store (in-memory), which is exported to the defined storeName (full path)
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-document-to-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String addFileEmbedding(String storeName, String contextPath,
-                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+  public InputStream addFileEmbedding(String storeName, String contextPath,
+                                      @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     try {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
@@ -423,7 +429,7 @@ public class LangchainEmbeddingStoresOperations {
       jsonObject.put(MuleChainConstants.STORE_NAME, storeName);
       jsonObject.put(MuleChainConstants.STATUS, MuleChainConstants.UPDATED);
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
@@ -438,10 +444,10 @@ public class LangchainEmbeddingStoresOperations {
   /**
    * Query information from embedding store (in-Memory), which is imported from the storeName (full path)
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-query-from-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String queryFromEmbedding(String storeName, String question, int maxResults, double minScore, boolean getLatest) {
+  public InputStream queryFromEmbedding(String storeName, String question, int maxResults, double minScore, boolean getLatest) {
     try {
       if (minScore == 0) {
         minScore = 0.7;
@@ -491,7 +497,7 @@ public class LangchainEmbeddingStoresOperations {
       }
       jsonObject.put(MuleChainConstants.SOURCES, sources);
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new ModuleException("Error while querying from the embedding store " + storeName,
                                 MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
@@ -501,11 +507,11 @@ public class LangchainEmbeddingStoresOperations {
   /**
    * Reads information via prompt from embedding store (in-Memory), which is imported from the storeName (full path)
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String promptFromEmbedding(@Config LangchainLLMConfiguration configuration, String storeName, String data,
-                                    boolean getLatest) {
+  public InputStream promptFromEmbedding(@Config LangchainLLMConfiguration configuration, String storeName, String data,
+                                         boolean getLatest) {
 
     try {
       InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
@@ -552,7 +558,7 @@ public class LangchainEmbeddingStoresOperations {
       jsonObject.put(MuleChainConstants.SOURCES, sources);
       jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(results));
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new ModuleException(String.format("Error while getting info from the store %s", storeName),
                                 MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
@@ -567,11 +573,11 @@ public class LangchainEmbeddingStoresOperations {
   /**
    * Reads information via prompt from embedding store (in-Memory), which is imported from the storeName (full path)
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration, String storeName, String data,
-                                          boolean getLatest) {
+  public InputStream promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration, String storeName, String data,
+                                               boolean getLatest) {
     try {
       InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
@@ -590,7 +596,7 @@ public class LangchainEmbeddingStoresOperations {
       jsonObject.put(MuleChainConstants.GET_LATEST, getLatest);
 
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new ModuleException(String.format("Error while getting info from the store %s", storeName),
                                 MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
@@ -607,10 +613,10 @@ public class LangchainEmbeddingStoresOperations {
   /**
   * (AI Services) Usage of tools by a defined AI Agent. Provide a list of tools (APIs) with all required informations (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
   */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("TOOLS-use-ai-service")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String useAIServiceTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
+  public InputStream useAIServiceTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
@@ -657,7 +663,7 @@ public class LangchainEmbeddingStoresOperations {
       jsonObject.put(MuleChainConstants.RESPONSE, response);
       jsonObject.put(MuleChainConstants.TOOLS_USED, toolsUsed);
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new ModuleException("Error occurred while executing AI Tools with the provided config",
                                 MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
@@ -668,11 +674,11 @@ public class LangchainEmbeddingStoresOperations {
   /**
   * Add document of type text, pdf and url to embedding store (in-memory), which is exported to the defined storeName (full path)
   */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-folder-to-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public String addFilesFromFolderEmbedding(String storeName, String contextPath,
-                                            @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+  public InputStream addFilesFromFolderEmbedding(String storeName, String contextPath,
+                                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
     try {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
@@ -692,7 +698,7 @@ public class LangchainEmbeddingStoresOperations {
       jsonObject.put(MuleChainConstants.STORE_NAME, storeName);
       jsonObject.put(MuleChainConstants.STATUS, MuleChainConstants.UPDATED);
 
-      return jsonObject.toString();
+      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {

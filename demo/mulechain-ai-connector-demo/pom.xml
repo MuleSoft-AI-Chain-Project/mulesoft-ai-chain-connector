@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>com.mule.mulechain</groupId>
 			<artifactId>mulechain-ai-connector</artifactId>
-			<version>0.2.0</version>
+			<version>0.2.24</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
