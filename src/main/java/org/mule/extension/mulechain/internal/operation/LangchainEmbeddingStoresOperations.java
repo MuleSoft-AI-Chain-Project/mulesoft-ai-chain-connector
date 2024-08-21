@@ -111,7 +111,9 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("RAG-load-document")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream loadDocumentFile(@Config LangchainLLMConfiguration configuration, String data, String contextPath,
+  public InputStream loadDocumentFile(@Config LangchainLLMConfiguration configuration,
+                                      @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                      String contextPath,
                                       @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     try {
@@ -203,8 +205,11 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("CHAT-answer-prompt-with-memory")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration, String data, String memoryName,
-                                              String dbFilePath, int maxMessages) {
+  public InputStream chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration,
+                                              @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                              String memoryName,
+                                              String dbFilePath,
+                                              int maxMessages) {
 
     try {
       ChatLanguageModel model = configuration.getModel();
@@ -277,7 +282,9 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("TOOLS-use-ai-service-legacy")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream useTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
+  public InputStream useTools(@Config LangchainLLMConfiguration configuration,
+                              @org.mule.runtime.extension.api.annotation.param.Content String data,
+                              String toolConfig) {
 
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -447,7 +454,11 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-query-from-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream queryFromEmbedding(String storeName, String question, int maxResults, double minScore, boolean getLatest) {
+  public InputStream queryFromEmbedding(String storeName,
+                                        @org.mule.runtime.extension.api.annotation.param.Content String question,
+                                        int maxResults,
+                                        double minScore,
+                                        boolean getLatest) {
     try {
       if (minScore == 0) {
         minScore = 0.7;
@@ -510,7 +521,9 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream promptFromEmbedding(@Config LangchainLLMConfiguration configuration, String storeName, String data,
+  public InputStream promptFromEmbedding(@Config LangchainLLMConfiguration configuration,
+                                         @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                         String storeName,
                                          boolean getLatest) {
 
     try {
@@ -576,7 +589,9 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration, String storeName, String data,
+  public InputStream promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration,
+                                               @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                               String storeName,
                                                boolean getLatest) {
     try {
       InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
@@ -616,7 +631,9 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("TOOLS-use-ai-service")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream useAIServiceTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
+  public InputStream useAIServiceTools(@Config LangchainLLMConfiguration configuration,
+                                       @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                       String toolConfig) {
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 

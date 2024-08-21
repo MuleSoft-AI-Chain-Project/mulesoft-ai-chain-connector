@@ -22,6 +22,7 @@ import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
@@ -50,7 +51,8 @@ public class LangchainLLMOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("CHAT-answer-prompt")
   @Throws(AiServiceErrorTypeProvider.class)
-  public InputStream answerPromptByModelName(@Config LangchainLLMConfiguration configuration, String prompt) {
+  public InputStream answerPromptByModelName(@Config LangchainLLMConfiguration configuration,
+                                             @Content String prompt) {
     // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
 
     try {
@@ -74,8 +76,10 @@ public class LangchainLLMOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("AGENT-define-prompt-template")
   @Throws(AiServiceErrorTypeProvider.class)
-  public InputStream definePromptTemplate(@Config LangchainLLMConfiguration configuration, String template, String instructions,
-                                          String dataset) {
+  public InputStream definePromptTemplate(@Config LangchainLLMConfiguration configuration,
+                                          @Content String dataset,
+                                          String template,
+                                          String instructions) {
 
     try {
       ChatLanguageModel model = configuration.getModel();
@@ -125,7 +129,8 @@ public class LangchainLLMOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("SENTIMENT-analyze")
   @Throws(AiServiceErrorTypeProvider.class)
-  public InputStream extractSentiments(@Config LangchainLLMConfiguration configuration, String data) {
+  public InputStream extractSentiments(@Config LangchainLLMConfiguration configuration,
+                                       @Content String data) {
 
     try {
       ChatLanguageModel model = configuration.getModel();

@@ -21,7 +21,10 @@
 			</munit:set-event>
 			<logger level="INFO" doc:name="Logger" message="#[payload.data]"/>
 			<ms-aichain:chat-answer-prompt doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
-										  config-ref="OPENAI" prompt="#[payload.data]">
+										  config-ref="OPENAI">
+				<ms-aichain:prompt>
+					#[payload.data]
+				</ms-aichain:prompt>
 			</ms-aichain:chat-answer-prompt>
 		</munit:execution>
 		<munit:validation>
@@ -36,7 +39,10 @@
 			</munit:set-event>
 			<logger level="INFO" doc:name="Logger" message="#[payload.data]"/>
 			<ms-aichain:sentiment-analyze doc:name="sentiment-prompt" doc:id="cd512cfd-e0d0-49b0-91da-dbc21c23cc63"
-										 config-ref="OPENAI" data="#[payload.data]">
+										 config-ref="OPENAI">
+				<ms-aichain:data>
+					#[payload.data]
+				</ms-aichain:data>
 		</ms-aichain:sentiment-analyze>
 		</munit:execution>
 		<munit:validation >
@@ -54,8 +60,11 @@
 		</munit:behavior>
 		<munit:execution >
 			<ms-aichain:agent-define-prompt-template doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
-													config-ref="OPENAI" template="#[payload.template]" instructions="#[payload.instructions]"
-													dataset="#[payload.data]"/>
+													 config-ref="OPENAI" template="#[payload.template]" instructions="#[payload.instructions]">
+				<ms-aichain:dataset>
+					#[payload.data]
+				</ms-aichain:dataset>
+			</ms-aichain:agent-define-prompt-template>
 		</munit:execution>
 		<munit:validation >
 			<munit-tools:assert doc:name="Assert payload" doc:id="8aacf144-da60-494c-9b61-8a8e4ff36bc7" message="The payload does not match">

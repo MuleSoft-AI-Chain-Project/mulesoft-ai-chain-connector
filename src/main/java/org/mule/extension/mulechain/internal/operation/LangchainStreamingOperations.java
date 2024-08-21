@@ -13,10 +13,9 @@ import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypePr
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +31,6 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
  */
 public class LangchainStreamingOperations {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LangchainStreamingOperations.class);
-
   interface Assistant {
 
     TokenStream chat(String userMessage);
@@ -45,7 +42,8 @@ public class LangchainStreamingOperations {
   @MediaType(value = ANY, strict = false)
   @Alias("CHAT-answer-prompt-w-stream")
   @Throws(AiServiceErrorTypeProvider.class)
-  public InputStream answerPromptByModelNameStream(@Config LangchainLLMConfiguration configuration, String prompt) {
+  public InputStream answerPromptByModelNameStream(@Config LangchainLLMConfiguration configuration,
+                                                   @Content String prompt) {
     String openaiApiKey = configuration.getConfigExtractor().extractValue("OPENAI_API_KEY");
     long durationInSec = configuration.getLlmTimeoutUnit().toSeconds(configuration.getLlmTimeout());
     try {
