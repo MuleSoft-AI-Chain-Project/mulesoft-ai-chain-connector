@@ -28,7 +28,7 @@
 		<munit.input.directory>src/test/munit</munit.input.directory>
 		<munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
 		<munit.extensions.maven.plugin.version>1.2.0</munit.extensions.maven.plugin.version>
-		<jacoco.version>0.8.6</jacoco.version>
+		<jacoco.version>0.8.12</jacoco.version>
     </properties>
 
 	<build>
