@@ -77,9 +77,9 @@ public class LangchainLLMOperations {
   @Alias("AGENT-define-prompt-template")
   @Throws(AiServiceErrorTypeProvider.class)
   public InputStream definePromptTemplate(@Config LangchainLLMConfiguration configuration,
-                                          @Content String dataset,
-                                          String template,
-                                          String instructions) {
+                                          @Content(primary = true) String dataset,
+                                          @Content String template,
+                                          @Content String instructions) {
 
     try {
       ChatLanguageModel model = configuration.getModel();

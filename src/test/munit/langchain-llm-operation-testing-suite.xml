@@ -60,10 +60,16 @@
 		</munit:behavior>
 		<munit:execution >
 			<ms-aichain:agent-define-prompt-template doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
-													 config-ref="OPENAI" template="#[payload.template]" instructions="#[payload.instructions]">
+													 config-ref="OPENAI">
 				<ms-aichain:dataset>
 					#[payload.data]
 				</ms-aichain:dataset>
+				<ms-aichain:template>
+					#[payload.template]
+				</ms-aichain:template>
+				<ms-aichain:instructions>
+					#[payload.instructions]
+				</ms-aichain:instructions>
 			</ms-aichain:agent-define-prompt-template>
 		</munit:execution>
 		<munit:validation >

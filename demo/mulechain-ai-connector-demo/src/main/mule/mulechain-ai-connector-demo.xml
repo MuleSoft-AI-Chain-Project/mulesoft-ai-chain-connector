@@ -14,10 +14,16 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<ms-aichain:config name="OPENAI-GPT4-TURBO" llmType="OPENAI" configType="Configuration Json" doc:name="MuleSoft AI Chain configuration" doc:id="74b85066-1569-4f10-a06b-e49e854eeef2" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' modelName="gpt-4o" />
 	<flow name="PromptTemplate" doc:id="cff3a8ed-3799-424a-becf-9d7387729bd0" >
 		<http:listener doc:name="Listener" doc:id="dd18126e-81f5-48ef-8f35-9dd19afdfaf0" config-ref="HTTP_Listener_config" path="/agent"/>
-		<ms-aichain:agent-define-prompt-template doc:name="Agent define prompt template" doc:id="c4f5bb4b-1bd4-49a3-8612-29f1dacbbef6" config-ref="OPENAI" template="You are a customer satisfaction agent, who analyses the customer feedback in the dataset. Answer via json output and add a type for the result only with positive or negative as well as the complete answer" instructions="If the customer feedback in the dataset is negative, open a service satisfaction case and apologize to the customer. If the customer feedback in the dataset is positive, thank the customer and wish them a nice day. Don't repeat the feedback and be more direct starting the conversation with formal greetings">
+		<ms-aichain:agent-define-prompt-template doc:name="Agent define prompt template" doc:id="c4f5bb4b-1bd4-49a3-8612-29f1dacbbef6" config-ref="OPENAI">
 			<ms-aichain:dataset>
 				#[payload.data]
 			</ms-aichain:dataset>
+			<ms-aichain:template>
+				"You are a customer satisfaction agent, who analyses the customer feedback in the dataset. Answer via json output and add a type for the result only with positive or negative as well as the complete answer"
+			</ms-aichain:template>
+			<ms-aichain:instructions>
+				"If the customer feedback in the dataset is negative, open a service satisfaction case and apologize to the customer. If the customer feedback in the dataset is positive, thank the customer and wish them a nice day. Don't repeat the feedback and be more direct starting the conversation with formal greetings"
+			</ms-aichain:instructions>
 		</ms-aichain:agent-define-prompt-template>
 	</flow>
 	<flow name="ChatAnswerPrompt" doc:id="c3de899b-5e08-493f-be6a-f7cda10e8214" >
