@@ -37,6 +37,7 @@ import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.EmbeddingErrorTypeProvider;
 import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
+import org.mule.extension.mulechain.internal.operation.LangchainEmbeddingStoresOperations.AssistantSources;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
 import org.mule.extension.mulechain.internal.util.JsonUtils;
@@ -67,6 +68,7 @@ import dev.langchain4j.retriever.EmbeddingStoreRetriever;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import net.bytebuddy.implementation.bind.annotation.Default;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -414,14 +416,14 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-document-to-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream addFileEmbedding(String storeName, String contextPath,
+  public InputStream addFileEmbedding(String storeName, String contextPath, int maxSegmentSizeInChars, int maxOverlapSizeInChars,
                                       @ParameterGroup(name = "Context") FileTypeParameters fileType) {
 
     try {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
       EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-          .documentSplitter(DocumentSplitters.recursive(2000, 200))
+          .documentSplitter(DocumentSplitters.recursive(maxSegmentSizeInChars, maxOverlapSizeInChars))
           .embeddingModel(this.embeddingModel)
           .embeddingStore(store)
           .build();
@@ -694,13 +696,14 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-folder-to-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream addFilesFromFolderEmbedding(String storeName, String contextPath,
+  public InputStream addFilesFromFolderEmbedding(String storeName, String contextPath, int maxSegmentSizeInChars,
+                                                 int maxOverlapSizeInChars,
                                                  @ParameterGroup(name = "Context") FileTypeParameters fileType) {
     try {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
       EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-          .documentSplitter(DocumentSplitters.recursive(2000, 200))
+          .documentSplitter(DocumentSplitters.recursive(maxSegmentSizeInChars, maxOverlapSizeInChars))
           .embeddingModel(this.embeddingModel)
           .embeddingStore(store)
           .build();

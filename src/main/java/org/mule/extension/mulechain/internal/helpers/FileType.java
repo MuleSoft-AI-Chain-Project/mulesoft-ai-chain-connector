@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public enum FileType {
 
-  PDF("pdf"), TEXT("text"), URL("url");
+  PDF("any"), TEXT("text"), URL("url");
 
   private final String value;
 
