@@ -172,7 +172,7 @@ public class LangchainEmbeddingStoresOperations {
         document = loadDocument(contextPath, new TextDocumentParser());
         ingestor.ingest(document);
         break;
-      case PDF:
+      case ANY:
         document = loadDocument(contextPath, new ApacheTikaDocumentParser());
         ingestor.ingest(document);
         break;
@@ -427,6 +427,8 @@ public class LangchainEmbeddingStoresOperations {
   @OutputJsonType(schema = "api/response/StatusResponse.json")
   public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> addFileEmbedding(String storeName,
                                                                                                                     String contextPath,
+                                                                                                                    int maxSegmentSizeInChars,
+                                                                                                                    int maxOverlapSizeInChars,
                                                                                                                     @ParameterGroup(
                                                                                                                         name = "Context") FileTypeParameters fileType) {
 
@@ -434,7 +436,7 @@ public class LangchainEmbeddingStoresOperations {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
       EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-          .documentSplitter(DocumentSplitters.recursive(2000, 200))
+          .documentSplitter(DocumentSplitters.recursive(maxSegmentSizeInChars, maxOverlapSizeInChars))
           .embeddingModel(this.embeddingModel)
           .embeddingStore(store)
           .build();
@@ -723,13 +725,15 @@ public class LangchainEmbeddingStoresOperations {
   @OutputJsonType(schema = "api/response/StatusResponse.json")
   public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> addFilesFromFolderEmbedding(String storeName,
                                                                                                                                String contextPath,
+                                                                                                                               int maxSegmentSizeInChars,
+                                                                                                                               int maxOverlapSizeInChars,
                                                                                                                                @ParameterGroup(
                                                                                                                                    name = "Context") FileTypeParameters fileType) {
     try {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
       EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-          .documentSplitter(DocumentSplitters.recursive(2000, 200))
+          .documentSplitter(DocumentSplitters.recursive(maxSegmentSizeInChars, maxOverlapSizeInChars))
           .embeddingModel(this.embeddingModel)
           .embeddingStore(store)
           .build();
@@ -782,7 +786,7 @@ public class LangchainEmbeddingStoresOperations {
               document = loadDocument(file.toString(), new TextDocumentParser());
               ingestor.ingest(document);
               break;
-            case PDF:
+            case ANY:
               document = loadDocument(file.toString(), new ApacheTikaDocumentParser());
               ingestor.ingest(document);
               break;
