@@ -11,7 +11,6 @@ public class MuleChainConstants {
   public static final String INPUT_COUNT = "inputCount";
   public static final String OUTPUT_COUNT = "outputCount";
   public static final String TOTAL_COUNT = "totalCount";
-  public static final String TOKEN_USAGE = "tokenUsage";
   public static final String FILE_PATH = "filePath";
   public static final String FILE_TYPE = "fileType";
   public static final String QUESTION = "question";
@@ -25,7 +24,6 @@ public class MuleChainConstants {
   public static final String UPDATED = "updated";
   public static final String MAX_RESULTS = "maxResults";
   public static final String MIN_SCORE = "minScore";
-  public static final String INFORMATION = "information";
   public static final String GET_LATEST = "getLatest";
   public static final String ABSOLUTE_DIRECTORY_PATH = "absoluteDirectoryPath";
   public static final String FULL_PATH = "fullPath";
