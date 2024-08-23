@@ -3,10 +3,7 @@
  */
 package org.mule.extension.mulechain.internal.util;
 
-import dev.langchain4j.model.output.Response;
-import dev.langchain4j.service.Result;
 import org.json.JSONObject;
-import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +30,5 @@ public final class JsonUtils {
       LOGGER.warn("File does not exist: {}", filePath);
     }
     return null;
-  }
-
-  public static JSONObject getTokenUsage(Result<?> results) {
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put(MuleChainConstants.INPUT_COUNT, results.tokenUsage().inputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, results.tokenUsage().outputTokenCount());
-    tokenUsage.put(MuleChainConstants.TOTAL_COUNT, results.tokenUsage().totalTokenCount());
-    return tokenUsage;
   }
 }
