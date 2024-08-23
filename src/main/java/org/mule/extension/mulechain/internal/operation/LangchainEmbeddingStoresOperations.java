@@ -109,6 +109,16 @@ public class LangchainEmbeddingStoresOperations {
     this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
   }
 
+  /**
+   * Enables the user to query the doc provided in natural language.<br>
+   * The doc will be embedded into in memory vector store.
+   *
+   * @param configuration       Refers to the configuration object
+   * @param data                Defines the query input provided by the user
+   * @param contextPath         Defines the file path which will be embedded
+   * @param fileType            Specifies the type of file. {@link org.mule.extension.mulechain.internal.helpers.FileType} Eg: "any", "text" & "url"
+   * @return                    Returns the output response of the query
+   */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("RAG-load-document")
   @Throws(EmbeddingErrorTypeProvider.class)

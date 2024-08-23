@@ -46,7 +46,10 @@ public class LangchainLLMOperations {
   }
 
   /**
-   * Implements a simple Chat agent
+   * Implements a simple Chat agent to enable chat with the LLM
+   * @param configuration       Refers to the configuration object
+   * @param prompt              User defined prompt query
+   * @return                    Returns the corresponding response as returned by the LLM
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("CHAT-answer-prompt")
@@ -68,7 +71,13 @@ public class LangchainLLMOperations {
   }
 
   /**
-   * Helps in defining an AI Agent with a prompt template
+   * Helps in defining an AI Agent configured with a prompt template
+   *
+   * @param configuration       Refers to the configuration object
+   * @param dataset             Refers to the user query to be acted upon
+   * @param template            Refers to sample template used by LLM to respond adequately to the user queries
+   * @param instructions        This provides the LLM on how to understand and respond to the user queries
+   * @return                    Returns the corresponding response as returned by the LLM
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("AGENT-define-prompt-template")
@@ -105,7 +114,7 @@ public class LangchainLLMOperations {
   }
 
   /**
-   * Supporting ENUM and Interface for Sentimetns
+   * Supporting ENUM and Interface for Sentiments
    */
   enum Sentiment {
     POSITIVE, NEUTRAL, NEGATIVE;
@@ -121,7 +130,11 @@ public class LangchainLLMOperations {
   }
 
   /**
-   * Example of a sentiment analyzer, which accepts text as input.
+   * Analyzes the sentiment of the user data.
+   *
+   * @param configuration         Refers to the configuration object
+   * @param data                  Refers to the user input which needs to be analyzed
+   * @return                      Returns the response belonging to sentiment out of POSITIVE, NEUTRAL & NEGATIVE
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("SENTIMENT-analyze")
