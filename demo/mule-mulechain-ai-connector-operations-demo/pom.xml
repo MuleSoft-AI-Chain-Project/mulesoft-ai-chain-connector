@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.mulesoft.connectors.examples</groupId>
-	<artifactId>mulechain-ai-connector-demo</artifactId>
+	<artifactId>mule-mulechain-ai-connector-operations-demo</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>mule-application</packaging>
 
-	<name>mulechain-ai-connector-demo</name>
+	<name>mule-mulechain-ai-connector-operations-demo</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>com.mule.mulechain</groupId>
 			<artifactId>mulechain-ai-connector</artifactId>
-			<version>0.2.24</version>
+			<version>0.2.25</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
