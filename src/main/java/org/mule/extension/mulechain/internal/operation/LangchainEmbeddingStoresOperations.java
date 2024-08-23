@@ -15,14 +15,13 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 
-import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.mapdb.Serializer.STRING;
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.stream.Stream;
 import java.util.concurrent.atomic.AtomicInteger;
 import dev.langchain4j.data.embedding.Embedding;
@@ -32,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mule.extension.mulechain.api.metadata.LLMResponseAttributes;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.EmbeddingErrorTypeProvider;
@@ -39,9 +39,9 @@ import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
-import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -76,6 +76,7 @@ import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser
 import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
 import static dev.langchain4j.data.message.ChatMessageDeserializer.messagesFromJson;
 import static dev.langchain4j.data.message.ChatMessageSerializer.messagesToJson;
+import static org.mule.extension.mulechain.internal.helpers.ResponseHelper.createLLMResponse;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 
 import java.util.regex.Matcher;
@@ -111,10 +112,12 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("RAG-load-document")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream loadDocumentFile(@Config LangchainLLMConfiguration configuration,
-                                      @org.mule.runtime.extension.api.annotation.param.Content String data,
-                                      String contextPath,
-                                      @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> loadDocumentFile(@Config LangchainLLMConfiguration configuration,
+                                                                                                                      @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                      String contextPath,
+                                                                                                                      @ParameterGroup(
+                                                                                                                          name = "Context") FileTypeParameters fileType) {
 
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -147,12 +150,13 @@ public class LangchainEmbeddingStoresOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
-      jsonObject.put(MuleChainConstants.FILE_PATH, contextPath);
-      jsonObject.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
-      jsonObject.put(MuleChainConstants.QUESTION, data);
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.FILE_PATH, contextPath);
+      attributes.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
+      attributes.put(MuleChainConstants.QUESTION, data);
+
+      return createLLMResponse(jsonObject.toString(), answer, attributes);
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
@@ -205,17 +209,16 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("CHAT-answer-prompt-with-memory")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration,
-                                              @org.mule.runtime.extension.api.annotation.param.Content String data,
-                                              String memoryName,
-                                              String dbFilePath,
-                                              int maxMessages) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration,
+                                                                                                                              @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                              String memoryName,
+                                                                                                                              String dbFilePath,
+                                                                                                                              int maxMessages) {
 
     try {
       ChatLanguageModel model = configuration.getModel();
-
       PersistentChatMemoryStore store = new PersistentChatMemoryStore(dbFilePath);
-
       ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
           .id(memoryName)
           .maxMessages(maxMessages)
@@ -231,12 +234,13 @@ public class LangchainEmbeddingStoresOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response.content());
-      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
-      jsonObject.put(MuleChainConstants.MEMORY_NAME, memoryName);
-      jsonObject.put(MuleChainConstants.DB_FILE_PATH, dbFilePath);
-      jsonObject.put(MuleChainConstants.MAX_MESSAGES, maxMessages);
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.MEMORY_NAME, memoryName);
+      attributes.put(MuleChainConstants.DB_FILE_PATH, dbFilePath);
+      attributes.put(MuleChainConstants.MAX_MESSAGES, maxMessages);
+
+      return createLLMResponse(jsonObject.toString(), response, attributes);
     } catch (Exception e) {
       throw new ModuleException("Error while responding with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
@@ -282,9 +286,10 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("TOOLS-use-ai-service-legacy")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream useTools(@Config LangchainLLMConfiguration configuration,
-                              @org.mule.runtime.extension.api.annotation.param.Content String data,
-                              String toolConfig) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> useTools(@Config LangchainLLMConfiguration configuration,
+                                                                                                            @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                            String toolConfig) {
 
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
@@ -335,9 +340,11 @@ public class LangchainEmbeddingStoresOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response);
-      jsonObject.put(MuleChainConstants.TOOLS_USED, toolsUsed);
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.TOOLS_USED, toolsUsed);
+
+      return createLLMResponse(jsonObject.toString(), attributes);
     } catch (Exception e) {
       throw new ModuleException("Error occurred while executing AI Tools with the provided config",
                                 MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
@@ -389,17 +396,20 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-new-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream createEmbedding(String storeName) {
+  @OutputJsonType(schema = "api/response/StatusResponse.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> createEmbedding(String storeName) {
     try {
       InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
       embeddingStore.serializeToFile(storeName);
 
       JSONObject jsonObject = new JSONObject();
-      jsonObject.put(MuleChainConstants.STORE_NAME, storeName);
       jsonObject.put(MuleChainConstants.STATUS, MuleChainConstants.CREATED);
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
+
+      return createLLMResponse(jsonObject.toString(), attributes);
     } catch (Exception e) {
       throw new ModuleException("Error while creating new Embedding store: " + storeName,
                                 MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
@@ -414,8 +424,11 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-document-to-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream addFileEmbedding(String storeName, String contextPath,
-                                      @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+  @OutputJsonType(schema = "api/response/StatusResponse.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> addFileEmbedding(String storeName,
+                                                                                                                    String contextPath,
+                                                                                                                    @ParameterGroup(
+                                                                                                                        name = "Context") FileTypeParameters fileType) {
 
     try {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
@@ -431,12 +444,14 @@ public class LangchainEmbeddingStoresOperations {
       store.serializeToFile(storeName);
 
       JSONObject jsonObject = new JSONObject();
-      jsonObject.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
-      jsonObject.put(MuleChainConstants.FILE_PATH, contextPath);
-      jsonObject.put(MuleChainConstants.STORE_NAME, storeName);
       jsonObject.put(MuleChainConstants.STATUS, MuleChainConstants.UPDATED);
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
+      attributes.put(MuleChainConstants.FILE_PATH, contextPath);
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
+
+      return createLLMResponse(jsonObject.toString(), attributes);
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {
@@ -454,11 +469,12 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-query-from-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream queryFromEmbedding(String storeName,
-                                        @org.mule.runtime.extension.api.annotation.param.Content String question,
-                                        int maxResults,
-                                        double minScore,
-                                        boolean getLatest) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> queryFromEmbedding(String storeName,
+                                                                                                                      @org.mule.runtime.extension.api.annotation.param.Content String question,
+                                                                                                                      int maxResults,
+                                                                                                                      double minScore,
+                                                                                                                      boolean getLatest) {
     try {
       if (minScore == 0) {
         minScore = 0.7;
@@ -475,11 +491,13 @@ public class LangchainEmbeddingStoresOperations {
           .collect(joining("\n\n"));
 
       JSONObject jsonObject = new JSONObject();
-      jsonObject.put(MuleChainConstants.MAX_RESULTS, maxResults);
-      jsonObject.put(MuleChainConstants.MIN_SCORE, minScore);
-      jsonObject.put(MuleChainConstants.QUESTION, question);
-      jsonObject.put(MuleChainConstants.STORE_NAME, storeName);
-      jsonObject.put(MuleChainConstants.INFORMATION, information);
+      jsonObject.put(MuleChainConstants.RESPONSE, information);
+
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.MAX_RESULTS, maxResults);
+      attributes.put(MuleChainConstants.MIN_SCORE, minScore);
+      attributes.put(MuleChainConstants.QUESTION, question);
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
 
       JSONArray sources = new JSONArray();
       String absoluteDirectoryPath;
@@ -506,9 +524,9 @@ public class LangchainEmbeddingStoresOperations {
 
         sources.put(contentObject);
       }
-      jsonObject.put(MuleChainConstants.SOURCES, sources);
+      attributes.put(MuleChainConstants.SOURCES, sources);
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      return createLLMResponse(jsonObject.toString(), attributes);
     } catch (Exception e) {
       throw new ModuleException("Error while querying from the embedding store " + storeName,
                                 MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
@@ -521,10 +539,11 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream promptFromEmbedding(@Config LangchainLLMConfiguration configuration,
-                                         @org.mule.runtime.extension.api.annotation.param.Content String data,
-                                         String storeName,
-                                         boolean getLatest) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> promptFromEmbedding(@Config LangchainLLMConfiguration configuration,
+                                                                                                                         @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                         String storeName,
+                                                                                                                         boolean getLatest) {
 
     try {
       InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
@@ -544,9 +563,11 @@ public class LangchainEmbeddingStoresOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, results.content());
-      jsonObject.put(MuleChainConstants.STORE_NAME, storeName);
-      jsonObject.put(MuleChainConstants.QUESTION, data);
-      jsonObject.put(MuleChainConstants.GET_LATEST, getLatest);
+
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
+      attributes.put(MuleChainConstants.QUESTION, data);
+      attributes.put(MuleChainConstants.GET_LATEST, getLatest);
 
       JSONArray sources = new JSONArray();
       String absoluteDirectoryPath;
@@ -557,9 +578,9 @@ public class LangchainEmbeddingStoresOperations {
       JSONObject contentObject;
       for (Content content : contents) {
         metadata = content.textSegment().metadata();
-        absoluteDirectoryPath = (String) metadata.getString(MuleChainConstants.EmbeddingConstants.ABSOLUTE_DIRECTORY_PATH);
-        fileName = (String) metadata.getString(MuleChainConstants.EmbeddingConstants.FILE_NAME);
-        url = (String) metadata.getString(MuleChainConstants.URL);
+        absoluteDirectoryPath = metadata.getString(MuleChainConstants.EmbeddingConstants.ABSOLUTE_DIRECTORY_PATH);
+        fileName = metadata.getString(MuleChainConstants.EmbeddingConstants.FILE_NAME);
+        url = metadata.getString(MuleChainConstants.URL);
 
         contentObject = new JSONObject();
         contentObject.put(MuleChainConstants.ABSOLUTE_DIRECTORY_PATH, absoluteDirectoryPath);
@@ -568,10 +589,9 @@ public class LangchainEmbeddingStoresOperations {
         contentObject.put(MuleChainConstants.TEXT_SEGMENT, content.textSegment().text());
         sources.put(contentObject);
       }
-      jsonObject.put(MuleChainConstants.SOURCES, sources);
-      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(results));
+      attributes.put(MuleChainConstants.SOURCES, sources);
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      return createLLMResponse(jsonObject.toString(), results, attributes);
     } catch (Exception e) {
       throw new ModuleException(String.format("Error while getting info from the store %s", storeName),
                                 MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
@@ -589,10 +609,11 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration,
-                                               @org.mule.runtime.extension.api.annotation.param.Content String data,
-                                               String storeName,
-                                               boolean getLatest) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration,
+                                                                                                                             @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                             String storeName,
+                                                                                                                             boolean getLatest) {
     try {
       InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
@@ -607,11 +628,13 @@ public class LangchainEmbeddingStoresOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, answer);
-      jsonObject.put(MuleChainConstants.STORE_NAME, storeName);
-      jsonObject.put(MuleChainConstants.GET_LATEST, getLatest);
+
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
+      attributes.put(MuleChainConstants.GET_LATEST, getLatest);
 
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      return createLLMResponse(jsonObject.toString(), attributes);
     } catch (Exception e) {
       throw new ModuleException(String.format("Error while getting info from the store %s", storeName),
                                 MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
@@ -631,9 +654,10 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("TOOLS-use-ai-service")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream useAIServiceTools(@Config LangchainLLMConfiguration configuration,
-                                       @org.mule.runtime.extension.api.annotation.param.Content String data,
-                                       String toolConfig) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> useAIServiceTools(@Config LangchainLLMConfiguration configuration,
+                                                                                                                     @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                     String toolConfig) {
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
@@ -678,9 +702,11 @@ public class LangchainEmbeddingStoresOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response);
-      jsonObject.put(MuleChainConstants.TOOLS_USED, toolsUsed);
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.TOOLS_USED, toolsUsed);
+
+      return createLLMResponse(jsonObject.toString(), attributes);
     } catch (Exception e) {
       throw new ModuleException("Error occurred while executing AI Tools with the provided config",
                                 MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
@@ -694,8 +720,11 @@ public class LangchainEmbeddingStoresOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-folder-to-store")
   @Throws(EmbeddingErrorTypeProvider.class)
-  public InputStream addFilesFromFolderEmbedding(String storeName, String contextPath,
-                                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+  @OutputJsonType(schema = "api/response/StatusResponse.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> addFilesFromFolderEmbedding(String storeName,
+                                                                                                                               String contextPath,
+                                                                                                                               @ParameterGroup(
+                                                                                                                                   name = "Context") FileTypeParameters fileType) {
     try {
       InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
@@ -710,12 +739,14 @@ public class LangchainEmbeddingStoresOperations {
       store.serializeToFile(storeName);
 
       JSONObject jsonObject = new JSONObject();
-      jsonObject.put(MuleChainConstants.FILES_COUNT, totalFiles);
-      jsonObject.put(MuleChainConstants.FOLDER_PATH, contextPath);
-      jsonObject.put(MuleChainConstants.STORE_NAME, storeName);
       jsonObject.put(MuleChainConstants.STATUS, MuleChainConstants.UPDATED);
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.FILES_COUNT, totalFiles);
+      attributes.put(MuleChainConstants.FOLDER_PATH, contextPath);
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
+
+      return createLLMResponse(jsonObject.toString(), attributes);
     } catch (ModuleException e) {
       throw e;
     } catch (Exception e) {

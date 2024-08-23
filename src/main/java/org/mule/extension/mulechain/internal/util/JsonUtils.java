@@ -42,12 +42,4 @@ public final class JsonUtils {
     tokenUsage.put(MuleChainConstants.TOTAL_COUNT, results.tokenUsage().totalTokenCount());
     return tokenUsage;
   }
-
-  public static JSONObject getTokenUsage(Response<?> results) {
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put(MuleChainConstants.INPUT_COUNT, results.tokenUsage().inputTokenCount());
-    tokenUsage.put(MuleChainConstants.OUTPUT_COUNT, results.tokenUsage().outputTokenCount());
-    tokenUsage.put(MuleChainConstants.TOTAL_COUNT, results.tokenUsage().totalTokenCount());
-    return tokenUsage;
-  }
 }

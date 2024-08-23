@@ -11,8 +11,6 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 
-import java.time.Duration;
-
 import static java.time.Duration.ofSeconds;
 
 public final class LangchainLLMInitializerUtil {

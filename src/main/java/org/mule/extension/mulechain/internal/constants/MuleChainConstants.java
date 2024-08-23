@@ -38,7 +38,6 @@ public class MuleChainConstants {
   public static final String FOLDER_PATH = "folderPath";
   public static final String INSTRUCTIONS = "instructions";
   public static final String DATASET = "dataset";
-  public static final String SENTIMENT = "sentiment";
   public static final String IS_POSITIVE = "isPositive";
   public static final String PAGE = "page";
   public static final String TOTAL_PAGES = "totalPages";

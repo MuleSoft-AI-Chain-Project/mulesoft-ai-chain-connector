@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "properties": {
+          "page": {
+            "type": "integer"
+          },
+          "response": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,19 +5,22 @@ package org.mule.extension.mulechain.internal.operation;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.mule.extension.mulechain.api.metadata.LLMResponseAttributes;
+import org.mule.extension.mulechain.api.metadata.TokenUsage;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.ImageErrorTypeProvider;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
-import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 
 import static org.apache.commons.io.IOUtils.toInputStream;
+import static org.mule.extension.mulechain.internal.helpers.ResponseHelper.createLLMResponse;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 
 import dev.langchain4j.model.openai.OpenAiImageModel;
@@ -31,6 +34,7 @@ import dev.langchain4j.data.message.TextContent;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +48,9 @@ import java.util.Base64;
 
 import javax.imageio.ImageIO;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
@@ -61,9 +68,10 @@ public class LangchainImageModelsOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-read")
   @Throws(ImageErrorTypeProvider.class)
-  public InputStream readFromImage(@Config LangchainLLMConfiguration configuration,
-                                   @Content String data,
-                                   String contextURL) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> readFromImage(@Config LangchainLLMConfiguration configuration,
+                                                                                                                   @Content String data,
+                                                                                                                   String contextURL) {
     try {
       ChatLanguageModel model = configuration.getModel();
 
@@ -75,9 +83,8 @@ public class LangchainImageModelsOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response.content().text());
-      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      return createLLMResponse(jsonObject.toString(), response, null);
     } catch (Exception e) {
       throw new ModuleException(String.format("Unable to analyze the provided image %s with the text: %s", contextURL,
                                               data),
@@ -92,8 +99,9 @@ public class LangchainImageModelsOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-generate")
   @Throws(ImageErrorTypeProvider.class)
-  public InputStream drawImage(@Config LangchainLLMConfiguration configuration,
-                               @Content String data) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Void> drawImage(@Config LangchainLLMConfiguration configuration,
+                                                                                              @Content String data) {
     try {
       ConfigExtractor configExtractor = configuration.getConfigExtractor();
       ImageModel model = OpenAiImageModel.builder()
@@ -107,7 +115,11 @@ public class LangchainImageModelsOperations {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response.content().url());
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      return Result.<InputStream, Void>builder()
+          .attributesMediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA)
+          .output(toInputStream(jsonObject.toString(), StandardCharsets.UTF_8))
+          .mediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON)
+          .build();
     } catch (Exception e) {
       throw new ModuleException("Error while generating the required image: " + data, MuleChainErrorType.IMAGE_GENERATION_FAILURE,
                                 e);
@@ -122,22 +134,27 @@ public class LangchainImageModelsOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-read-scanned-documents")
   @Throws(ImageErrorTypeProvider.class)
-  public InputStream readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration,
-                                            @Content String data,
-                                            String filePath) {
+  @OutputJsonType(schema = "api/response/ScannedResponse.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration,
+                                                                                                                            @Content String data,
+                                                                                                                            String filePath) {
 
     ChatLanguageModel model = configuration.getModel();
 
     JSONObject jsonObject = new JSONObject();
     JSONArray docPages = new JSONArray();
 
+    int inputTokenCount = 0;
+    int outputTokenCount = 0;
+    int totalTokenCount = 0;
+    int totalPages;
+
     try (InputStream inputStream = Files.newInputStream(Paths.get(filePath));
         PDDocument document = PDDocument.load(inputStream);) {
 
       PDFRenderer pdfRenderer = new PDFRenderer(document);
-      int totalPages = document.getNumberOfPages();
+      totalPages = document.getNumberOfPages();
       LOGGER.info("Total files to be converted -> {}", totalPages);
-      jsonObject.put(MuleChainConstants.TOTAL_PAGES, totalPages);
 
       JSONObject docPage;
       for (int pageNumber = 0; pageNumber < totalPages; pageNumber++) {
@@ -155,7 +172,9 @@ public class LangchainImageModelsOperations {
         docPage = new JSONObject();
         docPage.put(MuleChainConstants.PAGE, pageNumber + 1);
         docPage.put(MuleChainConstants.RESPONSE, response.content().text());
-        docPage.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(response));
+        inputTokenCount += response.tokenUsage().inputTokenCount();
+        outputTokenCount += response.tokenUsage().outputTokenCount();
+        totalTokenCount += response.tokenUsage().totalTokenCount();
         docPages.put(docPage);
       }
 
@@ -173,7 +192,11 @@ public class LangchainImageModelsOperations {
 
     jsonObject.put(MuleChainConstants.PAGES, docPages);
 
-    return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+    Map<String, Object> attributes = new HashMap<>();
+    attributes.put(MuleChainConstants.TOTAL_PAGES, totalPages);
+
+    return createLLMResponse(jsonObject.toString(), new TokenUsage(inputTokenCount, outputTokenCount, totalTokenCount),
+                             attributes);
   }
 
   private String convertToBase64String(BufferedImage image) {
