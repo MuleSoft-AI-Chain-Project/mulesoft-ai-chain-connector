@@ -8,15 +8,15 @@ public class ScannedDocResponseAttributes implements Serializable {
 
   private final ArrayList<DocResponseAttribute> scannedDocAttributes;
 
-  private final HashMap<String, Object> additionalAttributes;
+  private final HashMap<String, String> additionalAttributes;
 
   public ScannedDocResponseAttributes(ArrayList<DocResponseAttribute> scannedDocAttributes,
-                                      HashMap<String, Object> additionalAttributes) {
+                                      HashMap<String, String> additionalAttributes) {
     this.scannedDocAttributes = scannedDocAttributes;
     this.additionalAttributes = additionalAttributes;
   }
 
-  public HashMap<String, Object> getAdditionalAttributes() {
+  public HashMap<String, String> getAdditionalAttributes() {
     return additionalAttributes;
   }
 

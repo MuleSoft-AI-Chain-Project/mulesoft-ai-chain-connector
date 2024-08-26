@@ -18,6 +18,7 @@ import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import static org.mapdb.Serializer.STRING;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -161,7 +162,7 @@ public class LangchainEmbeddingStoresOperations {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
 
-      Map<String, Object> attributes = new HashMap<>();
+      Map<String, String> attributes = new HashMap<>();
       attributes.put(MuleChainConstants.FILE_PATH, contextPath);
       attributes.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
       attributes.put(MuleChainConstants.QUESTION, data);
@@ -245,10 +246,10 @@ public class LangchainEmbeddingStoresOperations {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response.content());
 
-      Map<String, Object> attributes = new HashMap<>();
+      Map<String, String> attributes = new HashMap<>();
       attributes.put(MuleChainConstants.MEMORY_NAME, memoryName);
       attributes.put(MuleChainConstants.DB_FILE_PATH, dbFilePath);
-      attributes.put(MuleChainConstants.MAX_MESSAGES, maxMessages);
+      attributes.put(MuleChainConstants.MAX_MESSAGES, String.valueOf(maxMessages));
 
       return createLLMResponse(jsonObject.toString(), response, attributes);
     } catch (Exception e) {
@@ -576,10 +577,10 @@ public class LangchainEmbeddingStoresOperations {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, results.content());
 
-      Map<String, Object> attributes = new HashMap<>();
+      Map<String, String> attributes = new HashMap<>();
       attributes.put(MuleChainConstants.STORE_NAME, storeName);
       attributes.put(MuleChainConstants.QUESTION, data);
-      attributes.put(MuleChainConstants.GET_LATEST, getLatest);
+      attributes.put(MuleChainConstants.GET_LATEST, String.valueOf(getLatest));
 
       JSONArray sources = new JSONArray();
       String absoluteDirectoryPath;

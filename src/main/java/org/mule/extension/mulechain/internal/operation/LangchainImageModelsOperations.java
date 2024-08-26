@@ -87,7 +87,7 @@ public class LangchainImageModelsOperations {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response.content().text());
 
-      return createLLMResponse(jsonObject.toString(), response, null);
+      return createLLMResponse(jsonObject.toString(), response, new HashMap<>());
     } catch (Exception e) {
       throw new ModuleException(String.format("Unable to analyze the provided image %s with the text: %s", contextURL,
                                               data),
@@ -195,8 +195,8 @@ public class LangchainImageModelsOperations {
 
     jsonObject.put(MuleChainConstants.PAGES, docPages);
 
-    Map<String, Object> attributes = new HashMap<>();
-    attributes.put(MuleChainConstants.TOTAL_PAGES, totalPages);
+    Map<String, String> attributes = new HashMap<>();
+    attributes.put(MuleChainConstants.TOTAL_PAGES, String.valueOf(totalPages));
 
     return createLLMResponse(jsonObject.toString(), docResponseAttributes,
                              attributes);
