@@ -2,11 +2,15 @@ package org.mule.extension.mulechain.internal.helpers;
 
 import dev.langchain4j.model.output.Response;
 import org.mule.extension.mulechain.api.metadata.LLMResponseAttributes;
+import org.mule.extension.mulechain.api.metadata.ScannedDocResponseAttributes;
 import org.mule.extension.mulechain.api.metadata.TokenUsage;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.io.IOUtils.toInputStream;
@@ -39,7 +43,19 @@ public final class ResponseHelper {
                                                                              TokenUsage tokenUsage,
                                                                              Map<String, Object> responseAttributes) {
     return Result.<InputStream, LLMResponseAttributes>builder()
-        .attributes(new LLMResponseAttributes(tokenUsage, responseAttributes))
+        .attributes(new LLMResponseAttributes(tokenUsage, (HashMap<String, Object>) responseAttributes))
+        .attributesMediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA)
+        .output(toInputStream(response, StandardCharsets.UTF_8))
+        .mediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON)
+        .build();
+  }
+
+  public static Result<InputStream, ScannedDocResponseAttributes> createLLMResponse(String response,
+                                                                                    List<ScannedDocResponseAttributes.DocResponseAttribute> docResponseAttributes,
+                                                                                    Map<String, Object> responseAttributes) {
+    return Result.<InputStream, ScannedDocResponseAttributes>builder()
+        .attributes(new ScannedDocResponseAttributes((ArrayList<ScannedDocResponseAttributes.DocResponseAttribute>) docResponseAttributes,
+                                                     (HashMap<String, Object>) responseAttributes))
         .attributesMediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA)
         .output(toInputStream(response, StandardCharsets.UTF_8))
         .mediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON)
