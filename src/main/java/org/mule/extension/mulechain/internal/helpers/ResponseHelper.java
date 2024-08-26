@@ -7,6 +7,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.apache.commons.io.IOUtils.toInputStream;
@@ -39,7 +40,7 @@ public final class ResponseHelper {
                                                                              TokenUsage tokenUsage,
                                                                              Map<String, Object> responseAttributes) {
     return Result.<InputStream, LLMResponseAttributes>builder()
-        .attributes(new LLMResponseAttributes(tokenUsage, responseAttributes))
+        .attributes(new LLMResponseAttributes(tokenUsage, (HashMap<String, Object>) responseAttributes))
         .attributesMediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA)
         .output(toInputStream(response, StandardCharsets.UTF_8))
         .mediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON)

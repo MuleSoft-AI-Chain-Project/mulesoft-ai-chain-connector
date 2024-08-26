@@ -1,14 +1,15 @@
 package org.mule.extension.mulechain.api.metadata;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 public class LLMResponseAttributes implements Serializable {
 
   private final TokenUsage tokenUsage;
-  private final Map<String, Object> attributes;
+  private final HashMap<String, Object> attributes;
 
-  public LLMResponseAttributes(TokenUsage tokenUsage, Map<String, Object> attributes) {
+  public LLMResponseAttributes(TokenUsage tokenUsage, HashMap<String, Object> attributes) {
     this.tokenUsage = tokenUsage;
     this.attributes = attributes;
   }
