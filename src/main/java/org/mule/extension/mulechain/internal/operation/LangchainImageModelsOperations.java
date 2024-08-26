@@ -6,6 +6,7 @@ package org.mule.extension.mulechain.internal.operation;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mule.extension.mulechain.api.metadata.LLMResponseAttributes;
+import org.mule.extension.mulechain.api.metadata.ScannedDocResponseAttributes;
 import org.mule.extension.mulechain.api.metadata.TokenUsage;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
@@ -44,11 +45,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -129,25 +132,21 @@ public class LangchainImageModelsOperations {
   /**
    * Reads a scanned document.
    */
-
-
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-read-scanned-documents")
   @Throws(ImageErrorTypeProvider.class)
   @OutputJsonType(schema = "api/response/ScannedResponse.json")
-  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration,
-                                                                                                                            @Content String data,
-                                                                                                                            String filePath) {
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, ScannedDocResponseAttributes> readScannedDocumentPDF(@Config LangchainLLMConfiguration configuration,
+                                                                                                                                   @Content String data,
+                                                                                                                                   String filePath) {
 
     ChatLanguageModel model = configuration.getModel();
 
     JSONObject jsonObject = new JSONObject();
     JSONArray docPages = new JSONArray();
 
-    int inputTokenCount = 0;
-    int outputTokenCount = 0;
-    int totalTokenCount = 0;
     int totalPages;
+    List<ScannedDocResponseAttributes.DocResponseAttribute> docResponseAttributes = new ArrayList<>();
 
     try (InputStream inputStream = Files.newInputStream(Paths.get(filePath));
         PDDocument document = PDDocument.load(inputStream);) {
@@ -157,6 +156,7 @@ public class LangchainImageModelsOperations {
       LOGGER.info("Total files to be converted -> {}", totalPages);
 
       JSONObject docPage;
+
       for (int pageNumber = 0; pageNumber < totalPages; pageNumber++) {
 
         BufferedImage image = pdfRenderer.renderImageWithDPI(pageNumber, 300);
@@ -172,9 +172,12 @@ public class LangchainImageModelsOperations {
         docPage = new JSONObject();
         docPage.put(MuleChainConstants.PAGE, pageNumber + 1);
         docPage.put(MuleChainConstants.RESPONSE, response.content().text());
-        inputTokenCount += response.tokenUsage().inputTokenCount();
-        outputTokenCount += response.tokenUsage().outputTokenCount();
-        totalTokenCount += response.tokenUsage().totalTokenCount();
+        docResponseAttributes
+            .add(new ScannedDocResponseAttributes.DocResponseAttribute(pageNumber + 1,
+                                                                       new TokenUsage(response.tokenUsage().inputTokenCount(),
+                                                                                      response.tokenUsage()
+                                                                                          .outputTokenCount(),
+                                                                                      response.tokenUsage().totalTokenCount())));
         docPages.put(docPage);
       }
 
@@ -195,7 +198,7 @@ public class LangchainImageModelsOperations {
     Map<String, Object> attributes = new HashMap<>();
     attributes.put(MuleChainConstants.TOTAL_PAGES, totalPages);
 
-    return createLLMResponse(jsonObject.toString(), new TokenUsage(inputTokenCount, outputTokenCount, totalTokenCount),
+    return createLLMResponse(jsonObject.toString(), docResponseAttributes,
                              attributes);
   }
 

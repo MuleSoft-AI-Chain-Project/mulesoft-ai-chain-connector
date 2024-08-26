@@ -536,7 +536,7 @@ public class LangchainEmbeddingStoresOperations {
 
         sources.put(contentObject);
       }
-      attributes.put(MuleChainConstants.SOURCES, sources);
+      jsonObject.put(MuleChainConstants.SOURCES, sources);
 
       return createLLMResponse(jsonObject.toString(), attributes);
     } catch (Exception e) {
@@ -601,7 +601,7 @@ public class LangchainEmbeddingStoresOperations {
         contentObject.put(MuleChainConstants.TEXT_SEGMENT, content.textSegment().text());
         sources.put(contentObject);
       }
-      attributes.put(MuleChainConstants.SOURCES, sources);
+      jsonObject.put(MuleChainConstants.SOURCES, sources);
 
       return createLLMResponse(jsonObject.toString(), results, attributes);
     } catch (Exception e) {
