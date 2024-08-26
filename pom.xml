@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mule.mulechain</groupId>
 	<artifactId>mulechain-ai-connector</artifactId>
-	<version>0.2.26-SNAPSHOT</version>
+	<version>0.2.28-SNAPSHOT</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleSoft AI Chain Connector - Mule 4</name>
 
@@ -248,4 +248,16 @@
 			<url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>
 		</repository>
 	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>mulesoft-releases</id>
+			<name>mulesoft release repository</name>
+			<layout>default</layout>
+			<url>https://repository.mulesoft.org/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
