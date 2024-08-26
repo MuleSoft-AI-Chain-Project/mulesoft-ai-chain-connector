@@ -7,6 +7,7 @@ import org.mule.extension.mulechain.api.metadata.TokenUsage;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +22,7 @@ public final class ResponseHelper {
 
   public static Result<InputStream, LLMResponseAttributes> createLLMResponse(String response,
                                                                              dev.langchain4j.service.Result<?> result,
-                                                                             Map<String, Object> responseAttributes) {
+                                                                             Map<String, String> responseAttributes) {
     TokenUsage tokenUsage = result != null ? new TokenUsage(result.tokenUsage().inputTokenCount(),
                                                             result.tokenUsage().outputTokenCount(),
                                                             result.tokenUsage().totalTokenCount())
@@ -31,7 +32,7 @@ public final class ResponseHelper {
 
   public static Result<InputStream, LLMResponseAttributes> createLLMResponse(String response,
                                                                              Response<?> result,
-                                                                             Map<String, Object> responseAttributes) {
+                                                                             Map<String, String> responseAttributes) {
     TokenUsage tokenUsage = result != null ? new TokenUsage(result.tokenUsage().inputTokenCount(),
                                                             result.tokenUsage().outputTokenCount(),
                                                             result.tokenUsage().totalTokenCount())
@@ -41,9 +42,9 @@ public final class ResponseHelper {
 
   public static Result<InputStream, LLMResponseAttributes> createLLMResponse(String response,
                                                                              TokenUsage tokenUsage,
-                                                                             Map<String, Object> responseAttributes) {
+                                                                             Map<String, String> responseAttributes) {
     return Result.<InputStream, LLMResponseAttributes>builder()
-        .attributes(new LLMResponseAttributes(tokenUsage, (HashMap<String, Object>) responseAttributes))
+        .attributes(new LLMResponseAttributes(tokenUsage, (HashMap<String, String>) responseAttributes))
         .attributesMediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA)
         .output(toInputStream(response, StandardCharsets.UTF_8))
         .mediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON)
@@ -52,10 +53,10 @@ public final class ResponseHelper {
 
   public static Result<InputStream, ScannedDocResponseAttributes> createLLMResponse(String response,
                                                                                     List<ScannedDocResponseAttributes.DocResponseAttribute> docResponseAttributes,
-                                                                                    Map<String, Object> responseAttributes) {
+                                                                                    Map<String, String> responseAttributes) {
     return Result.<InputStream, ScannedDocResponseAttributes>builder()
         .attributes(new ScannedDocResponseAttributes((ArrayList<ScannedDocResponseAttributes.DocResponseAttribute>) docResponseAttributes,
-                                                     (HashMap<String, Object>) responseAttributes))
+                                                     (HashMap<String, String>) responseAttributes))
         .attributesMediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA)
         .output(toInputStream(response, StandardCharsets.UTF_8))
         .mediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON)

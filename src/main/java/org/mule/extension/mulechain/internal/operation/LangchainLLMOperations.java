@@ -64,7 +64,7 @@ public class LangchainLLMOperations {
       Result<String> answer = assistant.chat(prompt);
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-      return createLLMResponse(jsonObject.toString(), answer, null);
+      return createLLMResponse(jsonObject.toString(), answer, new HashMap<>());
     } catch (Exception e) {
       throw new ModuleException("Unable to respond with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
@@ -107,7 +107,7 @@ public class LangchainLLMOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-      return createLLMResponse(jsonObject.toString(), answer, null);
+      return createLLMResponse(jsonObject.toString(), answer, new HashMap<>());
     } catch (Exception e) {
       throw new ModuleException("Unable to reply with the correct prompt template", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
@@ -155,8 +155,8 @@ public class LangchainLLMOperations {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, sentiment.content());
 
-      Map<String, Object> attributes = new HashMap<>();
-      attributes.put(MuleChainConstants.IS_POSITIVE, positive);
+      Map<String, String> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.IS_POSITIVE, String.valueOf(positive));
 
       return createLLMResponse(jsonObject.toString(), sentiment, attributes);
     } catch (Exception e) {
