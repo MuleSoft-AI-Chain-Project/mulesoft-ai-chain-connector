@@ -6,21 +6,22 @@ import java.util.HashMap;
 
 public class ScannedDocResponseAttributes implements Serializable {
 
-  private final ArrayList<DocResponseAttribute> docResponseAttribute;
+  private final ArrayList<DocResponseAttribute> scannedDocAttributes;
 
-  private final HashMap<String, Object> attributes;
+  private final HashMap<String, Object> additionalAttributes;
 
-  public ScannedDocResponseAttributes(ArrayList<DocResponseAttribute> docResponseAttribute, HashMap<String, Object> attributes) {
-    this.docResponseAttribute = docResponseAttribute;
-    this.attributes = attributes;
+  public ScannedDocResponseAttributes(ArrayList<DocResponseAttribute> scannedDocAttributes,
+                                      HashMap<String, Object> additionalAttributes) {
+    this.scannedDocAttributes = scannedDocAttributes;
+    this.additionalAttributes = additionalAttributes;
   }
 
-  public HashMap<String, Object> getAttributes() {
-    return attributes;
+  public HashMap<String, Object> getAdditionalAttributes() {
+    return additionalAttributes;
   }
 
-  public ArrayList<DocResponseAttribute> getDocResponseAttribute() {
-    return docResponseAttribute;
+  public ArrayList<DocResponseAttribute> getScannedDocAttributes() {
+    return scannedDocAttributes;
   }
 
   public static class DocResponseAttribute implements Serializable {
