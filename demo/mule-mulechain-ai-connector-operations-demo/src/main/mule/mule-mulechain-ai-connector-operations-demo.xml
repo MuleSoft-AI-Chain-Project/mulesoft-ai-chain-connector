@@ -48,11 +48,11 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	</flow>
 	<flow name="EmbeddingAddFile" doc:id="074f8a86-b931-477e-b3cc-3741a63a1822" >
 		<http:listener doc:name="Listener" doc:id="d1d00ff4-7c9d-4548-92ca-8a0fa50b3124" config-ref="HTTP_Listener_config" path="/embeddingAdd" />
-		<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName='#["embedding.store"]' contextPath="#[payload.filePath]" fileType="#[payload.fileType]"/>
+		<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName='#["embedding.store"]' contextPath="#[payload.filePath]" fileType="#[payload.fileType]" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
 	</flow>
 	<flow name="EmbeddingAddFolder" doc:id="b84bd92d-eea3-4691-bd6a-17c03d932789" >
 		<http:listener doc:name="Listener" doc:id="88456faf-719b-42fa-bd1e-8716c0ccf94c" config-ref="HTTP_Listener_config" path="/embeddingAddFolder" />
-		<ms-aichain:embedding-add-folder-to-store doc:name="Embedding add folder to store" doc:id="c113688a-3f1e-44d6-8b5c-a60a65abfdea" storeName='#["embedding.store"]' contextPath="#[payload.folderPath]"/>
+		<ms-aichain:embedding-add-folder-to-store doc:name="Embedding add folder to store" doc:id="c113688a-3f1e-44d6-8b5c-a60a65abfdea" storeName='#["embedding.store"]' contextPath="#[payload.folderPath]" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
 	</flow>
 	<flow name="EmbeddingQueryStore" doc:id="4dc447bb-2257-42c1-80e3-6f7c4d507737" >
 		<http:listener doc:name="Listener" doc:id="e16e5d95-c2d8-4778-99dc-da74ae55e6e1" config-ref="HTTP_Listener_config" path="/queryStore" />

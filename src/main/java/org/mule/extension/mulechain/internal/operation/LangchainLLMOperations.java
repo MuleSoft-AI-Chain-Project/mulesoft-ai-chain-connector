@@ -5,22 +5,22 @@ package org.mule.extension.mulechain.internal.operation;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 
-import static org.apache.commons.io.IOUtils.toInputStream;
+import static org.mule.extension.mulechain.internal.helpers.ResponseHelper.createLLMResponse;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONObject;
+import org.mule.extension.mulechain.api.metadata.LLMResponseAttributes;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
-import org.mule.extension.mulechain.internal.util.JsonUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -46,40 +46,48 @@ public class LangchainLLMOperations {
   }
 
   /**
-   * Implements a simple Chat agent
+   * Implements a simple Chat agent to enable chat with the LLM
+   * @param configuration       Refers to the configuration object
+   * @param prompt              User defined prompt query
+   * @return                    Returns the corresponding response as returned by the LLM
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("CHAT-answer-prompt")
   @Throws(AiServiceErrorTypeProvider.class)
-  public InputStream answerPromptByModelName(@Config LangchainLLMConfiguration configuration,
-                                             @Content String prompt) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> answerPromptByModelName(@Config LangchainLLMConfiguration configuration,
+                                                                                                                             @Content String prompt) {
     // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
-
     try {
       ChatLanguageModel model = configuration.getModel();
       Assistant assistant = AiServices.create(Assistant.class, model);
       Result<String> answer = assistant.chat(prompt);
-
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
-
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      return createLLMResponse(jsonObject.toString(), answer, null);
     } catch (Exception e) {
       throw new ModuleException("Unable to respond with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
   }
 
   /**
-   * Helps in defining an AI Agent with a prompt template
+   * Helps in defining an AI Agent configured with a prompt template
+   *
+   * @param configuration       Refers to the configuration object
+   * @param dataset             Refers to the user query to be acted upon
+   * @param template            Refers to sample template used by LLM to respond adequately to the user queries
+   * @param instructions        This provides the LLM on how to understand and respond to the user queries
+   * @return                    Returns the corresponding response as returned by the LLM
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("AGENT-define-prompt-template")
   @Throws(AiServiceErrorTypeProvider.class)
-  public InputStream definePromptTemplate(@Config LangchainLLMConfiguration configuration,
-                                          @Content(primary = true) String dataset,
-                                          @Content String template,
-                                          @Content String instructions) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> definePromptTemplate(@Config LangchainLLMConfiguration configuration,
+                                                                                                                          @Content(
+                                                                                                                              primary = true) String dataset,
+                                                                                                                          @Content String template,
+                                                                                                                          @Content String instructions) {
 
     try {
       ChatLanguageModel model = configuration.getModel();
@@ -99,16 +107,14 @@ public class LangchainLLMOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
-      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(answer));
-
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      return createLLMResponse(jsonObject.toString(), answer, null);
     } catch (Exception e) {
       throw new ModuleException("Unable to reply with the correct prompt template", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
   }
 
   /**
-   * Supporting ENUM and Interface for Sentimetns
+   * Supporting ENUM and Interface for Sentiments
    */
   enum Sentiment {
     POSITIVE, NEUTRAL, NEGATIVE;
@@ -124,19 +130,22 @@ public class LangchainLLMOperations {
   }
 
   /**
-   * Example of a sentiment analyzer, which accepts text as input.
+   * Analyzes the sentiment of the user data.
+   *
+   * @param configuration         Refers to the configuration object
+   * @param data                  Refers to the user input which needs to be analyzed
+   * @return                      Returns the response belonging to sentiment out of POSITIVE, NEUTRAL & NEGATIVE
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("SENTIMENT-analyze")
   @Throws(AiServiceErrorTypeProvider.class)
-  public InputStream extractSentiments(@Config LangchainLLMConfiguration configuration,
-                                       @Content String data) {
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> extractSentiments(@Config LangchainLLMConfiguration configuration,
+                                                                                                                       @Content String data) {
 
     try {
       ChatLanguageModel model = configuration.getModel();
-
       SentimentAnalyzer sentimentAnalyzer = AiServices.create(SentimentAnalyzer.class, model);
-
       Result<Sentiment> sentiment = sentimentAnalyzer.analyzeSentimentOf(data);
       LOGGER.info("Analyzed sentiment: {}", sentiment); // POSITIVE
 
@@ -144,11 +153,12 @@ public class LangchainLLMOperations {
       LOGGER.info("Is sentiment positive: {}", positive); // false
 
       JSONObject jsonObject = new JSONObject();
-      jsonObject.put(MuleChainConstants.SENTIMENT, sentiment.content());
-      jsonObject.put(MuleChainConstants.IS_POSITIVE, positive);
-      jsonObject.put(MuleChainConstants.TOKEN_USAGE, JsonUtils.getTokenUsage(sentiment));
+      jsonObject.put(MuleChainConstants.RESPONSE, sentiment.content());
 
-      return toInputStream(jsonObject.toString(), StandardCharsets.UTF_8);
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.IS_POSITIVE, positive);
+
+      return createLLMResponse(jsonObject.toString(), sentiment, attributes);
     } catch (Exception e) {
       throw new ModuleException("Unable to provide the correct sentiments", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }

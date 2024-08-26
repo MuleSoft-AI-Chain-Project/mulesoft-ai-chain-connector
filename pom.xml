@@ -7,7 +7,7 @@
 	<artifactId>mulechain-ai-connector</artifactId>
 	<version>0.2.26-SNAPSHOT</version>
 	<packaging>mule-extension</packaging>
-	<name>MuleChain</name>
+	<name>MuleSoft AI Chain Connector - Mule 4</name>
 
 	<parent>
 		<groupId>org.mule.extensions</groupId>
@@ -240,16 +240,6 @@
 			<version>1.2.1</version>
 			<scope>test</scope>
 		</dependency>
-		<!--<dependency>
-			<groupId>dev.langchain4j</groupId>
-			<artifactId>langchain4j-document-parser-apache-pdfbox</artifactId>
-			<version>0.31.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>3.0.2</version>
-		</dependency>-->
 	</dependencies>
 	<repositories>
 		<repository>
@@ -257,17 +247,5 @@
 			<name>Nexus Public Releases</name>
 			<url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>
 		</repository>
-
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>mulesoft-releases</id>
-			<name>mulesoft release repository</name>
-			<layout>default</layout>
-			<url>https://repository.mulesoft.org/releases/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
 </project>

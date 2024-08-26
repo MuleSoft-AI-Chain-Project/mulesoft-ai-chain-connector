@@ -28,7 +28,7 @@ payload.status must contain("created")]]]></munit-tools:that>
 			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
 		</munit:behavior>
 		<munit:execution>
-			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="pdf"/>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
 		</munit:execution>
 		<munit:validation>
 			<munit-tools:assert doc:name="Assert payload" doc:id="e2aad1f1-8fe4-4133-b812-7a947fa9a8f3" message="Unable to embed the file into the store">
