@@ -9,11 +9,7 @@
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
 	  http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd">
 	<munit:config name="langchain-llm-operation-testing-suite.xml" />
-	<ms-aichain:config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="ms-aichain AI Llm configuration"
-										doc:id="74b85066-1569-4f10-a06b-e49e854eeef2"
-										filePath='${app.home}/envVars.json'
-										modelName="gpt-3.5-turbo"
-										temperature="0.1"/>
+
 	<munit:test name="chat-answer-prompt-test" doc:id="772d135a-26b0-43d1-8acf-7000815da82f" >
 		<munit:execution>
 			<munit:set-event doc:name="Set Event" doc:id="ee8ce128-b7a9-4b57-ab9d-8a0daee2ddb9" >
@@ -49,7 +45,6 @@
 			<munit-tools:assert-that doc:name="Assert that" doc:id="72e5d1e2-148f-4873-b978-bb4772c07124" expression="#[MunitTools::containsString('POSITIVE')]" is="#[MunitTools::notNullValue()]" message="Output response is not matching"/>
 		</munit:validation>
 	</munit:test>
-
 
 	<munit:test name="agent-define-prompt-template-test" doc:id="3d111d5d-2ce9-464d-b4b2-114bac36b2e4" >
 		<munit:behavior >
