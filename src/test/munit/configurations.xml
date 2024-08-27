@@ -13,4 +13,9 @@
                        filePath='${app.home}/envVars.json'
                        modelName="gpt-3.5-turbo"
                        temperature="0.1"/>
+    <ms-aichain:config name="OPENAIGPT4" llmType="OPENAI" configType="Configuration Json" doc:name="ms-aichain AI Llm configuration"
+                       doc:id="84b85066-2369-4f10-a06b-e49e854eeef1"
+                       filePath='${app.home}/envVars.json'
+                       modelName="gpt-4o"
+                       temperature="0.1"/>
 </mule>
