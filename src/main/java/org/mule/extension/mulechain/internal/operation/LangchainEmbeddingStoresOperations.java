@@ -18,7 +18,6 @@ import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import static org.mapdb.Serializer.STRING;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -88,7 +87,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is a container for operations, every public method in this class will be taken as an extension operation.
+ * This class is a container for embedding related operations, every public method in this class will be taken as an extension operation.
  */
 public class LangchainEmbeddingStoresOperations {
 
@@ -213,9 +212,14 @@ public class LangchainEmbeddingStoresOperations {
   }
 
 
-
   /**
-   * Implements a chat memory for a defined LLM as an AI Agent. The memoryName is allows the multi-channel / profile design.
+   * Implements a chat memory for a defined LLM as an AI Agent. The memoryName allows the multichannel / profile design.
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt
+   * @param memoryName              Name of the memory to be fetched for further processing by the LLMs
+   * @param dbFilePath              Location of the file containing the memory
+   * @param maxMessages             Max messages to be analyzed for that memory.
+   * @return                        Returns the response as sent by the LLM
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("CHAT-answer-prompt-with-memory")
@@ -290,9 +294,13 @@ public class LangchainEmbeddingStoresOperations {
     }
   }
 
-
   /**
-   * (Legacy) Usage of tools by a defined AI Agent. Provide a list of tools (APIs) with all required informations (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
+   * (Legacy) Usage of tools by a defined AI Agent.<br>
+   * Provide a list of tools (APIs) with all required information (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt or query
+   * @param toolConfig              Contains the configuration required by the LLM to enable calling tools
+   * @return                        Returns the response while considering tools configuration
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("TOOLS-use-ai-service-legacy")
@@ -400,9 +408,10 @@ public class LangchainEmbeddingStoresOperations {
   ////////////////////////////////////////////
 
 
-
   /**
    * Create a new embedding store (in-memory), which is exported to the defined storeName (full path)
+   * @param storeName           Name of the embedding store
+   * @return                    Returns the status of creation of the store.
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-new-store")
@@ -428,9 +437,14 @@ public class LangchainEmbeddingStoresOperations {
   }
 
 
-
   /**
-   * Add document of type text, pdf and url to embedding store (in-memory), which is exported to the defined storeName (full path)
+   * Add document of type text, any and url to embedding store (in-memory), which is exported to the defined storeName (full path)
+   * @param storeName               Name of the embedding store
+   * @param contextPath             Refers to the location of the file to be processed
+   * @param maxSegmentSizeInChars   Max allowed size of continuous sequence of characters while embedding
+   * @param maxOverlapSizeInChars   Max size of overlapping characters allowed while embedding
+   * @param fileType                Refers to the type of the file (any, text, url)
+   * @return                        Returns the status of the embedding operation
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-document-to-store")
@@ -478,6 +492,12 @@ public class LangchainEmbeddingStoresOperations {
 
   /**
    * Query information from embedding store (in-Memory), which is imported from the storeName (full path)
+   * @param storeName         Name of the embedding store
+   * @param question          Refers to the user prompt or query
+   * @param maxResults        Max results to be retrieved from the store
+   * @param minScore          Filters the response with this minScore
+   * @param getLatest         Determines whether the store needs to be newly created or not
+   * @return                  Returns the relevant embeddings with the attached sources
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-query-from-store")
@@ -548,6 +568,11 @@ public class LangchainEmbeddingStoresOperations {
 
   /**
    * Reads information via prompt from embedding store (in-Memory), which is imported from the storeName (full path)
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt or query
+   * @param storeName               Name of the store to be queried
+   * @param getLatest               Determines whether the store needs to be newly created or not
+   * @return                        Returns the embeddings output by the LLM along with the sources
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
@@ -618,6 +643,11 @@ public class LangchainEmbeddingStoresOperations {
 
   /**
    * Reads information via prompt from embedding store (in-Memory), which is imported from the storeName (full path)
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt or query
+   * @param storeName               Name of the store to be queried
+   * @param getLatest               Determines whether the store needs to be newly created or not
+   * @return                        Returns the embeddings output by the LLM along with the sources
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
@@ -662,8 +692,13 @@ public class LangchainEmbeddingStoresOperations {
 
 
   /**
-  * (AI Services) Usage of tools by a defined AI Agent. Provide a list of tools (APIs) with all required informations (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
-  */
+   * (AI Services) Usage of tools by a defined AI Agent.<br>
+   * Provide a list of tools (APIs) with all required information (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt or query
+   * @param toolConfig              Contains the configuration required by the LLM to enable calling tools
+   * @return                        Returns the response while considering tools configuration
+   */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("TOOLS-use-ai-service")
   @Throws(EmbeddingErrorTypeProvider.class)
@@ -728,8 +763,14 @@ public class LangchainEmbeddingStoresOperations {
 
 
   /**
-  * Add document of type text, pdf and url to embedding store (in-memory), which is exported to the defined storeName (full path)
-  */
+   * Add document of type text, any and url to embedding store (in-memory), which is exported to the defined storeName (full path)
+   * @param storeName                 Name of the embedding store
+   * @param contextPath               Refers to the location of the folder to be processed
+   * @param maxSegmentSizeInChars     Max allowed size of continuous sequence of characters while embedding
+   * @param maxOverlapSizeInChars     Max size of overlapping characters allowed while embedding
+   * @param fileType                  Refers to the type of the file (any, text) - url is not supported
+   * @return                          Returns the status of the embedding operation
+   */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-folder-to-store")
   @Throws(EmbeddingErrorTypeProvider.class)

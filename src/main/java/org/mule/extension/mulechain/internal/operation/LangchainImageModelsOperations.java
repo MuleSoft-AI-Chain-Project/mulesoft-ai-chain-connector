@@ -59,14 +59,19 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 
 
 /**
- * This class is a container for operations, every public method in this class will be taken as an extension operation.
+ * This class is a container for Image related operations.Every public method in this class will be taken as an extension operation.
  */
 public class LangchainImageModelsOperations {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LangchainImageModelsOperations.class);
 
   /**
-   * Reads an image from a URL.
+   * Reads an image from a URL and provides the responses for the user prompts.
+   *
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt
+   * @param contextURL              Refers to the image URL to be analyzed
+   * @return                        Refers to the response returned by the LLM
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-read")
@@ -98,6 +103,9 @@ public class LangchainImageModelsOperations {
 
   /**
    * Generates an image based on the prompt in data
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt
+   * @return                        Returns the image URL link in the response
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-generate")
@@ -130,7 +138,11 @@ public class LangchainImageModelsOperations {
   }
 
   /**
-   * Reads a scanned document.
+   * Reads scanned documents and converts to response as prompted by the user.
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt
+   * @param filePath                Path to the file to be analyzed
+   * @return                        Returns the list of analyzed pages of the document
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("IMAGE-read-scanned-documents")

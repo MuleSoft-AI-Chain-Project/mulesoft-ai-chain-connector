@@ -7,7 +7,6 @@ import org.mule.extension.mulechain.api.metadata.TokenUsage;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
