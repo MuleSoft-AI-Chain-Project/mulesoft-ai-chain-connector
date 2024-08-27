@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ms-aichain="http://www.mulesoft.org/schema/mule/ms-aichain"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+	  http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd">
+    <ms-aichain:config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="ms-aichain AI Llm configuration"
+                       doc:id="74b85066-1569-4f10-a06b-e49e854eeef2"
+                       filePath='${app.home}/envVars.json'
+                       modelName="gpt-3.5-turbo"
+                       temperature="0.1"/>
+    <ms-aichain:config name="OPENAIGPT4" llmType="OPENAI" configType="Configuration Json" doc:name="ms-aichain AI Llm configuration"
+                       doc:id="84b85066-2369-4f10-a06b-e49e854eeef1"
+                       filePath='${app.home}/envVars.json'
+                       modelName="gpt-4o"
+                       temperature="0.1"/>
+</mule>
