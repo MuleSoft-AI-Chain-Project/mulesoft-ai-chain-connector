@@ -9,7 +9,7 @@
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
 	  http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd">
 	<munit:config name="langchain-embedding-operation-testing-suite.xml" />
-	<munit:test name="EmbeddingNewStore-test" doc:id="b794e6e8-779e-494a-9f95-d461103b7bbd" >
+	<munit:test name="embedding-new-store-test" doc:id="b794e6e8-779e-494a-9f95-d461103b7bbd" >
 		<munit:execution>
 			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
 		</munit:execution>
@@ -23,7 +23,7 @@ payload.status must contain("created")]]]></munit-tools:that>
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="EmbeddingAddFile-test" doc:id="3fea6933-396d-4a2b-813e-ae9248021548" >
+	<munit:test name="embedding-add-file-test" doc:id="3fea6933-396d-4a2b-813e-ae9248021548" >
 		<munit:behavior>
 			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
 		</munit:behavior>
@@ -40,7 +40,7 @@ payload.status must contain("updated")]]]></munit-tools:that>
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="EmbeddingAddFolder-test" doc:id="b1120c8d-2c9e-4a0f-9a24-1645c2367992" >
+	<munit:test name="embedding-add-folder-test" doc:id="b1120c8d-2c9e-4a0f-9a24-1645c2367992" >
 		<munit:behavior >
 			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
 		</munit:behavior>
@@ -57,7 +57,7 @@ payload.status must equalTo("updated")]]]></munit-tools:that>
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="EmbeddingQueryStore-test" doc:id="b3c6a483-b789-425b-a139-878d76208383" >
+	<munit:test name="embedding-query-store-test" doc:id="b3c6a483-b789-425b-a139-878d76208383" >
 		<munit:behavior >
 			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
 			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
@@ -79,7 +79,7 @@ payload.response must contain("reactive programming")]]]></munit-tools:that>
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="EmbeddingGetInfo-test" doc:id="623bfe65-ab6f-44c1-8482-bbe5f5562801" >
+	<munit:test name="embedding-get-info-test" doc:id="623bfe65-ab6f-44c1-8482-bbe5f5562801" >
 		<munit:behavior >
 			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
 			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
@@ -101,7 +101,7 @@ payload.response must contain("reactive programming")]]]></munit-tools:that>
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="EmbeddingGetInfoLegacy-test" doc:id="ad92562c-29dd-4989-a474-13aaca9e404b" >
+	<munit:test name="embedding-get-info-legacy-test" doc:id="ad92562c-29dd-4989-a474-13aaca9e404b" >
 		<munit:behavior >
 			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
 			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
@@ -123,7 +123,7 @@ payload.response must contain("reactive programming")]]]></munit-tools:that>
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="ToolsAIService-test" doc:id="69c1e915-63fb-4568-b0b4-464886a7dd07" >
+	<munit:test name="tools-ai-service-test" doc:id="69c1e915-63fb-4568-b0b4-464886a7dd07" >
 		<munit:execution >
 			<ms-aichain:tools-use-ai-service doc:name="Tools use ai service" doc:id="e7a3fcc4-653e-45c8-8f95-7b22ba9e4a63" config-ref="OPENAIGPT4" toolConfig="${app.home}/tools.config.json">
 				<ms-aichain:data>
@@ -141,7 +141,7 @@ attributes.toolsUsed must equalTo(true)]]]></munit-tools:that>
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="ToolsAIService-legacy-test" doc:id="f1a34fb7-b252-4f6f-a6be-f68a7644bc9b" >
+	<munit:test name="tools-ai-service-legacy-test" doc:id="f1a34fb7-b252-4f6f-a6be-f68a7644bc9b" >
 		<munit:execution >
 			<ms-aichain:tools-use-ai-service-legacy doc:name="Tools use ai service legacy" doc:id="51aa98dc-0ad2-42ad-9fc0-0883bdb766a4" config-ref="OPENAIGPT4" toolConfig="${app.home}/tools.config.json">
 				<ms-aichain:data>
@@ -159,7 +159,7 @@ attributes.toolsUsed must equalTo(true)]]]></munit-tools:that>
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="RAG-test" doc:id="36e4172f-0a2c-4c2e-9546-8f4f30c6cc93" >
+	<munit:test name="rag-test" doc:id="36e4172f-0a2c-4c2e-9546-8f4f30c6cc93" >
 		<munit:execution >
 			<ms-aichain:rag-load-document doc:name="Rag load document" doc:id="66b215ae-fab5-4da9-ac91-ebe1c60d6a7b" config-ref="OPENAI" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any">
 				<ms-aichain:data>
@@ -177,7 +177,7 @@ payload.response must contain("reactive programming")]]]></munit-tools:that>
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="ChatAnswerPromptWithMemory-test" doc:id="2a57db6b-92c2-45fe-a93f-8e20d0cfedf8" >
+	<munit:test name="chat-answer-prompt-with-memory-test" doc:id="2a57db6b-92c2-45fe-a93f-8e20d0cfedf8" >
 		<munit:behavior >
 			<ms-aichain:chat-answer-prompt-with-memory doc:name="Chat answer prompt with memory" doc:id="d012af47-a41d-46aa-8476-39e1a2f48d92" config-ref="OPENAI" memoryName="mule" dbFilePath="target/memory-test-chat-off.db" maxMessages="10">
 				<ms-aichain:data>My name is Mulechain</ms-aichain:data>
