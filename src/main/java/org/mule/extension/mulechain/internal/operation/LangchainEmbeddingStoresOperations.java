@@ -376,6 +376,11 @@ public class LangchainEmbeddingStoresOperations {
     String chat(String userMessage);
   }
 
+  interface AssistantR {
+
+    Result<String> chat(String userMessage);
+  }
+
 
 
   //************ IMPORTANT ******************//
@@ -690,6 +695,16 @@ public class LangchainEmbeddingStoresOperations {
     String chat(String userMessage);
   }
 
+  interface AssistantEmbeddingR {
+
+    Result<String> chat(String userMessage);
+  }
+
+  interface AssistantEmbeddingChat {
+
+    Result<String> chat(String userMessage);
+  }
+
 
   /**
    * (AI Services) Usage of tools by a defined AI Agent.<br>
@@ -703,9 +718,9 @@ public class LangchainEmbeddingStoresOperations {
   @Alias("TOOLS-use-ai-service")
   @Throws(EmbeddingErrorTypeProvider.class)
   @OutputJsonType(schema = "api/response/Response.json")
-  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> useAIServiceTools(@Config LangchainLLMConfiguration configuration,
-                                                                                                                     @org.mule.runtime.extension.api.annotation.param.Content String data,
-                                                                                                                     String toolConfig) {
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> useAIServiceTools(@Config LangchainLLMConfiguration configuration,
+                                                                                                                       @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                       String toolConfig) {
     try {
       EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
@@ -721,16 +736,22 @@ public class LangchainEmbeddingStoresOperations {
       ChatLanguageModel model = configuration.getModel();
       ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
 
-      AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
+      AssistantEmbeddingR assistant = AiServices.builder(AssistantEmbeddingR.class)
           .chatLanguageModel(model)
           .contentRetriever(contentRetriever)
           .build();
 
-      String intermediateAnswer = assistant.chat(data);
-      String response = model.generate(data);
-      List<String> findURLs = extractUrls(intermediateAnswer);
-      boolean toolsUsed = false;
 
+      AssistantEmbeddingChat assistantChat = AiServices.builder(AssistantEmbeddingChat.class)
+          .chatLanguageModel(model)
+          .build();
+
+      //String intermediateAnswer = assistant.chat(data);
+      dev.langchain4j.service.Result<String> intermediateAnswer = assistant.chat(data);
+      //String response = model.generate(data);
+      Result<String> response = assistantChat.chat(data);
+      List<String> findURLs = extractUrls(intermediateAnswer.content());
+      boolean toolsUsed = false;
       if (findURLs != null) {
 
         toolsUsed = true;
@@ -738,23 +759,27 @@ public class LangchainEmbeddingStoresOperations {
         GenericRestApiTool restApiTool = new GenericRestApiTool(findURLs.get(0), "API Call", "Execute GET or POST Requests");
 
         // Build the assistant with the custom tool
-        AssistantC assistantC = AiServices.builder(AssistantC.class)
+        AssistantR assistantC = AiServices.builder(AssistantR.class)
             .chatLanguageModel(model)
             .tools(restApiTool)
             //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
             .build();
         // Use the assistant to make a query
-        response = assistantC.chat(intermediateAnswer);
-        LOGGER.info("Response: {}", response);
+        //response = assistantC.chat(intermediateAnswer.content());
+        response = assistantC.chat(intermediateAnswer.content());
+        LOGGER.info("Response: {}", response.content());
       }
 
       JSONObject jsonObject = new JSONObject();
-      jsonObject.put(MuleChainConstants.RESPONSE, response);
 
-      Map<String, Object> attributes = new HashMap<>();
-      attributes.put(MuleChainConstants.TOOLS_USED, toolsUsed);
+      jsonObject.put(MuleChainConstants.RESPONSE, response.content());
 
-      return createLLMResponse(jsonObject.toString(), attributes);
+
+      Map<String, String> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.TOOLS_USED, String.valueOf(toolsUsed));
+
+      //return createLLMResponse(jsonObject.toString(), attributes);
+      return createLLMResponse(jsonObject.toString(), response, attributes);
     } catch (Exception e) {
       throw new ModuleException("Error occurred while executing AI Tools with the provided config",
                                 MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
