@@ -80,9 +80,9 @@ payload.pages[0].response must contain("The Slerexe Company Limited")]]]></munit
         </munit:validation>
     </munit:test>
 
-    <munit:test name="read-scanned-doc-failure-test" description="Failure while reading the doc file" expectedErrorType="MS-AICHAIN:IMAGE_ANALYSIS_FAILURE">
+    <munit:test name="read-scanned-doc-failure-test" description="Failure while reading the doc file" expectedErrorType="MS-AICHAIN:FILE_HANDLING_FAILURE">
         <munit:execution >
-            <ms-aichain:image-read-scanned-documents doc:name="Image read scanned documents" doc:id="45154a42-ce31-4b34-aadc-dc3ad10fcdc0" config-ref="OPENAIGPT4" filePath="${app.home}/scansmpl.pdf">
+            <ms-aichain:image-read-scanned-documents doc:name="Image read scanned documents" doc:id="45154a42-ce31-4b34-aadc-dc3ad10fcdc0" config-ref="OPENAIGPT4" filePath="${app.home}/scansmp.pdf">
                 <ms-aichain:data>
                     Convert the page to json
                 </ms-aichain:data>
@@ -90,9 +90,9 @@ payload.pages[0].response must contain("The Slerexe Company Limited")]]]></munit
         </munit:execution>
     </munit:test>
 
-    <munit:test name="read-scanned-doc-config-failure-test" description="Failure with incorrect configuration" expectedErrorType="MS-AICHAIN:FILE_HANDLING_FAILURE">
+    <munit:test name="read-scanned-doc-config-failure-test" description="Failure with incorrect configuration" expectedErrorType="MS-AICHAIN:IMAGE_ANALYSIS_FAILURE">
         <munit:execution >
-            <ms-aichain:image-read-scanned-documents doc:name="Image read scanned documents" doc:id="45154a42-ce31-4b34-aadc-dc3ad10fcdc0" config-ref="OPENAI-INCORRECT-MODEL-NAME" filePath="${app.home}/scansmp.pdf">
+            <ms-aichain:image-read-scanned-documents doc:name="Image read scanned documents" doc:id="45154a42-ce31-4b34-aadc-dc3ad10fcdc0" config-ref="OPENAI-INCORRECT-MODEL-NAME" filePath="${app.home}/scansmpl.pdf">
                 <ms-aichain:data>
                     Convert the page to json
                 </ms-aichain:data>

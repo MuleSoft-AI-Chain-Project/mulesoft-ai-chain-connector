@@ -53,9 +53,9 @@ public class GenericRestApiTool implements Tool {
       // Construct the full URL with parameters for GET request
       StringBuilder urlBuilder = new StringBuilder(apiEndpoint);
 
-      LOGGER.info("URL {}", urlBuilder);
-      LOGGER.info("input {}", input);
-      LOGGER.info("Method {}", method);
+      LOGGER.debug("URL {}", urlBuilder);
+      LOGGER.debug("input {}", input);
+      LOGGER.debug("Method {}", method);
       LOGGER.info("payload {}", payload);
       if (method == null) {
         method = "GET";
