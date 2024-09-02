@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ms-aichain="http://www.mulesoft.org/schema/mule/ms-aichain"
+	  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+	  http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd">
+	<munit:config name="langchain-embedding-operation-testing-suite.xml" />
+	<munit:test name="embedding-new-store-test" doc:id="b794e6e8-779e-494a-9f95-d461103b7bbd" >
+		<munit:execution>
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert doc:name="Assert payload" doc:id="66b00019-9817-4ab9-b5bb-6746bcba1d61" message="Unable to create the embedding store">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.status must contain("created")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="embedding-add-file-test" doc:id="3fea6933-396d-4a2b-813e-ae9248021548" >
+		<munit:behavior>
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+		</munit:behavior>
+		<munit:execution>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert doc:name="Assert payload" doc:id="e2aad1f1-8fe4-4133-b812-7a947fa9a8f3" message="Unable to embed the file into the store">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.status must contain("updated")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="embedding-add-folder-test" doc:id="b1120c8d-2c9e-4a0f-9a24-1645c2367992" >
+		<munit:behavior >
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:embedding-add-folder-to-store doc:name="Embedding add folder to store" doc:id="c113688a-3f1e-44d6-8b5c-a60a65abfdea" storeName='target/embedding.store' contextPath="${app.home}/embeddingaddfiletest/" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="c3240de6-41a3-49ae-a24f-21b19f68a2b9" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.status must equalTo("updated")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="embedding-query-store-test" doc:id="b3c6a483-b789-425b-a139-878d76208383" >
+		<munit:behavior >
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:embedding-query-from-store doc:name="Embedding query from store" doc:id="1ee361ea-e62a-4e0f-9c74-0363f8721052" storeName="target/embedding.store" maxResults="3" minScore="0.7" getLatest="true">
+				<ms-aichain:question>
+					What is Mule 4?
+				</ms-aichain:question>
+			</ms-aichain:embedding-query-from-store>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="1005cfc5-c2e1-43a3-b4e6-4938d761d3e0" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.response must contain("reactive programming")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="embedding-get-info-test" doc:id="623bfe65-ab6f-44c1-8482-bbe5f5562801" >
+		<munit:behavior >
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:embedding-get-info-from-store doc:name="Embedding get info from store" doc:id="ae5b31c6-d99d-4ab8-848c-03124785184b" config-ref="OPENAI" storeName='target/embedding.store' getLatest="true">
+				<ms-aichain:data>
+					What is Mule 4?
+				</ms-aichain:data>
+			</ms-aichain:embedding-get-info-from-store>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="685d2a89-1110-48e1-b16c-9cebb1f0c84f" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.response must contain("reactive programming")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="embedding-get-info-legacy-test" doc:id="ad92562c-29dd-4989-a474-13aaca9e404b" >
+		<munit:behavior >
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:embedding-get-info-from-store-legacy doc:name="Embedding get info from store legacy" doc:id="1f9e0410-4357-4ad8-bf17-29112f20e2f6" config-ref="OPENAI" storeName='target/embedding.store'>
+				<ms-aichain:data>
+					What is Mule 4?
+				</ms-aichain:data>
+			</ms-aichain:embedding-get-info-from-store-legacy>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="bb726a69-9898-41f3-a5f2-771e88eefae5" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.response must contain("reactive programming")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="tools-ai-service-test" doc:id="69c1e915-63fb-4568-b0b4-464886a7dd07" >
+		<munit:execution >
+			<ms-aichain:tools-use-ai-service doc:name="Tools use ai service" doc:id="e7a3fcc4-653e-45c8-8f95-7b22ba9e4a63" config-ref="OPENAIGPT4" toolConfig="${app.home}/tools.config.json">
+				<ms-aichain:data>
+					Check Inventory for MULETEST0, dont assume things and invent answers. Answer with the most probable statement.
+				</ms-aichain:data>
+			</ms-aichain:tools-use-ai-service>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="0ba4128f-37f3-4bc9-a8c0-760e58eb14ba" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+attributes.additionalAttributes.toolsUsed must equalTo("true")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="tools-ai-service-legacy-test" doc:id="f1a34fb7-b252-4f6f-a6be-f68a7644bc9b" >
+		<munit:execution >
+			<ms-aichain:tools-use-ai-service-legacy doc:name="Tools use ai service legacy" doc:id="51aa98dc-0ad2-42ad-9fc0-0883bdb766a4" config-ref="OPENAIGPT4" toolConfig="${app.home}/tools.config.json">
+				<ms-aichain:data>
+					Check Inventory for MULETEST0, dont assume things and invent answers. Answer with the most probable statement.
+				</ms-aichain:data>
+			</ms-aichain:tools-use-ai-service-legacy>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert doc:name="Assert payload" doc:id="0ba4128f-37f3-4bc9-a8c0-760e58eb14ba" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+attributes.toolsUsed must equalTo(true)]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="rag-test" doc:id="36e4172f-0a2c-4c2e-9546-8f4f30c6cc93" >
+		<munit:execution >
+			<ms-aichain:rag-load-document doc:name="Rag load document" doc:id="66b215ae-fab5-4da9-ac91-ebe1c60d6a7b" config-ref="OPENAI" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any">
+				<ms-aichain:data>
+					What is mule 4?
+				</ms-aichain:data>
+			</ms-aichain:rag-load-document>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="6f7421e7-5327-45b3-8247-54497e0ccd2e" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.response must contain("reactive programming")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="chat-answer-prompt-with-memory-test" doc:id="2a57db6b-92c2-45fe-a93f-8e20d0cfedf8" >
+		<munit:behavior >
+			<ms-aichain:chat-answer-prompt-with-memory doc:name="Chat answer prompt with memory" doc:id="d012af47-a41d-46aa-8476-39e1a2f48d92" config-ref="OPENAI" memoryName="mule" dbFilePath="target/memory-test-chat-off.db" maxMessages="10">
+				<ms-aichain:data>My name is Mulechain</ms-aichain:data>
+			</ms-aichain:chat-answer-prompt-with-memory>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:chat-answer-prompt-with-memory doc:name="Chat answer prompt with memory" doc:id="d012af47-a41d-46aa-8476-39e1a2f48d92" config-ref="OPENAI" memoryName="mule" dbFilePath="target/memory-test-chat-off.db" maxMessages="10">
+				<ms-aichain:data>What is my name?</ms-aichain:data>
+			</ms-aichain:chat-answer-prompt-with-memory>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert doc:name="Assert payload" doc:id="db650737-776f-4751-9c18-99e58df71570" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload must equalTo({
+  "response": "Your name is Mulechain."
+})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+</mule>

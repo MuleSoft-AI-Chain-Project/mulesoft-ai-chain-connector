@@ -21,8 +21,8 @@ import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
  * This is the main class of an extension, is the entry point from which configurations, connection providers, operations
  * and sources are going to be declared.
  */
-@Xml(prefix = "mulechain")
-@Extension(name = "MuleChain AI", category = Category.CERTIFIED)
+@Xml(prefix = "ms-aichain")
+@Extension(name = "MuleSoft AI Chain", category = Category.CERTIFIED)
 @Configurations({LangchainLLMConfiguration.class})
 @RequiresEnterpriseLicense(allowEvaluationLicense = true)
 @ErrorTypes(MuleChainErrorType.class)

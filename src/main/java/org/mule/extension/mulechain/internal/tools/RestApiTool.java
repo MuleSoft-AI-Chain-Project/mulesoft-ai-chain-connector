@@ -3,7 +3,7 @@
  */
 package org.mule.extension.mulechain.internal.tools;
 
-import dev.langchain4j.agent.tool.*;
+import dev.langchain4j.agent.tool.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,6 @@ import java.lang.annotation.Annotation;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-
 
 public class RestApiTool implements Tool {
 
@@ -45,7 +44,6 @@ public class RestApiTool implements Tool {
     try {
       // Construct the full URL with parameters
       StringBuilder urlBuilder = new StringBuilder(apiEndpoint);
-      //urlBuilder.append(input);
 
       URL url = new URL(urlBuilder.toString());
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -77,14 +75,6 @@ public class RestApiTool implements Tool {
         br.close();
 
         return sb.toString();
-
-        //                Scanner scanner = new Scanner(url.openStream());
-        //                StringBuilder response = new StringBuilder();
-        //                while (scanner.hasNext()) {
-        //                    response.append(scanner.nextLine());
-        //                }
-        //                scanner.close();
-        //                return response.toString();
       } else {
         LOGGER.info("Response Code: {}", responseCode);
         return "Error: Received response code " + responseCode;
@@ -110,6 +100,6 @@ public class RestApiTool implements Tool {
   @Override
   public String[] value() {
     // TODO Auto-generated method stub
-    return null;
+    return new String[] {};
   }
 }

@@ -3,26 +3,38 @@
  */
 package org.mule.extension.mulechain.internal.llm.config;
 
+import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
+import org.mule.extension.mulechain.internal.error.exception.ConfigValidationException;
+
 import java.util.Arrays;
+import java.util.function.Function;
 
 public enum ConfigType {
 
-  ENV_VARIABLE("Environment Variables"), CONFIG_JSON("Configuration Json");
+  ENV_VARIABLE("Environment Variables", configuration -> new EnvConfigExtractor()), CONFIG_JSON("Configuration Json",
+      FileConfigExtractor::new);
 
   private final String value;
 
-  ConfigType(String value) {
+  private final Function<LangchainLLMConfiguration, ConfigExtractor> configExtractorFunction;
+
+  ConfigType(String value, Function<LangchainLLMConfiguration, ConfigExtractor> configExtractorFunction) {
     this.value = value;
+    this.configExtractorFunction = configExtractorFunction;
   }
 
   public static ConfigType fromValue(String value) {
     return Arrays.stream(ConfigType.values())
         .filter(configType -> configType.value.equals(value))
         .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("Unsupported Config Type: " + value));
+        .orElseThrow(() -> new ConfigValidationException("Unsupported Config Type: " + value));
   }
 
   public String getValue() {
     return value;
+  }
+
+  public Function<LangchainLLMConfiguration, ConfigExtractor> getConfigExtractorFunction() {
+    return configExtractorFunction;
   }
 }

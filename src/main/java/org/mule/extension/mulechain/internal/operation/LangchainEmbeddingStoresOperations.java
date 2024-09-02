@@ -14,11 +14,14 @@ import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+
 import static org.mapdb.Serializer.STRING;
-import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.stream.Stream;
 import java.util.concurrent.atomic.AtomicInteger;
 import dev.langchain4j.data.embedding.Embedding;
@@ -28,11 +31,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mule.extension.mulechain.api.metadata.LLMResponseAttributes;
+import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
+import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
+import org.mule.extension.mulechain.internal.error.provider.EmbeddingErrorTypeProvider;
 import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -43,7 +52,6 @@ import dev.langchain4j.service.Result;
 import dev.langchain4j.service.UserMessage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
@@ -68,23 +76,28 @@ import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser
 import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
 import static dev.langchain4j.data.message.ChatMessageDeserializer.messagesFromJson;
 import static dev.langchain4j.data.message.ChatMessageSerializer.messagesToJson;
+import static org.mule.extension.mulechain.internal.helpers.ResponseHelper.createLLMResponse;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is a container for operations, every public method in this class will be taken as an extension operation.
+ * This class is a container for embedding related operations, every public method in this class will be taken as an extension operation.
  */
 public class LangchainEmbeddingStoresOperations {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LangchainEmbeddingStoresOperations.class);
 
-  private EmbeddingModel embeddingModel;
+  private final EmbeddingModel embeddingModel;
 
-  private static InMemoryEmbeddingStore<TextSegment> deserializedStore;
+  private InMemoryEmbeddingStore<TextSegment> deserializedStore;
 
-  private static InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName, boolean getLatest) {
+  private InMemoryEmbeddingStore<TextSegment> getDeserializedStore(String storeName, boolean getLatest) {
     if (deserializedStore == null || getLatest) {
       deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
     }
@@ -96,55 +109,74 @@ public class LangchainEmbeddingStoresOperations {
     this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
   }
 
-  @MediaType(value = ANY, strict = false)
+  /**
+   * Enables the user to query the doc provided in natural language.<br>
+   * The doc will be embedded into in memory vector store.
+   *
+   * @param configuration       Refers to the configuration object
+   * @param data                Defines the query input provided by the user
+   * @param contextPath         Defines the file path which will be embedded
+   * @param fileType            Specifies the type of file. {@link org.mule.extension.mulechain.internal.helpers.FileType} Eg: "any", "text" & "url"
+   * @return                    Returns the output response of the query
+   */
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("RAG-load-document")
-  public String loadDocumentFile(@Config LangchainLLMConfiguration configuration, String data, String contextPath,
-                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> loadDocumentFile(@Config LangchainLLMConfiguration configuration,
+                                                                                                                      @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                      String contextPath,
+                                                                                                                      @ParameterGroup(
+                                                                                                                          name = "Context") FileTypeParameters fileType) {
 
-    EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+    try {
+      LOGGER.debug("RAG Load Document Operation called with data: {}, file: {} & fileType: {}", data, contextPath,
+                   fileType.getFileType());
+      EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-    EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+          .documentSplitter(DocumentSplitters.recursive(1000, 200, new OpenAiTokenizer()))
+          .embeddingModel(embeddingModel)
+          .embeddingStore(embeddingStore)
+          .build();
 
-    EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-        .documentSplitter(DocumentSplitters.recursive(1000, 200, new OpenAiTokenizer()))
-        .embeddingModel(embeddingModel)
-        .embeddingStore(embeddingStore)
-        .build();
+      ingestDocument(fileType, contextPath, ingestor);
 
-    LOGGER.info("RAG loading document with file type: {}", fileType.getFileType());
+      LOGGER.debug("File successfully embedded into the in-memory embedding store");
 
-    // ChatLanguageModel model = null;
-    ingestDocument(fileType, contextPath, ingestor);
-
-    ChatLanguageModel model = configuration.getModel();
+      ChatLanguageModel model = configuration.getModel();
 
 
-    // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
-    // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
-    //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
+      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
 
-    ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
+      ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
 
-    AssistantSources assistant = AiServices.builder(AssistantSources.class)
-        .chatLanguageModel(model)
-        .contentRetriever(contentRetriever)
-        .build();
+      AssistantSources assistant = AiServices.builder(AssistantSources.class)
+          .chatLanguageModel(model)
+          .contentRetriever(contentRetriever)
+          .build();
 
-    Result<String> answer = assistant.chat(data);
-    //    LOGGER.info("Answer: {}", answer);
+      Result<String> answer = assistant.chat(data);
 
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", answer.content());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put("inputCount", answer.tokenUsage().inputTokenCount());
-    tokenUsage.put("outputCount", answer.tokenUsage().outputTokenCount());
-    tokenUsage.put("totalCount", answer.tokenUsage().totalTokenCount());
-    jsonObject.put("tokenUsage", tokenUsage);
-    jsonObject.put("filePath", contextPath);
-    jsonObject.put("fileType", fileType);
-    jsonObject.put("question", data);
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
 
-    return jsonObject.toString();
+      Map<String, String> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.FILE_PATH, contextPath);
+      attributes.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
+      attributes.put(MuleChainConstants.QUESTION, data);
+
+      LOGGER.debug("RAG Load Document Operation completed with response: {}", answer.content());
+
+      return createLLMResponse(jsonObject.toString(), answer, attributes);
+    } catch (ModuleException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ModuleException("Error while loading and retrieving content from the document " + contextPath,
+                                MuleChainErrorType.RAG_FAILURE, e);
+    }
   }
 
   private void ingestDocument(FileTypeParameters fileType, String contextPath, EmbeddingStoreIngestor ingestor) {
@@ -154,7 +186,7 @@ public class LangchainEmbeddingStoresOperations {
         document = loadDocument(contextPath, new TextDocumentParser());
         ingestor.ingest(document);
         break;
-      case PDF:
+      case ANY:
         document = loadDocument(contextPath, new ApacheTikaDocumentParser());
         ingestor.ingest(document);
         break;
@@ -163,7 +195,8 @@ public class LangchainEmbeddingStoresOperations {
         try {
           url = new URL(contextPath);
         } catch (MalformedURLException e) {
-          LOGGER.error("Error while loading the document: " + contextPath, e);
+          throw new ModuleException("Error while loading the document: " + contextPath, MuleChainErrorType.FILE_HANDLING_FAILURE,
+                                    e);
         }
 
         Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
@@ -173,10 +206,9 @@ public class LangchainEmbeddingStoresOperations {
         ingestor.ingest(document);
         break;
       default:
-        throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
+        throw new ModuleException("Unsupported File Type: " + fileType.getFileType(), MuleChainErrorType.FILE_HANDLING_FAILURE);
     }
   }
-
 
   interface AssistantMemory {
 
@@ -184,67 +216,70 @@ public class LangchainEmbeddingStoresOperations {
   }
 
 
-
   /**
-   * Implements a chat memory for a defined LLM as an AI Agent. The memoryName is allows the multi-channel / profile design.
+   * Implements a chat memory for a defined LLM as an AI Agent. The memoryName allows the multichannel / profile design.
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt
+   * @param memoryName              Name of the memory to be fetched for further processing by the LLMs
+   * @param dbFilePath              Location of the file containing the memory
+   * @param maxMessages             Max messages to be analyzed for that memory.
+   * @return                        Returns the response as sent by the LLM
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("CHAT-answer-prompt-with-memory")
-  public String chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration, String data, String memoryName,
-                                         String dbFilePath, int maxMessages) {
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> chatWithPersistentMemory(@Config LangchainLLMConfiguration configuration,
+                                                                                                                              @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                              String memoryName,
+                                                                                                                              String dbFilePath,
+                                                                                                                              int maxMessages) {
 
-    ChatLanguageModel model = configuration.getModel();
+    try {
+      LOGGER.debug(
+                   "Chat Answer Prompt With Memory Operation called with userPrompt: {}, memoryName: {}, dbFilePath: {} & maxMessages: {}",
+                   data, memoryName, dbFilePath, maxMessages);
+      ChatLanguageModel model = configuration.getModel();
+      PersistentChatMemoryStore store = new PersistentChatMemoryStore(dbFilePath);
+      ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
+          .id(memoryName)
+          .maxMessages(maxMessages)
+          .chatMemoryStore(store)
+          .build();
 
-    PersistentChatMemoryStore.initialize(dbFilePath);
+      AssistantMemory assistant = AiServices.builder(AssistantMemory.class)
+          .chatLanguageModel(model)
+          .chatMemoryProvider(chatMemoryProvider)
+          .build();
 
-    PersistentChatMemoryStore store = new PersistentChatMemoryStore();
+      Result<String> response = assistant.chat(memoryName, data);
 
-    ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
-        .id(memoryName)
-        .maxMessages(maxMessages)
-        .chatMemoryStore(store)
-        .build();
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, response.content());
 
+      LOGGER.debug("Chat Answer Prompt With Memory Operation completed with response: {}", response.content());
 
-    AssistantMemory assistant = AiServices.builder(AssistantMemory.class)
-        .chatLanguageModel(model)
-        .chatMemoryProvider(chatMemoryProvider)
-        .build();
+      Map<String, String> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.MEMORY_NAME, memoryName);
+      attributes.put(MuleChainConstants.DB_FILE_PATH, dbFilePath);
+      attributes.put(MuleChainConstants.MAX_MESSAGES, String.valueOf(maxMessages));
 
-    Result<String> response = assistant.chat(memoryName, data);
-
-
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", response.content());
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put("inputCount", response.tokenUsage().inputTokenCount());
-    tokenUsage.put("outputCount", response.tokenUsage().outputTokenCount());
-    tokenUsage.put("totalCount", response.tokenUsage().totalTokenCount());
-    jsonObject.put("tokenUsage", tokenUsage);
-
-    jsonObject.put("memoryName", memoryName);
-    jsonObject.put("dbFilePath", dbFilePath);
-    jsonObject.put("maxMessages", maxMessages);
-
-
-    return jsonObject.toString();
-
+      return createLLMResponse(jsonObject.toString(), response, attributes);
+    } catch (Exception e) {
+      throw new ModuleException("Error while responding with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
+    }
   }
 
   static class PersistentChatMemoryStore implements ChatMemoryStore {
 
-    //private final DB db = DBMaker.fileDB("/Users/amir.khan/Documents/langchain4mule resources/multi-user-chat-memory.db").transactionEnable().fileLockDisable().make();
-    //private final Map<Integer, String> map = db.hashMap("messages", INTEGER, STRING).createOrOpen();
-    private static DB db;
-    //  private static Map<Integer, String> map;
-    private static Map<String, String> map;
+    private final DB db;
+    private final Map<String, String> map;
 
-    public static void initialize(String dbMFilePath) {
+    public PersistentChatMemoryStore(String dbMFilePath) {
       db = DBMaker.fileDB(dbMFilePath)
           .transactionEnable()
           .fileLockDisable()
           .make();
-      //map = db.hashMap("messages", INTEGER, STRING).createOrOpen();
       map = db.hashMap("messages", STRING, STRING).createOrOpen();
     }
 
@@ -268,73 +303,84 @@ public class LangchainEmbeddingStoresOperations {
     }
   }
 
-
   /**
-   * (Legacy) Usage of tools by a defined AI Agent. Provide a list of tools (APIs) with all required informations (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
+   * (Legacy) Usage of tools by a defined AI Agent.<br>
+   * Provide a list of tools (APIs) with all required information (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt or query
+   * @param toolConfig              Contains the configuration required by the LLM to enable calling tools
+   * @return                        Returns the response while considering tools configuration
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("TOOLS-use-ai-service-legacy")
-  public String useTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> useTools(@Config LangchainLLMConfiguration configuration,
+                                                                                                            @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                            String toolConfig) {
 
-    EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+    try {
+      LOGGER.debug("Tools Use Ai Service Legacy Operation called with userPrompt: {}", data);
+      LOGGER.debug("Tools Config: {}", toolConfig);
+      EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-    EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-
-    EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-        .documentSplitter(DocumentSplitters.recursive(30000, 200))
-        .embeddingModel(embeddingModel)
-        .embeddingStore(embeddingStore)
-        .build();
-
-
-    Document document = loadDocument(toolConfig, new TextDocumentParser());
-    ingestor.ingest(document);
-
-
-    ChatLanguageModel model = configuration.getModel();
-
-    // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
-    // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
-    //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
-    ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
-        .chatLanguageModel(model)
-        .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
-        // .chatMemory() // you can override default chat memory
-        // .promptTemplate() // you can override default prompt template
-        .build();
-
-
-    boolean toolsUsed = false;
-    String intermediateAnswer = chain.execute(data);
-    String response = model.generate(data);
-    List<String> findURL = extractUrls(intermediateAnswer);
-    if (findURL != null) {
-
-      toolsUsed = true;
-
-      // Create an instance of the custom tool with parameters
-      GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
-
-      // Build the assistant with the custom tool
-      AssistantC assistant = AiServices.builder(AssistantC.class)
-          .chatLanguageModel(model)
-          .tools(restApiTool)
-          //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+          .documentSplitter(DocumentSplitters.recursive(30000, 200))
+          .embeddingModel(embeddingModel)
+          .embeddingStore(embeddingStore)
           .build();
-      // Use the assistant to make a query
-      response = assistant.chat(intermediateAnswer);
-      LOGGER.info("Response: {}", response);
-      /*  } else{
-        response =  intermediateAnswer; */
+
+      Document document = loadDocument(toolConfig, new TextDocumentParser());
+      ingestor.ingest(document);
+
+      ChatLanguageModel model = configuration.getModel();
+
+      // MIGRATE CHAINS TO AI SERVICES: https://docs.langchain4j.dev/tutorials/ai-services/
+      // and Specifically the RAG section: https://docs.langchain4j.dev/tutorials/ai-services#rag
+      //chains are legacy now, please use AI Services: https://docs.langchain4j.dev/tutorials/ai-services > Update to AI Services
+      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+          .chatLanguageModel(model)
+          .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
+          // .chatMemory() // you can override default chat memory
+          // .promptTemplate() // you can override default prompt template
+          .build();
+
+      String intermediateAnswer = chain.execute(data);
+      LOGGER.debug("Intermediate Answer containing the request URLs: {}", intermediateAnswer);
+      String response = model.generate(data);
+      List<String> findURLs = extractUrls(intermediateAnswer);
+      boolean toolsUsed = false;
+
+      if (findURLs != null) {
+
+        toolsUsed = true;
+
+        // Create an instance of the custom tool with parameters
+        GenericRestApiTool restApiTool = new GenericRestApiTool(findURLs.get(0), "API Call", "Execute GET or POST Requests");
+
+        // Build the assistant with the custom tool
+        AssistantC assistant = AiServices.builder(AssistantC.class)
+            .chatLanguageModel(model)
+            .tools(restApiTool)
+            .build();
+        // Use the assistant to make a query
+        response = assistant.chat(intermediateAnswer);
+        LOGGER.info("Response after Tools Usage: {}", response);
+      }
+
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, response);
+
+      LOGGER.debug("Tools Use Ai Service Legacy Operation completed with response: {}, toolsUsed: {}", response, toolsUsed);
+
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.TOOLS_USED, toolsUsed);
+
+      return createLLMResponse(jsonObject.toString(), attributes);
+    } catch (Exception e) {
+      throw new ModuleException("Error occurred while executing AI Tools with the provided config",
+                                MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
     }
-
-
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", response);
-    jsonObject.put("toolsUsed", toolsUsed);
-
-
-    return jsonObject.toString();
   }
 
 
@@ -343,16 +389,17 @@ public class LangchainEmbeddingStoresOperations {
     String chat(String userMessage);
   }
 
+  interface AssistantR {
+
+    Result<String> chat(String userMessage);
+  }
+
 
 
   //************ IMPORTANT ******************//
 
   // TO DO TASKS SERIALIZATION AND DESERIALIZATION FOR STORE
   // In-memory embedding store can be serialized and deserialized to/from file
-  // String filePath = "/home/me/embedding.store";
-  // embeddingStore.serializeToFile(filePath);
-  // InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(filePath);
-
 
   private static List<String> extractUrls(String input) {
     // Define the URL pattern
@@ -379,246 +426,302 @@ public class LangchainEmbeddingStoresOperations {
   ////////////////////////////////////////////
 
 
-
   /**
    * Create a new embedding store (in-memory), which is exported to the defined storeName (full path)
+   * @param storeName           Name of the embedding store
+   * @return                    Returns the status of creation of the store.
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-new-store")
-  public String createEmbedding(String storeName) {
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/StatusResponse.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> createEmbedding(String storeName) {
+    try {
+      LOGGER.debug("Embedding New Store Operation called with the storeName: {}", storeName);
+      InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-    InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+      embeddingStore.serializeToFile(storeName);
 
-    embeddingStore.serializeToFile(storeName);
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.STATUS, MuleChainConstants.CREATED);
 
-    embeddingStore = null;
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("storeName", storeName);
-    jsonObject.put("status", "created");
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
 
-    return jsonObject.toString();
+      LOGGER.debug("Embedding New Store Operation completed with {} creation", storeName);
+
+      return createLLMResponse(jsonObject.toString(), attributes);
+    } catch (Exception e) {
+      throw new ModuleException("Error while creating new Embedding store: " + storeName,
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
+    }
   }
 
 
-
   /**
-   * Add document of type text, pdf and url to embedding store (in-memory), which is exported to the defined storeName (full path)
+   * Add document of type text, any and url to embedding store (in-memory), which is exported to the defined storeName (full path)
+   * @param storeName               Name of the embedding store
+   * @param contextPath             Refers to the location of the file to be processed
+   * @param maxSegmentSizeInChars   Max allowed size of continuous sequence of characters while embedding
+   * @param maxOverlapSizeInChars   Max size of overlapping characters allowed while embedding
+   * @param fileType                Refers to the type of the file (any, text, url)
+   * @return                        Returns the status of the embedding operation
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-document-to-store")
-  public String addFileEmbedding(String storeName, String contextPath,
-                                 @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/StatusResponse.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> addFileEmbedding(String storeName,
+                                                                                                                    String contextPath,
+                                                                                                                    int maxSegmentSizeInChars,
+                                                                                                                    int maxOverlapSizeInChars,
+                                                                                                                    @ParameterGroup(
+                                                                                                                        name = "Context") FileTypeParameters fileType) {
 
-    //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+    try {
+      LOGGER.debug("Embedding Add Document To Store Operation called with the storeName: {}, filePath: {} & fileType: {}",
+                   storeName, contextPath, fileType.getFileType());
+      InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
+      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+          .documentSplitter(DocumentSplitters.recursive(maxSegmentSizeInChars, maxOverlapSizeInChars))
+          .embeddingModel(this.embeddingModel)
+          .embeddingStore(store)
+          .build();
 
-    InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
-    //EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+      ingestDocument(fileType, contextPath, ingestor);
 
-    EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-        .documentSplitter(DocumentSplitters.recursive(2000, 200))
-        .embeddingModel(this.embeddingModel)
-        .embeddingStore(deserializedStore)
-        .build();
+      store.serializeToFile(storeName);
 
-    //Document document = loadDocument(toPath("story-about-happy-carrot.txt"), new TextDocumentParser());
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.STATUS, MuleChainConstants.UPDATED);
 
-    //Document document = loadDocument(contextFile, new TextDocumentParser());
-    //ingestor.ingest(document);
+      LOGGER.debug("File ({}) successfully ingested into the store: {}", contextPath, storeName);
 
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.FILE_TYPE, fileType.getFileType());
+      attributes.put(MuleChainConstants.FILE_PATH, contextPath);
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
 
-
-    // ChatLanguageModel model = null;
-
-    ingestDocument(fileType, contextPath, ingestor);
-
-    deserializedStore.serializeToFile(storeName);
-    deserializedStore = null;
-
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("fileType", fileType.getFileType());
-    jsonObject.put("filePath", contextPath);
-    jsonObject.put("storeName", storeName);
-    jsonObject.put("status", "updated");
-
-    return jsonObject.toString();
+      return createLLMResponse(jsonObject.toString(), attributes);
+    } catch (ModuleException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ModuleException(String.format("Error while adding document %s to the Embedding store %s",
+                                              contextPath, storeName),
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE,
+                                e);
+    }
   }
 
 
   /**
    * Query information from embedding store (in-Memory), which is imported from the storeName (full path)
+   * @param storeName         Name of the embedding store
+   * @param question          Refers to the user prompt or query
+   * @param maxResults        Max results to be retrieved from the store
+   * @param minScore          Filters the response with this minScore
+   * @param getLatest         Determines whether the store needs to be freshly fetched from the location
+   * @return                  Returns the relevant embeddings with the attached sources
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-query-from-store")
-  public String queryFromEmbedding(String storeName, String question, int maxResults, double minScore, boolean getLatest) {
-    if (minScore == 0) {
-      minScore = 0.7;
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> queryFromEmbedding(String storeName,
+                                                                                                                      @org.mule.runtime.extension.api.annotation.param.Content String question,
+                                                                                                                      int maxResults,
+                                                                                                                      double minScore,
+                                                                                                                      boolean getLatest) {
+    try {
+      LOGGER.debug(
+                   "Embedding Query from Store Operation called with storeName: {}, latestFetchRequired:{}, query: {}, minScore: {}, maxResults: {}",
+                   storeName, getLatest, question, minScore, maxResults);
+      if (minScore == 0) {
+        minScore = 0.7;
+      }
+
+      InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
+
+      Embedding questionEmbedding = this.embeddingModel.embed(question).content();
+
+      List<EmbeddingMatch<TextSegment>> relevantEmbeddings = store.findRelevant(questionEmbedding, maxResults, minScore);
+
+      String information = relevantEmbeddings.stream()
+          .map(match -> match.embedded().text())
+          .collect(joining("\n\n"));
+
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, information);
+
+      LOGGER.debug("Embedding Query from Store Operation completed with the information: {}", information);
+
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.MAX_RESULTS, maxResults);
+      attributes.put(MuleChainConstants.MIN_SCORE, minScore);
+      attributes.put(MuleChainConstants.QUESTION, question);
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
+
+      JSONArray sources = new JSONArray();
+      String absoluteDirectoryPath;
+      String fileName;
+      String url;
+
+      JSONObject contentObject;
+      String fullPath;
+      for (EmbeddingMatch<TextSegment> match : relevantEmbeddings) {
+        Metadata matchMetadata = match.embedded().metadata();
+
+        fileName = matchMetadata.getString(MuleChainConstants.EmbeddingConstants.FILE_NAME);
+        url = matchMetadata.getString(MuleChainConstants.URL);
+        fullPath = matchMetadata.getString(MuleChainConstants.EmbeddingConstants.FULL_PATH);
+        absoluteDirectoryPath = matchMetadata.getString(MuleChainConstants.EmbeddingConstants.ABSOLUTE_DIRECTORY_PATH);
+
+        contentObject = new JSONObject();
+        contentObject.put(MuleChainConstants.ABSOLUTE_DIRECTORY_PATH, absoluteDirectoryPath);
+        contentObject.put(MuleChainConstants.FULL_PATH, fullPath);
+        contentObject.put(MuleChainConstants.FILE_NAME, fileName);
+        contentObject.put(MuleChainConstants.URL, url);
+        contentObject.put(MuleChainConstants.INDIVIDUAL_SCORE, match.score());
+        contentObject.put(MuleChainConstants.TEXT_SEGMENT, match.embedded().text());
+
+        sources.put(contentObject);
+      }
+      LOGGER.debug("Sources for the information: {}", sources);
+      jsonObject.put(MuleChainConstants.SOURCES, sources);
+
+      return createLLMResponse(jsonObject.toString(), attributes);
+    } catch (Exception e) {
+      throw new ModuleException("Error while querying from the embedding store " + storeName,
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
-
-    //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-
-    //InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
-
-    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
-
-
-
-    Embedding questionEmbedding = this.embeddingModel.embed(question).content();
-
-    List<EmbeddingMatch<TextSegment>> relevantEmbeddings = store.findRelevant(questionEmbedding, maxResults, minScore);
-
-    String information = relevantEmbeddings.stream()
-        .map(match -> match.embedded().text())
-        .collect(joining("\n\n"));
-
-
-    //deserializedStore = null;
-    questionEmbedding = null;
-
-
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("maxResults", maxResults);
-    jsonObject.put("minScore", minScore);
-    jsonObject.put("question", question);
-    jsonObject.put("storeName", storeName);
-    jsonObject.put("information", information);
-
-    JSONArray sources = new JSONArray();
-    String absoluteDirectoryPath;
-    String fileName;
-    String url;
-    String textSegment;
-
-    JSONObject contentObject;
-    String fullPath;
-    for (EmbeddingMatch<TextSegment> match : relevantEmbeddings) {
-      Metadata matchMetadata = match.embedded().metadata();
-
-      fileName = matchMetadata.getString("file_name");
-      url = matchMetadata.getString("url");
-      fullPath = matchMetadata.getString("full_path");
-      absoluteDirectoryPath = matchMetadata.getString("absolute_directory_path");
-      textSegment = matchMetadata.getString("textSegment");
-
-      contentObject = new JSONObject();
-      contentObject.put("absoluteDirectoryPath", absoluteDirectoryPath);
-      contentObject.put("full_path", fullPath);
-      contentObject.put("file_name", fileName);
-      contentObject.put("url", url);
-      contentObject.put("individualScore", match.score());
-
-      contentObject.put("textSegment", match.embedded().text());
-      sources.put(contentObject);
-    }
-
-    jsonObject.put("sources", sources);
-
-
-
-    return jsonObject.toString();
   }
-
-
 
   /**
    * Reads information via prompt from embedding store (in-Memory), which is imported from the storeName (full path)
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt or query
+   * @param storeName               Name of the store to be queried
+   * @param getLatest               Determines whether the store needs to be freshly fetched from the location
+   * @return                        Returns the embeddings output by the LLM along with the sources
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store")
-  public String promptFromEmbedding(@Config LangchainLLMConfiguration configuration, String storeName, String data,
-                                    boolean getLatest) {
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> promptFromEmbedding(@Config LangchainLLMConfiguration configuration,
+                                                                                                                         @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                         String storeName,
+                                                                                                                         boolean getLatest) {
 
-    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
+    try {
+      LOGGER.debug("Embedding Get info from Store Operation called with storeName: {}, latestFetchRequired:{} & query: {}",
+                   storeName, getLatest, data);
+      InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
-    ChatLanguageModel model = configuration.getModel();
+      ChatLanguageModel model = configuration.getModel();
 
+      ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(store, this.embeddingModel);
 
-    ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(store, this.embeddingModel);
+      AssistantSources assistantSources = AiServices.builder(AssistantSources.class)
+          .chatLanguageModel(model)
+          .contentRetriever(contentRetriever)
+          .build();
 
-    Result<String> results;
-    JSONObject jsonObject = new JSONObject();
+      Result<String> results;
+      results = assistantSources.chat(data);
+      List<Content> contents = results.sources();
 
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, results.content());
 
-    AssistantSources assistantSources = AiServices.builder(AssistantSources.class)
-        .chatLanguageModel(model)
-        .contentRetriever(contentRetriever)
-        .build();
+      LOGGER.debug("Embedding Get info from Store Operation completed with response: {}", results.content());
 
+      Map<String, String> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
+      attributes.put(MuleChainConstants.QUESTION, data);
+      attributes.put(MuleChainConstants.GET_LATEST, String.valueOf(getLatest));
 
-    results = assistantSources.chat(data);
-    List<Content> contents = results.sources();
+      JSONArray sources = new JSONArray();
+      String absoluteDirectoryPath;
+      String fileName;
+      String url;
+      Metadata metadata;
 
-    jsonObject.put("response", results.content());
-    jsonObject.put("storeName", storeName);
-    jsonObject.put("question", data);
-    jsonObject.put("getLatest", getLatest);
-    JSONArray sources = new JSONArray();
-    String absoluteDirectoryPath;
-    String fileName;
-    String url;
-    Metadata metadata;
+      JSONObject contentObject;
+      for (Content content : contents) {
+        metadata = content.textSegment().metadata();
+        absoluteDirectoryPath = metadata.getString(MuleChainConstants.EmbeddingConstants.ABSOLUTE_DIRECTORY_PATH);
+        fileName = metadata.getString(MuleChainConstants.EmbeddingConstants.FILE_NAME);
+        url = metadata.getString(MuleChainConstants.URL);
 
-    JSONObject contentObject;
-    for (Content content : contents) {
-      metadata = content.textSegment().metadata();
-      absoluteDirectoryPath = (String) metadata.getString("absolute_directory_path");
-      fileName = (String) metadata.getString("file_name");
-      url = (String) metadata.getString("url");
+        contentObject = new JSONObject();
+        contentObject.put(MuleChainConstants.ABSOLUTE_DIRECTORY_PATH, absoluteDirectoryPath);
+        contentObject.put(MuleChainConstants.FILE_NAME, fileName);
+        contentObject.put(MuleChainConstants.URL, url);
+        contentObject.put(MuleChainConstants.TEXT_SEGMENT, content.textSegment().text());
+        sources.put(contentObject);
+      }
+      jsonObject.put(MuleChainConstants.SOURCES, sources);
+      LOGGER.debug("Sources for this information: {}", sources);
 
-      contentObject = new JSONObject();
-      contentObject.put("absoluteDirectoryPath", absoluteDirectoryPath);
-      contentObject.put("fileName", fileName);
-      contentObject.put("url", url);
-      contentObject.put("textSegment", content.textSegment().text());
-      sources.put(contentObject);
+      return createLLMResponse(jsonObject.toString(), results, attributes);
+    } catch (Exception e) {
+      throw new ModuleException(String.format("Error while getting info from the store %s", storeName),
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
     }
-
-    jsonObject.put("sources", sources);
-
-    JSONObject tokenUsage = new JSONObject();
-    tokenUsage.put("inputCount", results.tokenUsage().inputTokenCount());
-    tokenUsage.put("outputCount", results.tokenUsage().outputTokenCount());
-    tokenUsage.put("totalCount", results.tokenUsage().totalTokenCount());
-    jsonObject.put("tokenUsage", tokenUsage);
-
-    return jsonObject.toString();
   }
-
 
   interface AssistantSources {
 
     Result<String> chat(String userMessage);
   }
 
-
-
   /**
    * Reads information via prompt from embedding store (in-Memory), which is imported from the storeName (full path)
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt or query
+   * @param storeName               Name of the store to be queried
+   * @param getLatest               Determines whether the store needs to be freshly fetched from the location
+   * @return                        Returns the embeddings output by the LLM along with the sources
    */
-  @MediaType(value = ANY, strict = false)
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-get-info-from-store-legacy")
-  public String promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration, String storeName, String data,
-                                          boolean getLatest) {
-    InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> promptFromEmbeddingLegacy(@Config LangchainLLMConfiguration configuration,
+                                                                                                                             @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                             String storeName,
+                                                                                                                             boolean getLatest) {
+    try {
+      LOGGER.debug("Embedding Get info from Store Legacy Operation called with storeName: {}, latestFetchRequired:{} & query: {}",
+                   storeName, getLatest, data);
+      InMemoryEmbeddingStore<TextSegment> store = getDeserializedStore(storeName, getLatest);
 
-    ChatLanguageModel model = configuration.getModel();
+      ChatLanguageModel model = configuration.getModel();
+
+      ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+          .chatLanguageModel(model)
+          .retriever(EmbeddingStoreRetriever.from(store, this.embeddingModel))
+          .build();
+
+      String answer = chain.execute(data);
+
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, answer);
+
+      LOGGER.debug("Embedding Get info from Store Legacy Operation completed with response: {}", answer);
+
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
+      attributes.put(MuleChainConstants.GET_LATEST, getLatest);
 
 
-
-    ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
-        .chatLanguageModel(model)
-        .retriever(EmbeddingStoreRetriever.from(store, this.embeddingModel))
-        .build();
-
-    String answer = chain.execute(data);
-
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", answer);
-    jsonObject.put("storeName", storeName);
-    jsonObject.put("getLatest", getLatest);
-
-
-    return jsonObject.toString();
+      return createLLMResponse(jsonObject.toString(), attributes);
+    } catch (Exception e) {
+      throw new ModuleException(String.format("Error while getting info from the store %s", storeName),
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE, e);
+    }
   }
 
 
@@ -627,92 +730,157 @@ public class LangchainEmbeddingStoresOperations {
     String chat(String userMessage);
   }
 
+  interface AssistantEmbeddingR {
 
-  /**
-  * (AI Services) Usage of tools by a defined AI Agent. Provide a list of tools (APIs) with all required informations (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
-  */
-  @MediaType(value = ANY, strict = false)
-  @Alias("TOOLS-use-ai-service")
-  public String useAIServiceTools(@Config LangchainLLMConfiguration configuration, String data, String toolConfig) {
+    Result<String> chat(String userMessage);
+  }
 
-    EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+  interface AssistantEmbeddingChat {
 
-    EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-
-    EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-        .documentSplitter(DocumentSplitters.recursive(30000, 200))
-        .embeddingModel(embeddingModel)
-        .embeddingStore(embeddingStore)
-        .build();
-
-
-    Document document = loadDocument(toolConfig, new TextDocumentParser());
-    ingestor.ingest(document);
-
-
-    ChatLanguageModel model = configuration.getModel();
-
-    ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
-
-
-
-    AssistantEmbedding assistant = AiServices.builder(AssistantEmbedding.class)
-        .chatLanguageModel(model)
-        .contentRetriever(contentRetriever)
-        .build();
-
-    boolean toolsUsed = false;
-
-    String intermediateAnswer = assistant.chat(data);
-    String response = model.generate(data);
-    List<String> findURL = extractUrls(intermediateAnswer);
-    //System.out.println("find URL : " + findURL.get(0));
-    if (findURL != null) {
-
-      toolsUsed = true;
-      // Create an instance of the custom tool with parameters
-      GenericRestApiTool restApiTool = new GenericRestApiTool(findURL.get(0), "API Call", "Execute GET or POST Requests");
-
-      // Build the assistant with the custom tool
-      AssistantC assistantC = AiServices.builder(AssistantC.class)
-          .chatLanguageModel(model)
-          .tools(restApiTool)
-          //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
-          .build();
-      // Use the assistant to make a query
-      response = assistantC.chat(intermediateAnswer);
-      LOGGER.info("Response: {}", response);
-      /*  } else{
-        response =  intermediateAnswer; */
-    }
-
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("response", response);
-    jsonObject.put("toolsUsed", toolsUsed);
-
-
-    return jsonObject.toString();
+    Result<String> chat(String userMessage);
   }
 
 
   /**
-  * Add document of type text, pdf and url to embedding store (in-memory), which is exported to the defined storeName (full path)
-  */
-  @MediaType(value = ANY, strict = false)
+   * (AI Services) Usage of tools by a defined AI Agent.<br>
+   * Provide a list of tools (APIs) with all required information (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt or query
+   * @param toolConfig              Contains the configuration required by the LLM to enable calling tools
+   * @return                        Returns the response while considering tools configuration
+   */
+  @MediaType(value = APPLICATION_JSON, strict = false)
+  @Alias("TOOLS-use-ai-service")
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> useAIServiceTools(@Config LangchainLLMConfiguration configuration,
+                                                                                                                       @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                       String toolConfig) {
+    try {
+      LOGGER.debug("Tools Use Ai Service Operation called with userPrompt: {}", data);
+      LOGGER.debug("Tools Config: {}", toolConfig);
+      EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
+      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+          .documentSplitter(DocumentSplitters.recursive(30000, 200))
+          .embeddingModel(embeddingModel)
+          .embeddingStore(embeddingStore)
+          .build();
+
+      Document document = loadDocument(toolConfig, new TextDocumentParser());
+      ingestor.ingest(document);
+
+      ChatLanguageModel model = configuration.getModel();
+      ContentRetriever contentRetriever = new EmbeddingStoreContentRetriever(embeddingStore, embeddingModel);
+
+      AssistantEmbeddingR assistant = AiServices.builder(AssistantEmbeddingR.class)
+          .chatLanguageModel(model)
+          .contentRetriever(contentRetriever)
+          .build();
+
+
+      AssistantEmbeddingChat assistantChat = AiServices.builder(AssistantEmbeddingChat.class)
+          .chatLanguageModel(model)
+          .build();
+
+      //String intermediateAnswer = assistant.chat(data);
+      dev.langchain4j.service.Result<String> intermediateAnswer = assistant.chat(data);
+      LOGGER.debug("Intermediate Answer containing the request URLs: {}", intermediateAnswer.content());
+      //String response = model.generate(data);
+      Result<String> response = assistantChat.chat(data);
+      List<String> findURLs = extractUrls(intermediateAnswer.content());
+      boolean toolsUsed = false;
+      if (findURLs != null) {
+
+        toolsUsed = true;
+        // Create an instance of the custom tool with parameters
+        GenericRestApiTool restApiTool = new GenericRestApiTool(findURLs.get(0), "API Call", "Execute GET or POST Requests");
+
+        // Build the assistant with the custom tool
+        AssistantR assistantC = AiServices.builder(AssistantR.class)
+            .chatLanguageModel(model)
+            .tools(restApiTool)
+            //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+            .build();
+        // Use the assistant to make a query
+        //response = assistantC.chat(intermediateAnswer.content());
+        response = assistantC.chat(intermediateAnswer.content());
+        LOGGER.info("Response after Tools Usage: {}", response);
+      }
+
+      JSONObject jsonObject = new JSONObject();
+
+      jsonObject.put(MuleChainConstants.RESPONSE, response.content());
+
+
+      Map<String, String> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.TOOLS_USED, String.valueOf(toolsUsed));
+
+      LOGGER.debug("Tools Use Ai Service Operation completed with response: {}, toolsUsed: {}", response, toolsUsed);
+      return createLLMResponse(jsonObject.toString(), response, attributes);
+    } catch (Exception e) {
+      throw new ModuleException("Error occurred while executing AI Tools with the provided config",
+                                MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
+    }
+  }
+
+
+  /**
+   * Add document of type text, any and url to embedding store (in-memory), which is exported to the defined storeName (full path)
+   * @param storeName                 Name of the embedding store
+   * @param contextPath               Refers to the location of the folder to be processed
+   * @param maxSegmentSizeInChars     Max allowed size of continuous sequence of characters while embedding
+   * @param maxOverlapSizeInChars     Max size of overlapping characters allowed while embedding
+   * @param fileType                  Refers to the type of the file (any, text) - url is not supported
+   * @return                          Returns the status of the embedding operation
+   */
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("EMBEDDING-add-folder-to-store")
-  public String addFilesFromFolderEmbedding(String storeName, String contextPath,
-                                            @ParameterGroup(name = "Context") FileTypeParameters fileType) {
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/StatusResponse.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Map<String, Object>> addFilesFromFolderEmbedding(String storeName,
+                                                                                                                               String contextPath,
+                                                                                                                               int maxSegmentSizeInChars,
+                                                                                                                               int maxOverlapSizeInChars,
+                                                                                                                               @ParameterGroup(
+                                                                                                                                   name = "Context") FileTypeParameters fileType) {
+    try {
+      LOGGER.debug("Embedding Add Folder To Store Operation called with storeName: {}, filePath: {} & fileType: {}", storeName,
+                   contextPath, fileType.getFileType());
+      InMemoryEmbeddingStore<TextSegment> store = InMemoryEmbeddingStore.fromFile(storeName);
 
-    //EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-    InMemoryEmbeddingStore<TextSegment> deserializedStore = InMemoryEmbeddingStore.fromFile(storeName);
+      EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+          .documentSplitter(DocumentSplitters.recursive(maxSegmentSizeInChars, maxOverlapSizeInChars))
+          .embeddingModel(this.embeddingModel)
+          .embeddingStore(store)
+          .build();
 
-    EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-        .documentSplitter(DocumentSplitters.recursive(2000, 200))
-        .embeddingModel(this.embeddingModel)
-        .embeddingStore(deserializedStore)
-        .build();
+      long totalFiles = getTotalFilesCount(contextPath);
+      ingestFolder(contextPath, fileType, ingestor);
+      store.serializeToFile(storeName);
 
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.STATUS, MuleChainConstants.UPDATED);
 
+      Map<String, Object> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.FILES_COUNT, totalFiles);
+      attributes.put(MuleChainConstants.FOLDER_PATH, contextPath);
+      attributes.put(MuleChainConstants.STORE_NAME, storeName);
+
+      LOGGER.debug("Embedding Add Folder To Store Operation completed successfully");
+
+      return createLLMResponse(jsonObject.toString(), attributes);
+    } catch (ModuleException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ModuleException(String.format("Error while adding folder %s into the store %s", contextPath,
+                                              storeName),
+                                MuleChainErrorType.EMBEDDING_OPERATIONS_FAILURE,
+                                e);
+    }
+  }
+
+  private long getTotalFilesCount(String contextPath) {
     long totalFiles = 0;
     try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
       totalFiles = paths.filter(Files::isRegularFile).count();
@@ -721,6 +889,10 @@ public class LangchainEmbeddingStoresOperations {
     }
 
     LOGGER.info("Total number of files to process: {}", totalFiles);
+    return totalFiles;
+  }
+
+  private void ingestFolder(String contextPath, FileTypeParameters fileType, EmbeddingStoreIngestor ingestor) {
     AtomicInteger fileCounter = new AtomicInteger(0);
     try (Stream<Path> paths = Files.walk(Paths.get(contextPath))) {
       paths.filter(Files::isRegularFile).forEach(file -> {
@@ -733,7 +905,7 @@ public class LangchainEmbeddingStoresOperations {
               document = loadDocument(file.toString(), new TextDocumentParser());
               ingestor.ingest(document);
               break;
-            case PDF:
+            case ANY:
               document = loadDocument(file.toString(), new ApacheTikaDocumentParser());
               ingestor.ingest(document);
               break;
@@ -741,28 +913,17 @@ public class LangchainEmbeddingStoresOperations {
               // Handle URLs separately if needed
               break;
             default:
-              throw new IllegalArgumentException("Unsupported File Type: " + fileType.getFileType());
+              throw new ModuleException("Unsupported File Type: " + fileType.getFileType(),
+                                        MuleChainErrorType.FILE_HANDLING_FAILURE);
           }
         } catch (BlankDocumentException e) {
           LOGGER.warn("Skipping file due to BlankDocumentException: {}", file.getFileName());
         }
       });
     } catch (IOException e) {
-      LOGGER.error("Exception occurred while loading files: " + contextPath, e);
+      throw new ModuleException("Exception occurred while loading files: " + contextPath,
+                                MuleChainErrorType.FILE_HANDLING_FAILURE, e);
     }
-
-
-
-    deserializedStore.serializeToFile(storeName);
-    deserializedStore = null;
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("filesCount", totalFiles);
-    jsonObject.put("folderPath", contextPath);
-    jsonObject.put("storeName", storeName);
-    jsonObject.put("status", "updated");
-
-
-    return jsonObject.toString();
   }
 
 }
