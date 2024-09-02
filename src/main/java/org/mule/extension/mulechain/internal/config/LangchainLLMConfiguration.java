@@ -131,6 +131,7 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   private ChatLanguageModel createModel(ConfigExtractor configExtractor) {
     LangchainLLMType type = LangchainLLMType.fromValue(llmType);
+    LOGGER.debug("Creating Model of LLMType: {}", llmType);
     return type.getConfigBiFunction().apply(configExtractor, this);
   }
 

@@ -81,6 +81,7 @@ public class LangchainImageModelsOperations {
                                                                                                                    @Content String data,
                                                                                                                    String contextURL) {
     try {
+      LOGGER.debug("Image Read Operation called with the prompt: {} & the url: {}", data, contextURL);
       ChatLanguageModel model = configuration.getModel();
 
       UserMessage userMessage = UserMessage.from(
@@ -91,6 +92,8 @@ public class LangchainImageModelsOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response.content().text());
+
+      LOGGER.debug("Image Read Operation completed with the response: {}", response.content().text());
 
       return createLLMResponse(jsonObject.toString(), response, new HashMap<>());
     } catch (Exception e) {
@@ -114,6 +117,7 @@ public class LangchainImageModelsOperations {
   public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, Void> drawImage(@Config LangchainLLMConfiguration configuration,
                                                                                               @Content String data) {
     try {
+      LOGGER.debug("Image Generate Operation called with the prompt: {}", data);
       ConfigExtractor configExtractor = configuration.getConfigExtractor();
       ImageModel model = OpenAiImageModel.builder()
           .modelName(configuration.getModelName())
@@ -126,6 +130,7 @@ public class LangchainImageModelsOperations {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, response.content().url());
 
+      LOGGER.debug("Image Generate Operation completed successfully with the image: {}", response.content().url());
       return Result.<InputStream, Void>builder()
           .attributesMediaType(org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA)
           .output(toInputStream(jsonObject.toString(), StandardCharsets.UTF_8))
@@ -152,6 +157,7 @@ public class LangchainImageModelsOperations {
                                                                                                                                    @Content String data,
                                                                                                                                    String filePath) {
 
+    LOGGER.debug("Image Read Scanned Documents Operation called with the prompt: {} & filePath: {}", data, filePath);
     ChatLanguageModel model = configuration.getModel();
 
     JSONObject jsonObject = new JSONObject();
@@ -172,7 +178,7 @@ public class LangchainImageModelsOperations {
       for (int pageNumber = 0; pageNumber < totalPages; pageNumber++) {
 
         BufferedImage image = pdfRenderer.renderImageWithDPI(pageNumber, 300);
-        LOGGER.info("Reading page -> {}", pageNumber);
+        LOGGER.debug("Reading page -> {}", pageNumber);
 
         String imageBase64 = convertToBase64String(image);
         UserMessage userMessage = UserMessage.from(
@@ -184,6 +190,7 @@ public class LangchainImageModelsOperations {
         docPage = new JSONObject();
         docPage.put(MuleChainConstants.PAGE, pageNumber + 1);
         docPage.put(MuleChainConstants.RESPONSE, response.content().text());
+        LOGGER.debug("Image Read Scanned Documents Operation completed with the response: {}", response.content().text());
         docResponseAttributes
             .add(new ScannedDocResponseAttributes.DocResponseAttribute(pageNumber + 1,
                                                                        new TokenUsage(response.tokenUsage().inputTokenCount(),

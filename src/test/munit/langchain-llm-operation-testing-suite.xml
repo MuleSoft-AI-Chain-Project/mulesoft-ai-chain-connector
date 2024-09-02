@@ -27,7 +27,22 @@
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="sentiment-test" doc:id="ddc7561d-c2e5-4816-aef9-b083c71ae829" >
+	<munit:test name="chat-answer-prompt-failure-test" description="Failure while performing the operation chat-answer-prompt" expectedErrorType="MS-AICHAIN:AI_SERVICES_FAILURE">
+		<munit:execution>
+			<munit:set-event doc:name="Set Event" doc:id="ee8ce128-b7a9-4b57-ab9d-8a0daee2ddb9" >
+				<munit:payload value='#[{"data": "What is the capital of Switzerland"}]' />
+			</munit:set-event>
+			<logger level="INFO" doc:name="Logger" message="#[payload.data]"/>
+			<ms-aichain:chat-answer-prompt doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
+										   config-ref="OPENAI-INCORRECT-MODEL-NAME">
+				<ms-aichain:prompt>
+					#[payload.data]
+				</ms-aichain:prompt>
+			</ms-aichain:chat-answer-prompt>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="sentiment-analysis-test" doc:id="ddc7561d-c2e5-4816-aef9-b083c71ae829" >
 		<munit:execution >
 			<munit:set-event doc:name="Set Event" doc:id="cd512cfd-e0d0-49b0-91da-dbc21c23cc63" >
 				<munit:payload value='#[{"data": "Hello, I appreciate the opportunity to speak with you this morning about our new pricing model. Enclosed, you will find the presentation we discussed."}]' />
@@ -45,7 +60,22 @@
 		</munit:validation>
 	</munit:test>
 
-	<munit:test name="agent-define-prompt-template-test" doc:id="3d111d5d-2ce9-464d-b4b2-114bac36b2e4" >
+	<munit:test name="sentiment-analysis-failure-test" description="Failure while performing the operation sentiment-analyze" expectedErrorType="MS-AICHAIN:AI_SERVICES_FAILURE">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="cd512cfd-e0d0-49b0-91da-dbc21c23cc63" >
+				<munit:payload value='#[{"data": "Hello, I appreciate the opportunity to speak with you this morning about our new pricing model. Enclosed, you will find the presentation we discussed."}]' />
+			</munit:set-event>
+			<logger level="INFO" doc:name="Logger" message="#[payload.data]"/>
+			<ms-aichain:sentiment-analyze doc:name="sentiment-prompt" doc:id="cd512cfd-e0d0-49b0-91da-dbc21c23cc63"
+										  config-ref="OPENAI-INCORRECT-MODEL-NAME">
+				<ms-aichain:data>
+					#[payload.data]
+				</ms-aichain:data>
+			</ms-aichain:sentiment-analyze>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="agent-define-prompt-template-test">
 		<munit:behavior >
 			<munit:set-event doc:name="Set Input" doc:id="01b3a666-0856-440c-a499-c1374896a95b" >
 				<munit:payload value="#[output application/json --- readUrl('classpath://agentdefineprompttemplatetest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
@@ -53,7 +83,7 @@
 			</munit:set-event>
 		</munit:behavior>
 		<munit:execution >
-			<ms-aichain:agent-define-prompt-template doc:name="CHAT-answer-prompt" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
+			<ms-aichain:agent-define-prompt-template doc:name="agent-define-prompt-template" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
 													 config-ref="OPENAI">
 				<ms-aichain:dataset>
 					#[payload.data]
@@ -74,5 +104,28 @@ import agentdefineprompttemplatetest::assert_expression_payload
 assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
 			</munit-tools:assert>
 		</munit:validation>
+	</munit:test>
+
+	<munit:test name="agent-define-prompt-template-failure-test" description="Failure while performing the operation agent-define-prompt-template" expectedErrorType="MS-AICHAIN:AI_SERVICES_FAILURE">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="01b3a666-0856-440c-a499-c1374896a95b" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://agentdefineprompttemplatetest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://agentdefineprompttemplatetest/set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:agent-define-prompt-template doc:name="agent-define-prompt-template" doc:id="553233cb-8b97-42ae-ab73-b3d98ea58e83"
+													 config-ref="OPENAI-INCORRECT-MODEL-NAME">
+				<ms-aichain:dataset>
+					#[payload.data]
+				</ms-aichain:dataset>
+				<ms-aichain:template>
+					#[payload.template]
+				</ms-aichain:template>
+				<ms-aichain:instructions>
+					#[payload.instructions]
+				</ms-aichain:instructions>
+			</ms-aichain:agent-define-prompt-template>
+		</munit:execution>
 	</munit:test>
 </mule>

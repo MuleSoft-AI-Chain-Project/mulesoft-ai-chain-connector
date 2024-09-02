@@ -59,11 +59,13 @@ public class LangchainLLMOperations {
                                                                                                                              @Content String prompt) {
     // OpenAI parameters are explained here: https://platform.openai.com/docs/api-reference/chat/create
     try {
+      LOGGER.debug("Chat Answer Prompt Operation called with prompt: {}", prompt);
       ChatLanguageModel model = configuration.getModel();
       Assistant assistant = AiServices.create(Assistant.class, model);
       Result<String> answer = assistant.chat(prompt);
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
+      LOGGER.debug("Chat Answer Prompt Operation completed with response: {}", answer.content());
       return createLLMResponse(jsonObject.toString(), answer, new HashMap<>());
     } catch (Exception e) {
       throw new ModuleException("Unable to respond with the chat provided", MuleChainErrorType.AI_SERVICES_FAILURE, e);
@@ -90,6 +92,8 @@ public class LangchainLLMOperations {
                                                                                                                           @Content String instructions) {
 
     try {
+      LOGGER.debug("Agent Define Prompt Template Operation called with prompt: {}, template: {} & instruction: {}", dataset,
+                   template, instructions);
       ChatLanguageModel model = configuration.getModel();
 
       PromptTemplate promptTemplate = PromptTemplate.from(template + System.lineSeparator() + "Instructions: {{instructions}}"
@@ -107,6 +111,7 @@ public class LangchainLLMOperations {
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, answer.content());
+      LOGGER.debug("Agent Define Prompt Template Operation completed with response: {}", answer.content());
       return createLLMResponse(jsonObject.toString(), answer, new HashMap<>());
     } catch (Exception e) {
       throw new ModuleException("Unable to reply with the correct prompt template", MuleChainErrorType.AI_SERVICES_FAILURE, e);
@@ -144,13 +149,14 @@ public class LangchainLLMOperations {
                                                                                                                        @Content String data) {
 
     try {
+      LOGGER.debug("Sentiment Analyze Operation called with data: {}", data);
       ChatLanguageModel model = configuration.getModel();
       SentimentAnalyzer sentimentAnalyzer = AiServices.create(SentimentAnalyzer.class, model);
       Result<Sentiment> sentiment = sentimentAnalyzer.analyzeSentimentOf(data);
-      LOGGER.info("Analyzed sentiment: {}", sentiment); // POSITIVE
+      LOGGER.debug("Sentiment Analyze Operation completed with Analyzed sentiment: {}", sentiment); // POSITIVE
 
       boolean positive = sentimentAnalyzer.isPositive(data);
-      LOGGER.info("Is sentiment positive: {}", positive); // false
+      LOGGER.debug("Is sentiment positive: {}", positive); // false
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, sentiment.content());
