@@ -365,7 +365,7 @@ public class LangchainEmbeddingStoresOperations {
             .build();
         // Use the assistant to make a query
         response = assistant.chat(intermediateAnswer);
-        LOGGER.info("Response after Tools Usage: {}", response);
+        LOGGER.debug("Response after Tools Usage: {}", response);
       }
 
       JSONObject jsonObject = new JSONObject();
@@ -805,7 +805,7 @@ public class LangchainEmbeddingStoresOperations {
         // Use the assistant to make a query
         //response = assistantC.chat(intermediateAnswer.content());
         response = assistantC.chat(intermediateAnswer.content());
-        LOGGER.info("Response after Tools Usage: {}", response.content());
+        LOGGER.debug("Response after Tools Usage: {}", response.content());
       }
 
       JSONObject jsonObject = new JSONObject();
