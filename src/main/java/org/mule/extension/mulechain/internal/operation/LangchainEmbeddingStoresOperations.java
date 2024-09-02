@@ -805,7 +805,7 @@ public class LangchainEmbeddingStoresOperations {
         // Use the assistant to make a query
         //response = assistantC.chat(intermediateAnswer.content());
         response = assistantC.chat(intermediateAnswer.content());
-        LOGGER.info("Response after Tools Usage: {}", response);
+        LOGGER.info("Response after Tools Usage: {}", response.content());
       }
 
       JSONObject jsonObject = new JSONObject();
