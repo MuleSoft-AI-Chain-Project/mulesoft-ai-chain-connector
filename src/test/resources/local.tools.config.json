@@ -1,0 +1,56 @@
+[
+    {
+        "action":"Execute POST requests for API endpoints.",
+        "url": "http://localhost/mmbe",
+        "method": "POST",
+        "headers": "",
+        "example-payload":"{\n \"materialNo\": \"paramValue\"}",
+        "query": ["Check inventory in SAP","Check Stock Overview", "Show product availability", "Check the inventory for MULETEST0"],
+        "description": "Check inventory details for material in SAP by providing the materialNo als input for paramValue. Please use the materialNo and not materialNumber."
+    },
+    {
+        "action":"Execute GET requests for API endpoints.",
+        "url": "https://localhost/mocking/api/v1/sources/exchange/assets/612eb739-4266-4f4c-bf2f-29953c153d80/accounts-api/1.0.1/m/accounts",
+        "method": "GET",
+        "headers": "",
+        "example-payload":"{}",
+        "query": ["Get all accounts","Show accounts"],
+        "description": "Get all accounts from a CRM. "
+    },
+    {
+        "action":"Execute POST requests for API endpoints.",
+        "url": "https://localhost",
+        "method": "POST",
+        "headers": "Basic NjA4MTU4YWRhM2RmNDhlNmI5MGZjZWE5MTE2YjJkOGE6MGU5NTQ4RUY5OTQ5NDg0QWE2QTMyRjA3Y2UyY0IwZkI=",
+       "example-payload":"{\n \"Fullname\": \"paramValue\"}",
+        "query": ["Order a Laptop for Amir Khan","Get a new Laptop for Heinz Kohlweg","New employee laptop for Simon Peters."],
+        "description":"Order a Laptop by providing the persons fullname als input for paramValue. "
+    },
+    {
+        "action":"Execute GET requests for API endpoints.",
+        "url": "https://localhost/mocking/api/v1/sources/exchange/assets/7b99cead-a984-497b-9e6c-c16a3b4dcb76/employee-api/1.0.1/m/employees",
+        "method": "GET",
+        "headers": "",
+        "example-payload":"{}",
+        "query": ["Get all employee informations","Show employee for the country Switzerland", "How many employees do we have", "Show a list of all employees"],
+        "description": "Get all informations aboout all employees."
+    },
+    {
+        "action":"Execute GET requests for API endpoints.",
+        "url": "https://localhost/mocking/api/v1/sources/exchange/assets/7b99cead-a984-497b-9e6c-c16a3b4dcb76/leads/1.0.0/m/leads",
+        "method": "GET",
+        "headers": "",
+        "example-payload":"{}",
+        "query": ["Get all leads","Show all leads", "How many leads do we have", "Show a list of all leads"],
+        "description": "Get all informations aboout current leads."
+    },
+    {
+        "action":"Execute POST requests for API endpoints.",
+        "url": "https://localhost/",
+        "method": "POST",
+        "headers": "Basic ZGYzODFiNzY5NjY0NGM3YmFlNTMzM2E2YmRkNDdlODM6RjU3RTE4MTFkQjVjNDY3ZmIyQjdFRDBmRjUzOEFENDk=",
+       "example-payload":"{\n \"salesOrder\": \"paramValue\"}",
+        "query": ["Get additional details for order 300","Show more information for order 301","Show request delivery date for order 201"],
+        "description":"Get additional order details by providing the sales order als input for paramValue."
+    }
+]

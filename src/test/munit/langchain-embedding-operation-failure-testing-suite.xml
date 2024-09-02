@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ms-aichain="http://www.mulesoft.org/schema/mule/ms-aichain"
+	  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+	  http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd">
+	<munit:config name="langchain-embedding-operation-failure-testing-suite.xml" />
+
+	<munit:test name="embedding-add-file-incorrect-store-failure-test" description="Embedding Add Doc operation failure due to incorrect store name" expectedErrorType="MS-AICHAIN:EMBEDDING_OPERATIONS_FAILURE">
+		<munit:behavior>
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+		</munit:behavior>
+		<munit:execution>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="embedding-add-file-incorrect-file-failure-test" description="Embedding Add Doc operation failure due to incorrect file path" expectedErrorType="MS-AICHAIN:FILE_HANDLING_FAILURE">
+		<munit:behavior>
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+		</munit:behavior>
+		<munit:execution>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="pdf" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="embedding-add-folder-incorrect-store-failure-test" description="Embedding Add Folder operation failure due to incorrect store name" expectedErrorType="MS-AICHAIN:EMBEDDING_OPERATIONS_FAILURE">
+		<munit:behavior >
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:embedding-add-folder-to-store doc:name="Embedding add folder to store" doc:id="c113688a-3f1e-44d6-8b5c-a60a65abfdea" storeName='embedding.store' contextPath="${app.home}/embeddingaddfiletest/" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="embedding-add-folder-incorrect-path-failure-test" description="Embedding Add Folder operation failure due to incorrect folder path" expectedErrorType="MS-AICHAIN:FILE_HANDLING_FAILURE">
+		<munit:behavior >
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:embedding-add-folder-to-store doc:name="Embedding add folder to store" doc:id="c113688a-3f1e-44d6-8b5c-a60a65abfdea" storeName='target/embedding.store' contextPath="${app.home}/embeddingaddfiletese/" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="embedding-query-store-failure-test" description="Embedding Query Store Operation failure due to incorrect minScore config" expectedErrorType="MS-AICHAIN:EMBEDDING_OPERATIONS_FAILURE">
+		<munit:behavior >
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:embedding-query-from-store doc:name="Embedding query from store" doc:id="1ee361ea-e62a-4e0f-9c74-0363f8721052" storeName="target/embedding.store" maxResults="3" minScore="2" getLatest="true">
+				<ms-aichain:question>
+					What is Mule 4?
+				</ms-aichain:question>
+			</ms-aichain:embedding-query-from-store>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="embedding-get-info-failure-test" description="Embedding Get Info Operation failure due to incorrect model config" expectedErrorType="MS-AICHAIN:EMBEDDING_OPERATIONS_FAILURE">
+		<munit:behavior >
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:embedding-get-info-from-store doc:name="Embedding get info from store" doc:id="ae5b31c6-d99d-4ab8-848c-03124785184b" config-ref="OPENAI-INCORRECT-MODEL-NAME" storeName='target/embedding.store' getLatest="true">
+				<ms-aichain:data>
+					What is Mule 4?
+				</ms-aichain:data>
+			</ms-aichain:embedding-get-info-from-store>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="embedding-get-info-legacy-failure-test" description="Embedding Get Info Legacy Operation failure due to incorrect storeName" expectedErrorType="MS-AICHAIN:EMBEDDING_OPERATIONS_FAILURE">
+		<munit:behavior >
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
+			<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName="target/embedding.store" contextPath='${app.home}/embeddingaddfiletest/Foundations_for_High_Scalability_in_Mule_4.pdf' fileType="any" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:embedding-get-info-from-store-legacy doc:name="Embedding get info from store legacy" doc:id="1f9e0410-4357-4ad8-bf17-29112f20e2f6" config-ref="OPENAI" storeName='embedding.store'>
+				<ms-aichain:data>
+					What is Mule 4?
+				</ms-aichain:data>
+			</ms-aichain:embedding-get-info-from-store-legacy>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="tools-ai-service-api-failure-test" description="Api call fails due to incorrect endpoint configuration in tools.config">
+		<munit:execution >
+			<ms-aichain:tools-use-ai-service doc:name="Tools use ai service" doc:id="e7a3fcc4-653e-45c8-8f95-7b22ba9e4a63" config-ref="OPENAIGPT4" toolConfig="${app.home}/local.tools.config.json">
+				<ms-aichain:data>
+					Check Inventory for MULETEST0, dont assume things and invent answers. Answer with the most probable statement.
+				</ms-aichain:data>
+			</ms-aichain:tools-use-ai-service>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="0ba4128f-37f3-4bc9-a8c0-760e58eb14ba" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.response must contain("localhost")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="tools-ai-service-failure-test" description="Tools Use AI Service Failure due to incorrect configuration" expectedErrorType="MS-AICHAIN:TOOLS_OPERATION_FAILURE">
+		<munit:execution >
+			<ms-aichain:tools-use-ai-service doc:name="Tools use ai service" doc:id="e7a3fcc4-653e-45c8-8f95-7b22ba9e4a63" config-ref="OPENAI-INCORRECT-MODEL-NAME" toolConfig="${app.home}/local.tools.config.json">
+				<ms-aichain:data>
+					Check Inventory for MULETEST0, dont assume things and invent answers. Answer with the most probable statement.
+				</ms-aichain:data>
+			</ms-aichain:tools-use-ai-service>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="tools-ai-service-legacy-failure-test" description="Tools Use AI Service Failure due to incorrect tool config path" expectedErrorType="MS-AICHAIN:TOOLS_OPERATION_FAILURE">
+		<munit:execution >
+			<ms-aichain:tools-use-ai-service-legacy doc:name="Tools use ai service legacy" doc:id="51aa98dc-0ad2-42ad-9fc0-0883bdb766a4" config-ref="OPENAI-INCORRECT-MODEL-NAME" toolConfig="${app.home}/tools/tools.config.json">
+				<ms-aichain:data>
+					Check Inventory for MULETEST0, dont assume things and invent answers. Answer with the most probable statement.
+				</ms-aichain:data>
+			</ms-aichain:tools-use-ai-service-legacy>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="rag-malformed-url-failure-test" description="Rag Operation failure due to incorrect URL" expectedErrorType="MS-AICHAIN:FILE_HANDLING_FAILURE" >
+		<munit:execution >
+			<ms-aichain:rag-load-document doc:name="Rag load document" doc:id="66b215ae-fab5-4da9-ac91-ebe1c60d6a7b" config-ref="OPENAI" contextPath='httlocalhost/dummy' fileType="url">
+				<ms-aichain:data>
+					What is mule 4?
+				</ms-aichain:data>
+			</ms-aichain:rag-load-document>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="rag-incorrect-url-failure-test" description="Rag Operation failure due to incorrect URL" expectedErrorType="MS-AICHAIN:RAG_FAILURE" >
+		<munit:execution >
+			<ms-aichain:rag-load-document doc:name="Rag load document" doc:id="66b215ae-fab5-4da9-ac91-ebe1c60d6a7b" config-ref="OPENAI" contextPath='http://localhost/dummy' fileType="url">
+				<ms-aichain:data>
+					What is mule 4?
+				</ms-aichain:data>
+			</ms-aichain:rag-load-document>
+		</munit:execution>
+	</munit:test>
+
+	<munit:test name="chat-answer-prompt-with-memory-failure-test" description="Chat Answer prompt with memory operation failure due to incorrect db file path" expectedErrorType="MS-AICHAIN:AI_SERVICES_FAILURE">
+		<munit:behavior >
+			<ms-aichain:chat-answer-prompt-with-memory doc:name="Chat answer prompt with memory" doc:id="d012af47-a41d-46aa-8476-39e1a2f48d92" config-ref="OPENAI" memoryName="mule" dbFilePath="target/memory-test-chat-off.db" maxMessages="10">
+				<ms-aichain:data>My name is Mulechain</ms-aichain:data>
+			</ms-aichain:chat-answer-prompt-with-memory>
+		</munit:behavior>
+		<munit:execution >
+			<ms-aichain:chat-answer-prompt-with-memory doc:name="Chat answer prompt with memory" doc:id="d012af47-a41d-46aa-8476-39e1a2f48d92" config-ref="OPENAI" memoryName="mule" dbFilePath="target/db/memory-test-chat-off.db" maxMessages="10">
+				<ms-aichain:data>What is my name?</ms-aichain:data>
+			</ms-aichain:chat-answer-prompt-with-memory>
+		</munit:execution>
+	</munit:test>
+</mule>

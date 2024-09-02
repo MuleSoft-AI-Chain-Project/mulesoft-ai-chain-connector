@@ -75,7 +75,7 @@ payload.response must notBeNull()]]]></munit-tools:that>
                 <munit-tools:that ><![CDATA[#[%dw 2.0
 import * from dw::test::Asserts
 ---
-payload.pages[0].response must contain("The Slerexe Company Limited")]]]></munit-tools:that>
+payload.pages[0].response must contain("Pete")]]]></munit-tools:that>
             </munit-tools:assert>
         </munit:validation>
     </munit:test>
