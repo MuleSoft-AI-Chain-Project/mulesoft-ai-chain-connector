@@ -10,6 +10,7 @@ import dev.langchain4j.service.TokenStream;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
+import org.mule.extension.mulechain.internal.util.ExcludeFromGeneratedCoverage;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -29,6 +30,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 /**
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
  */
+@ExcludeFromGeneratedCoverage
 public class LangchainStreamingOperations {
 
   interface Assistant {

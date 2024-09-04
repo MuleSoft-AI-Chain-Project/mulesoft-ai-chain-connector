@@ -39,6 +39,7 @@ import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
+import org.mule.extension.mulechain.internal.util.ExcludeFromGeneratedCoverage;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
@@ -93,6 +94,7 @@ public class LangchainEmbeddingStoresOperations {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LangchainEmbeddingStoresOperations.class);
 
+  @ExcludeFromGeneratedCoverage
   private final EmbeddingModel embeddingModel;
 
   private InMemoryEmbeddingStore<TextSegment> deserializedStore;
