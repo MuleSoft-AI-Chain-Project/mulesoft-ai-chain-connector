@@ -10,6 +10,12 @@
 	  http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd">
 	<munit:config name="langchain-embedding-operation-failure-testing-suite.xml" />
 
+	<munit:test name="embedding-new-store-test" expectedErrorType="MS-AICHAIN:EMBEDDING_OPERATIONS_FAILURE" >
+		<munit:execution>
+			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/dummy/embedding.store"/>
+		</munit:execution>
+	</munit:test>
+
 	<munit:test name="embedding-add-file-incorrect-store-failure-test" description="Embedding Add Doc operation failure due to incorrect store name" expectedErrorType="MS-AICHAIN:EMBEDDING_OPERATIONS_FAILURE">
 		<munit:behavior>
 			<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName="target/embedding.store"/>
