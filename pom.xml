@@ -29,6 +29,7 @@
 		<munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
 		<munit.extensions.maven.plugin.version>1.2.0</munit.extensions.maven.plugin.version>
 		<jacoco.version>0.8.12</jacoco.version>
+		<maven.surefire.version>2.22.2</maven.surefire.version>
     </properties>
 
 	<build>
@@ -106,6 +107,44 @@
 							<goal>test</goal>
 						</goals>
 						<phase>integration-test</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven.surefire.version}</version>
+				<configuration>
+					<argLine>-Dfile.encoding=UTF-8</argLine>
+					<argLine>
+						-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
+					</argLine>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
