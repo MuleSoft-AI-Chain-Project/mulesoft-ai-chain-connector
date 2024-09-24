@@ -1,6 +1,6 @@
 # MuleSoft AI Chain Connector Overview
 
-The MuleSoft AI Chain Connector is designed design, build and manage AI agents within MuleSoft Anypoint Platform. It provides the tools and support needed to integrate Large Language Models (LLMs), vector stores, and other advanced AI services into MuleSoft applications.
+The MuleSoft AI Chain Connector helps developers design, build and manage AI agents within Anypoint Platform. It provides the tools and support needed to integrate Large Language Models (LLMs), vector stores, and other advanced AI services into MuleSoft applications.
 
 ## Key Features
 
