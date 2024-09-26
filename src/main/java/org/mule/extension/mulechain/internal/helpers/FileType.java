@@ -3,6 +3,9 @@
  */
 package org.mule.extension.mulechain.internal.helpers;
 
+import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
+import org.mule.runtime.extension.api.exception.ModuleException;
+
 import java.util.Arrays;
 
 public enum FileType {
@@ -23,7 +26,7 @@ public enum FileType {
     return Arrays.stream(FileType.values())
         .filter(fileType -> fileType.value.equals(value))
         .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("Unsupported File Type: " + value));
+        .orElseThrow(() -> new ModuleException("Unsupported File Type: " + value, MuleChainErrorType.FILE_HANDLING_FAILURE));
   }
 
 }

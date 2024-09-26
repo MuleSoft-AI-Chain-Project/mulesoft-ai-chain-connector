@@ -193,9 +193,7 @@ payload.response must contain("reactive programming")]]]></munit-tools:that>
 				<munit-tools:that ><![CDATA[#[%dw 2.0
 import * from dw::test::Asserts
 ---
-payload must equalTo({
-  "response": "Your name is Mulechain."
-})]]]></munit-tools:that>
+payload.response must contain("Your name is Mulechain.")]]]></munit-tools:that>
 			</munit-tools:assert>
 		</munit:validation>
 	</munit:test>

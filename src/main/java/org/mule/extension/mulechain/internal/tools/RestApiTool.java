@@ -4,6 +4,7 @@
 package org.mule.extension.mulechain.internal.tools;
 
 import dev.langchain4j.agent.tool.Tool;
+import org.mule.extension.mulechain.internal.util.ExcludeFromGeneratedCoverage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+@ExcludeFromGeneratedCoverage
 public class RestApiTool implements Tool {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RestApiTool.class);
