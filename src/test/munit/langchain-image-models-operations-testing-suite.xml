@@ -8,7 +8,7 @@
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
 	  http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd">
-    <munit:config name="langchain-image-models-operations-testing-suit.xml" />
+    <munit:config name="langchain-image-models-operations-testing-suite.xml" />
     <munit:test name="image-read-test" doc:id="c5205680-748b-436c-a68c-f359db3218b7" >
         <munit:behavior >
             <munit:set-event doc:name="Set Input" doc:id="184e75aa-206e-4807-94ba-2767d71a65ef" >
@@ -62,6 +62,16 @@ payload.response must notBeNull()]]]></munit-tools:that>
         </munit:validation>
     </munit:test>
 
+    <munit:test name="image-generate-failure-test" expectedErrorType="MS-AICHAIN:IMAGE_GENERATION_FAILURE">
+        <munit:execution >
+            <ms-aichain:image-generate doc:name="Image generate" doc:id="e698de71-aaf5-4da3-a202-7d4d5dec5814" config-ref="OPENAI-INCORRECT-KEY">
+                <ms-aichain:data>
+                    Generate a picture of a pinguin dancing on the beach, cartoon style.
+                </ms-aichain:data>
+            </ms-aichain:image-generate>
+        </munit:execution>
+    </munit:test>
+
     <munit:test name="read-scanned-doc-test" doc:id="ae13a919-c5fd-469e-88b7-e89eeea77727" >
         <munit:execution >
             <ms-aichain:image-read-scanned-documents doc:name="Image read scanned documents" doc:id="45154a42-ce31-4b34-aadc-dc3ad10fcdc0" config-ref="OPENAIGPT4" filePath="${app.home}/scansmpl.pdf">
@@ -75,7 +85,7 @@ payload.response must notBeNull()]]]></munit-tools:that>
                 <munit-tools:that ><![CDATA[#[%dw 2.0
 import * from dw::test::Asserts
 ---
-payload.pages[0].response must contain("The Slerexe Company Limited")]]]></munit-tools:that>
+payload.pages[0].response must contain("Pete")]]]></munit-tools:that>
             </munit-tools:assert>
         </munit:validation>
     </munit:test>

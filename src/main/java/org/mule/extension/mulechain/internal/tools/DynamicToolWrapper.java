@@ -4,13 +4,14 @@
 package org.mule.extension.mulechain.internal.tools;
 
 import dev.langchain4j.agent.tool.Tool;
+import org.mule.extension.mulechain.internal.util.ExcludeFromGeneratedCoverage;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-//Obsolete
+@ExcludeFromGeneratedCoverage
 public class DynamicToolWrapper implements Tool {
 
   private final String name;
