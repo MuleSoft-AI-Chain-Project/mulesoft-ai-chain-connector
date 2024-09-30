@@ -796,12 +796,19 @@ public class LangchainEmbeddingStoresOperations {
 
         toolsUsed = true;
         // Create an instance of the custom tool with parameters
-        GenericRestApiTool restApiTool = new GenericRestApiTool(findURLs.get(0), "API Call", "Execute GET or POST Requests");
-
+        //AW GenericRestApiTool restApiTool = new GenericRestApiTool(findURLs.get(0), "API Call", "Execute GET or POST Requests");
+        // AW begin
+        List<GenericRestApiTool> restApiTool = new ArrayList<>();
+        for (String url : findURLs) {
+          restApiTool.add(new GenericRestApiTool(url, "API Call", "Execute GET or POST Requests"));
+          LOGGER.info("url added: {}", url);
+        }
+        //AW End */
         // Build the assistant with the custom tool
         AssistantR assistantC = AiServices.builder(AssistantR.class)
             .chatLanguageModel(model)
-            .tools(restApiTool)
+        //AW    .tools(restApiTool)
+            .tools(restApiTool.toArray())
             //.chatMemory(MessageWindowChatMemory.withMaxMessages(10))
             .build();
         // Use the assistant to make a query
