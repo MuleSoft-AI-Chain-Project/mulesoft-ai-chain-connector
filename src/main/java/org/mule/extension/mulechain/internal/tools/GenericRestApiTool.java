@@ -62,7 +62,8 @@ public class GenericRestApiTool implements Tool {
         method = "GET";
       }
 
-      LOGGER.info("apiEndpoint-{}", apiEndpoint);
+      //AW LOGGER.info("apiEndpoint-{}", apiEndpoint);
+      LOGGER.info("apiEndpoint-{}", input);
       URL url = new URL(urlBuilder.toString());
 
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
