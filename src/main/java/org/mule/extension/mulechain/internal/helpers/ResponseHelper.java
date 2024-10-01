@@ -26,6 +26,8 @@ public final class ResponseHelper {
                                                             result.tokenUsage().outputTokenCount(),
                                                             result.tokenUsage().totalTokenCount())
         : null;
+
+    System.out.println(response + ", " + tokenUsage + ", " + responseAttributes);
     return createLLMResponse(response, tokenUsage, responseAttributes);
   }
 
