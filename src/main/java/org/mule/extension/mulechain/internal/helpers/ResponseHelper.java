@@ -22,21 +22,21 @@ public final class ResponseHelper {
   public static Result<InputStream, LLMResponseAttributes> createLLMResponse(String response,
                                                                              dev.langchain4j.service.Result<?> result,
                                                                              Map<String, String> responseAttributes) {
-    TokenUsage tokenUsage = result != null ? new TokenUsage(result.tokenUsage().inputTokenCount(),
-                                                            result.tokenUsage().outputTokenCount(),
-                                                            result.tokenUsage().totalTokenCount())
+
+    TokenUsage tokenUsage = result.tokenUsage() != null ? new TokenUsage(result.tokenUsage().inputTokenCount(),
+                                                                         result.tokenUsage().outputTokenCount(),
+                                                                         result.tokenUsage().totalTokenCount())
         : null;
 
-    System.out.println(response + ", " + tokenUsage + ", " + responseAttributes);
     return createLLMResponse(response, tokenUsage, responseAttributes);
   }
 
   public static Result<InputStream, LLMResponseAttributes> createLLMResponse(String response,
                                                                              Response<?> result,
                                                                              Map<String, String> responseAttributes) {
-    TokenUsage tokenUsage = result != null ? new TokenUsage(result.tokenUsage().inputTokenCount(),
-                                                            result.tokenUsage().outputTokenCount(),
-                                                            result.tokenUsage().totalTokenCount())
+    TokenUsage tokenUsage = result.tokenUsage() != null ? new TokenUsage(result.tokenUsage().inputTokenCount(),
+                                                                         result.tokenUsage().outputTokenCount(),
+                                                                         result.tokenUsage().totalTokenCount())
         : null;
     return createLLMResponse(response, tokenUsage, responseAttributes);
   }
