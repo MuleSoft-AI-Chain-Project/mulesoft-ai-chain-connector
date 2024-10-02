@@ -23,7 +23,10 @@ public enum LangchainLLMType {
           getMistralAIModelNameStream(), LangchainLLMInitializerUtil::createMistralAiChatModel), OLLAMA("OLLAMA",
               getOllamaModelNameStream(), LangchainLLMInitializerUtil::createOllamaChatModel), ANTHROPIC("ANTHROPIC",
                   getAnthropicModelNameStream(), LangchainLLMInitializerUtil::createAnthropicChatModel), AZURE_OPENAI(
-                      "AZURE_OPENAI", OPENAI.getModelNameStream(), LangchainLLMInitializerUtil::createAzureOpenAiChatModel);
+                      "AZURE_OPENAI", OPENAI.getModelNameStream(),
+                      LangchainLLMInitializerUtil::createAzureOpenAiChatModel), HUGGING_FACE(
+                          "HUGGING_FACE", getHuggingFaceModelNameStream(),
+                          LangchainLLMInitializerUtil::createHuggingFaceChatModel);
 
   private final String value;
   private final Stream<String> modelNameStream;
@@ -62,6 +65,10 @@ public enum LangchainLLMType {
     return Arrays.stream(OllamaModelName.values()).map(String::valueOf);
   }
 
+  private static Stream<String> getHuggingFaceModelNameStream() {
+    return Arrays.stream(HuggingFaceModelName.values()).map(String::valueOf);
+  }
+
   private static Stream<String> getAnthropicModelNameStream() {
     return Arrays.stream(AnthropicChatModelName.values()).map(String::valueOf);
   }
@@ -87,4 +94,21 @@ public enum LangchainLLMType {
       return this.value;
     }
   }
+
+  enum HuggingFaceModelName {
+    TII_UAE_FALCON_7B_INSTRUCT("tiiuae/falcon-7b-instruct"), PHI3("microsoft/Phi-3.5-mini-instruct"), MISTRAL_7B_INSTRUCT_v03(
+        "mistralai/Mistral-7B-Instruct-v0.3"), TINY_LLAMA("TinyLlama/TinyLlama-1.1B-Chat-v1.0");
+
+    private final String value;
+
+    HuggingFaceModelName(String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return this.value;
+    }
+  }
+
 }
