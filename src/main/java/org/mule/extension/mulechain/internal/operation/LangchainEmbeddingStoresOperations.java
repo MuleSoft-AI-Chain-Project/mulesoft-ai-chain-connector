@@ -39,6 +39,7 @@ import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
+import org.mule.extension.mulechain.internal.util.ExcludeFromGeneratedCoverage;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
@@ -60,7 +61,7 @@ import dev.langchain4j.data.document.parser.TextDocumentParser;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.document.transformer.HtmlTextExtractor;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
-import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
+import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.retriever.EmbeddingStoreRetriever;
@@ -93,6 +94,7 @@ public class LangchainEmbeddingStoresOperations {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LangchainEmbeddingStoresOperations.class);
 
+  @ExcludeFromGeneratedCoverage
   private final EmbeddingModel embeddingModel;
 
   private InMemoryEmbeddingStore<TextSegment> deserializedStore;
@@ -365,7 +367,7 @@ public class LangchainEmbeddingStoresOperations {
             .build();
         // Use the assistant to make a query
         response = assistant.chat(intermediateAnswer);
-        LOGGER.info("Response after Tools Usage: {}", response);
+        LOGGER.debug("Response after Tools Usage: {}", response);
       }
 
       JSONObject jsonObject = new JSONObject();
@@ -805,7 +807,7 @@ public class LangchainEmbeddingStoresOperations {
         // Use the assistant to make a query
         //response = assistantC.chat(intermediateAnswer.content());
         response = assistantC.chat(intermediateAnswer.content());
-        LOGGER.info("Response after Tools Usage: {}", response);
+        LOGGER.debug("Response after Tools Usage: {}", response.content());
       }
 
       JSONObject jsonObject = new JSONObject();

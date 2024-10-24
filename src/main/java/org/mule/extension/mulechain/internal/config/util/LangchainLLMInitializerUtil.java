@@ -5,6 +5,7 @@ package org.mule.extension.mulechain.internal.config.util;
 
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.azure.AzureOpenAiChatModel;
+import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
@@ -75,6 +76,21 @@ public final class LangchainLLMInitializerUtil {
         .modelName(configuration.getModelName())
         .temperature(configuration.getTemperature())
         .timeout(ofSeconds(durationInSec))
+        .build();
+  }
+
+
+  public static HuggingFaceChatModel createHuggingFaceChatModel(ConfigExtractor configExtractor,
+                                                                LangchainLLMConfiguration configuration) {
+    String huggingFaceApiKey = configExtractor.extractValue("HUGGING_FACE_API_KEY");
+    long durationInSec = configuration.getLlmTimeoutUnit().toSeconds(configuration.getLlmTimeout());
+    return HuggingFaceChatModel.builder()
+        .accessToken(huggingFaceApiKey)
+        .modelId(configuration.getModelName())
+        .timeout(ofSeconds(durationInSec))
+        .temperature(configuration.getTemperature())
+        .maxNewTokens(configuration.getMaxTokens())
+        .waitForModel(true)
         .build();
   }
 
