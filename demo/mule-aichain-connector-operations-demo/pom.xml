@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.mulesoft.connectors.examples</groupId>
-	<artifactId>mulechain-ai-connector-operations-demo</artifactId>
+	<artifactId>mule4-aichain-connector-operations-demo</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>mule-application</packaging>
 
-	<name>mule-aichain-connector-operations-demo</name>
+	<name>mule4-aichain-connector-operations-demo</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -58,9 +58,9 @@
 		</dependency>
 		<!--  JSOUP DEPENDENCY -->
 		<dependency>
-			<groupId>com.mule.mulechain</groupId>
-			<artifactId>mulechain-ai-connector</artifactId>
-			<version>0.2.25</version>
+			<groupId>com.mulesoft.connectors</groupId>
+			<artifactId>mule4-aichain-connector</artifactId>
+			<version>1.0.0</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
