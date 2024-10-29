@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:ms-aichain="http://www.mulesoft.org/schema/mule/ms-aichain"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="817b3a99-cf1c-41ea-a8bd-10932e93a6e3" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<ms-aichain:config name="MISTRAL_AI" llmType="MISTRAL_AI" configType="Configuration Json" doc:name="MuleSoft AI Chain configuration" doc:id="bf1ef7ec-4aa1-41c8-a184-a13ca165c925" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' modelName="mistral-large-latest" temperature="0.1"/>
+	<ms-aichain:config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="MuleSoft AI Chain configuration" doc:id="edb0d5a6-97c5-4d93-8098-4e197e563827" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' temperature="0.1" modelName="gpt-3.5-turbo"/>
+	<ms-aichain:config name="OPENAI-GPT4-TURBO" llmType="OPENAI" configType="Configuration Json" doc:name="MuleSoft AI Chain configuration" doc:id="74b85066-1569-4f10-a06b-e49e854eeef2" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' modelName="gpt-4o" />
+	<flow name="PromptTemplate" doc:id="cff3a8ed-3799-424a-becf-9d7387729bd0" >
+		<http:listener doc:name="Listener" doc:id="dd18126e-81f5-48ef-8f35-9dd19afdfaf0" config-ref="HTTP_Listener_config" path="/agent">
+			<http:response >
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:agent-define-prompt-template doc:name="Agent define prompt template" doc:id="c4f5bb4b-1bd4-49a3-8612-29f1dacbbef6" config-ref="OPENAI">
+			<ms-aichain:dataset>
+				#[payload.data]
+			</ms-aichain:dataset>
+			<ms-aichain:template>
+				"You are a customer satisfaction agent, who analyses the customer feedback in the dataset. Answer via json output and add a type for the result only with positive or negative as well as the complete answer"
+			</ms-aichain:template>
+			<ms-aichain:instructions>
+				"If the customer feedback in the dataset is negative, open a service satisfaction case and apologize to the customer. If the customer feedback in the dataset is positive, thank the customer and wish them a nice day. Don't repeat the feedback and be more direct starting the conversation with formal greetings"
+			</ms-aichain:instructions>
+		</ms-aichain:agent-define-prompt-template>
+	</flow>
+	<flow name="ChatAnswerPrompt" doc:id="c3de899b-5e08-493f-be6a-f7cda10e8214" >
+		<http:listener doc:name="Listener" doc:id="ec2df0e9-8ff7-4f86-ba6a-5bcd64a092ba" config-ref="HTTP_Listener_config" path="/chat">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:chat-answer-prompt doc:name="Chat answer prompt" doc:id="e2706dfd-79e6-463f-9dab-ecef6f576c22" config-ref="OPENAI">
+			<ms-aichain:prompt>
+				#[payload.data]
+			</ms-aichain:prompt>
+		</ms-aichain:chat-answer-prompt>
+	</flow>
+	<flow name="ChatAnswerPromptWithMemory" doc:id="0036faaa-b891-42c8-96e3-a7f08660e41d" >
+		<http:listener doc:name="Listener" doc:id="a3d66872-10a6-4eb9-916a-436f25d92841" config-ref="HTTP_Listener_config" path="/chatMemory">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:chat-answer-prompt-with-memory doc:name="Chat answer prompt with memory" doc:id="d012af47-a41d-46aa-8476-39e1a2f48d92" config-ref="OPENAI" memoryName="#[payload.memory]" dbFilePath="#[payload.memoryFilePath]" maxMessages="#[payload.maxMessages]">
+			<ms-aichain:data>
+				#[payload.data]
+			</ms-aichain:data>
+		</ms-aichain:chat-answer-prompt-with-memory>
+	</flow>
+	<flow name="EmbeddingNewStore" doc:id="7ec661b2-2e96-4d29-bef8-13afdc4df66f" >
+		<http:listener doc:name="Listener" doc:id="f57d8296-4ebf-4c85-b6bc-b154cc34d1bc" config-ref="HTTP_Listener_config" path="/embeddingNew">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:embedding-new-store doc:name="Embedding new store" doc:id="8f4b53ec-f238-4af0-bc9b-f18bc8ef579a" storeName='#["embedding.store"]'/>
+	</flow>
+	<flow name="EmbeddingAddFile" doc:id="074f8a86-b931-477e-b3cc-3741a63a1822" >
+		<http:listener doc:name="Listener" doc:id="d1d00ff4-7c9d-4548-92ca-8a0fa50b3124" config-ref="HTTP_Listener_config" path="/embeddingAdd">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:embedding-add-document-to-store doc:name="Embedding add document to store" doc:id="7f5feb33-8302-4c06-a358-a23267b808fb" storeName='#["embedding.store"]' contextPath="#[payload.filePath]" fileType="#[payload.fileType]" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+	</flow>
+	<flow name="EmbeddingAddFolder" doc:id="b84bd92d-eea3-4691-bd6a-17c03d932789" >
+		<http:listener doc:name="Listener" doc:id="88456faf-719b-42fa-bd1e-8716c0ccf94c" config-ref="HTTP_Listener_config" path="/embeddingAddFolder" >
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:embedding-add-folder-to-store doc:name="Embedding add folder to store" doc:id="c113688a-3f1e-44d6-8b5c-a60a65abfdea" storeName='#["embedding.store"]' contextPath="#[payload.folderPath]" maxSegmentSizeInChars="2000" maxOverlapSizeInChars="200"/>
+	</flow>
+	<flow name="EmbeddingQueryStore" doc:id="4dc447bb-2257-42c1-80e3-6f7c4d507737" >
+		<http:listener doc:name="Listener" doc:id="e16e5d95-c2d8-4778-99dc-da74ae55e6e1" config-ref="HTTP_Listener_config" path="/queryStore">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:embedding-query-from-store doc:name="Embedding query from store" doc:id="1ee361ea-e62a-4e0f-9c74-0363f8721052" storeName='#["embedding.store"]' maxResults="3" minScore="0.7" getLatest="true">
+			<ms-aichain:question>
+				#[payload.question]
+			</ms-aichain:question>
+		</ms-aichain:embedding-query-from-store>
+	</flow>
+	<flow name="EmbeddingGetInfo" doc:id="3d54ea4d-b932-42c3-8ab1-1a24675a5caf" >
+		<http:listener doc:name="Listener" doc:id="a4f76b29-9203-4b65-81aa-d5be3fff4789" config-ref="HTTP_Listener_config" path="/embeddingInfo">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:embedding-get-info-from-store doc:name="Embedding get info from store" doc:id="ae5b31c6-d99d-4ab8-848c-03124785184b" config-ref="OPENAI" storeName='#["embedding.store"]' getLatest="true">
+			<ms-aichain:data>
+				#[payload.question]
+			</ms-aichain:data>
+		</ms-aichain:embedding-get-info-from-store>
+	</flow>
+	<flow name="EmbeddingAdd5" doc:id="347caa3d-ed7b-4ba8-bf74-4f184e8727d3" >
+		<http:listener doc:name="Listener" doc:id="6720bf73-6b8c-4bc7-8153-f21a5df4f7d8" config-ref="HTTP_Listener_config" path="/embeddingInfoLegacy">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:embedding-get-info-from-store-legacy doc:name="Embedding get info from store legacy" doc:id="1f9e0410-4357-4ad8-bf17-29112f20e2f6" config-ref="OPENAI" storeName='#["embedding.store"]'>
+			<ms-aichain:data>
+				#[payload.question]
+			</ms-aichain:data>
+		</ms-aichain:embedding-get-info-from-store-legacy>
+	</flow>
+	<flow name="ImageGenerate" doc:id="d9dfb328-65d4-499b-8eaf-282e21a245cf" >
+		<http:listener doc:name="Listener" doc:id="ebd04ee3-0e40-456e-ad6e-8be37cd9f706" config-ref="HTTP_Listener_config" path="/image">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:image-generate doc:name="Image generate" doc:id="e698de71-aaf5-4da3-a202-7d4d5dec5814" config-ref="OPENAI-GPT4-TURBO">
+			<ms-aichain:data>
+				#[payload.prompt]
+			</ms-aichain:data>
+		</ms-aichain:image-generate>
+		<ee:transform doc:name="Transform Message" doc:id="c3eec9c9-14a3-4676-87f5-839d00638a35" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{ imageURL: payload.response as String }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="ImageRead" doc:id="e1603839-8651-4fff-9436-9cb66e41cd8c" >
+		<http:listener doc:name="Listener" doc:id="5248fffd-9678-432f-987f-b2ca0e0382b2" config-ref="HTTP_Listener_config" path="/imageRead">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:image-read doc:name="Image read" doc:id="a6a11fd7-6f48-4063-820c-1d9d488dd033" config-ref="OPENAI-GPT4-TURBO" contextURL="#[payload.imageUrl]">
+			<ms-aichain:data>
+				#[payload.prompt]
+			</ms-aichain:data>
+		</ms-aichain:image-read>
+	</flow>
+	<flow name="RAG" doc:id="3831de2a-109f-4864-96ea-4a9f4e1255f0" >
+		<http:listener doc:name="Listener" doc:id="e3db6396-bea6-4fcc-8ade-fe07dcad2150" config-ref="HTTP_Listener_config" path="/rag">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:rag-load-document doc:name="Rag load document" doc:id="66b215ae-fab5-4da9-ac91-ebe1c60d6a7b" config-ref="OPENAI-GPT4-TURBO" contextPath="#[payload.filePath]" fileType="#[payload.fileType]">
+			<ms-aichain:data>
+				#[payload.data]
+			</ms-aichain:data>
+		</ms-aichain:rag-load-document>
+	</flow>
+	<flow name="ms-aichain-testingFlow" doc:id="b074f6aa-3a5b-40b2-9147-6e18b02c019d" >
+		<http:listener doc:name="Listener" doc:id="15e4941a-468b-48ab-b21f-61fbb38544ca" config-ref="HTTP_Listener_config" path="/sentiments">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:sentiment-analyze doc:name="Sentiment analyze" doc:id="f3d0d5dc-aab8-4986-85b5-2860435657f8" config-ref="OPENAI">
+			<ms-aichain:data>
+				#[payload.data]
+			</ms-aichain:data>
+		</ms-aichain:sentiment-analyze>
+	</flow>
+	<flow name="ToolsAIService" doc:id="b4f5e268-13f0-40d6-a03a-47dbaac8d4f7" >
+		<http:listener doc:name="Listener" doc:id="c551c245-3152-4795-a857-989fbee12adc" config-ref="HTTP_Listener_config" path="/aiservice">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:tools-use-ai-service doc:name="Tools use ai service" doc:id="e7a3fcc4-653e-45c8-8f95-7b22ba9e4a63" config-ref="OPENAI-GPT4-TURBO" toolConfig='#[mule.home ++ "/apps/" ++ app.name ++ "/tools.config.json"]'>
+			<ms-aichain:data>
+				#[payload.question ++ ", dont assume things and invent answers. Answer with the most probable statement."]
+			</ms-aichain:data>
+		</ms-aichain:tools-use-ai-service>
+	</flow>
+	<flow name="ms-aichain-testingFlow1" doc:id="c5236fd3-d578-4f91-b1f9-16c334e1cd7c" >
+		<http:listener doc:name="Listener" doc:id="30727c05-9524-4011-9d3a-6658f4706d4e" config-ref="HTTP_Listener_config" path="/chains">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:tools-use-ai-service-legacy doc:name="Tools use ai service legacy" doc:id="51aa98dc-0ad2-42ad-9fc0-0883bdb766a4" config-ref="OPENAI-GPT4-TURBO" toolConfig='#[mule.home ++ "/apps/" ++ app.name ++ "/tools.config.json"]'>
+			<ms-aichain:data>
+				#[payload.question ++ ", dont assume things and invent answers. Answer with the most probable statement."]
+			</ms-aichain:data>
+		</ms-aichain:tools-use-ai-service-legacy>
+	</flow>
+	<flow name="ms-aichain-testingFlow2" doc:id="2f02e10e-6422-4b94-ab34-9584e5ee0ed6" >
+		<http:listener doc:name="Listener" doc:id="0f940ad8-5210-4433-9651-79af3fbd88c4" config-ref="HTTP_Listener_config" path="/scanned">
+			<http:response>
+				<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></http:body>
+			</http:response>
+		</http:listener>
+		<ms-aichain:image-read-scanned-documents doc:name="Image read scanned documents" doc:id="45154a42-ce31-4b34-aadc-dc3ad10fcdc0" config-ref="OPENAI-GPT4-TURBO" filePath="#[payload.filePath]">
+			<ms-aichain:data>
+				#[payload.prompt]
+			</ms-aichain:data>
+		</ms-aichain:image-read-scanned-documents>
+	</flow>
+</mule>

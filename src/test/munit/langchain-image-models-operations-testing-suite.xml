@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ms-aichain="http://www.mulesoft.org/schema/mule/ms-aichain"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+	  http://www.mulesoft.org/schema/mule/ms-aichain http://www.mulesoft.org/schema/mule/ms-aichain/current/mule-ms-aichain.xsd">
+    <munit:config name="langchain-image-models-operations-testing-suite.xml" />
+    <munit:test name="image-read-test" doc:id="c5205680-748b-436c-a68c-f359db3218b7" >
+        <munit:behavior >
+            <munit:set-event doc:name="Set Input" doc:id="184e75aa-206e-4807-94ba-2767d71a65ef" >
+                <munit:payload value="#[output application/json --- readUrl('classpath://imagereadtest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+            </munit:set-event>
+        </munit:behavior>
+        <munit:execution >
+            <ms-aichain:image-read doc:name="IMAGE-read" doc:id="b6a1436f-028c-460d-97dc-f3670520001b"
+                                                    config-ref="OPENAIGPT4" contextURL="#[payload.imageUrl]">
+                <ms-aichain:data>
+                    #[payload.prompt]
+                </ms-aichain:data>
+            </ms-aichain:image-read>
+        </munit:execution>
+        <munit:validation >
+            <munit-tools:assert doc:name="Assert payload" doc:id="000e7f6c-1e37-4a86-8ce9-8768af0d7c33" message="The payload does not match">
+                <munit-tools:that ><![CDATA[#[%dw 2.0
+import imagereadtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+            </munit-tools:assert>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="image-read-incorrect-url-failure-test" description="Failure when the image url is wrongly provided" expectedErrorType="MS-AICHAIN:IMAGE_ANALYSIS_FAILURE">
+        <munit:execution>
+            <ms-aichain:image-read doc:name="IMAGE-read" doc:id="b6a1436f-028c-460d-97dc-f3670520001b"
+                                   config-ref="OPENAIGPT4" contextURL="https://www.quickanddirtytips.com/wp-content/uploads/2022/ezgif.com-gif-maker-3.jpg">
+                <ms-aichain:data>
+                    What do you see?
+                </ms-aichain:data>
+            </ms-aichain:image-read>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="image-generate-test" doc:id="b6b84e68-13f2-40d7-9486-1298c9698d97" >
+        <munit:execution >
+            <ms-aichain:image-generate doc:name="Image generate" doc:id="e698de71-aaf5-4da3-a202-7d4d5dec5814" config-ref="OPENAIGPT4">
+                <ms-aichain:data>
+                    Generate a picture of a pinguin dancing on the beach, cartoon style.
+                </ms-aichain:data>
+            </ms-aichain:image-generate>
+        </munit:execution>
+        <munit:validation >
+            <munit-tools:assert doc:name="Assert payload" doc:id="df9a8fc1-7d0e-4181-bf08-13e27693511c" message="The payload does not match">
+                <munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.response must notBeNull()]]]></munit-tools:that>
+            </munit-tools:assert>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="image-generate-failure-test" expectedErrorType="MS-AICHAIN:IMAGE_GENERATION_FAILURE">
+        <munit:execution >
+            <ms-aichain:image-generate doc:name="Image generate" doc:id="e698de71-aaf5-4da3-a202-7d4d5dec5814" config-ref="OPENAI-INCORRECT-KEY">
+                <ms-aichain:data>
+                    Generate a picture of a pinguin dancing on the beach, cartoon style.
+                </ms-aichain:data>
+            </ms-aichain:image-generate>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="read-scanned-doc-test" doc:id="ae13a919-c5fd-469e-88b7-e89eeea77727" >
+        <munit:execution >
+            <ms-aichain:image-read-scanned-documents doc:name="Image read scanned documents" doc:id="45154a42-ce31-4b34-aadc-dc3ad10fcdc0" config-ref="OPENAIGPT4" filePath="${app.home}/scansmpl.pdf">
+                <ms-aichain:data>
+                    Convert the page to json
+                </ms-aichain:data>
+            </ms-aichain:image-read-scanned-documents>
+        </munit:execution>
+        <munit:validation >
+            <munit-tools:assert doc:name="Assert payload" doc:id="cb078fcd-c98d-43ad-b6ae-88155d5450fd" message="The payload does not match">
+                <munit-tools:that ><![CDATA[#[%dw 2.0
+import * from dw::test::Asserts
+---
+payload.pages[0].response must contain("Pete")]]]></munit-tools:that>
+            </munit-tools:assert>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="read-scanned-doc-failure-test" description="Failure while reading the doc file" expectedErrorType="MS-AICHAIN:FILE_HANDLING_FAILURE">
+        <munit:execution >
+            <ms-aichain:image-read-scanned-documents doc:name="Image read scanned documents" doc:id="45154a42-ce31-4b34-aadc-dc3ad10fcdc0" config-ref="OPENAIGPT4" filePath="${app.home}/scansmp.pdf">
+                <ms-aichain:data>
+                    Convert the page to json
+                </ms-aichain:data>
+            </ms-aichain:image-read-scanned-documents>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="read-scanned-doc-config-failure-test" description="Failure with incorrect configuration" expectedErrorType="MS-AICHAIN:IMAGE_ANALYSIS_FAILURE">
+        <munit:execution >
+            <ms-aichain:image-read-scanned-documents doc:name="Image read scanned documents" doc:id="45154a42-ce31-4b34-aadc-dc3ad10fcdc0" config-ref="OPENAI-INCORRECT-MODEL-NAME" filePath="${app.home}/scansmpl.pdf">
+                <ms-aichain:data>
+                    Convert the page to json
+                </ms-aichain:data>
+            </ms-aichain:image-read-scanned-documents>
+        </munit:execution>
+    </munit:test>
+
+</mule>
