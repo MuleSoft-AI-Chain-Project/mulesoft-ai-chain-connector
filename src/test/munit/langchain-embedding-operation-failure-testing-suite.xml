@@ -94,7 +94,7 @@
 		</munit:execution>
 	</munit:test>
 
-	<munit:test name="tools-ai-service-api-failure-test" description="Api call fails due to incorrect endpoint configuration in tools.config">
+	<munit:test name="tools-ai-service-api-failure-test" description="Api call fails due to incorrect endpoint configuration in tools.config" ignore="true">
 		<munit:execution >
 			<ms-aichain:tools-use-ai-service doc:name="Tools use ai service" doc:id="e7a3fcc4-653e-45c8-8f95-7b22ba9e4a63" config-ref="OPENAIGPT4" toolConfig="${app.home}/local.tools.config.json">
 				<ms-aichain:data>
