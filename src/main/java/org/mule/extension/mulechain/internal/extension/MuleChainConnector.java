@@ -22,7 +22,7 @@ import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
  * and sources are going to be declared.
  */
 @Xml(prefix = "ms-aichain")
-@Extension(name = "MuleSoft AI Chain", category = Category.CERTIFIED)
+@Extension(name = "MuleSoft AI Chain", category = Category.SELECT)
 @Configurations({LangchainLLMConfiguration.class})
 @RequiresEnterpriseLicense(allowEvaluationLicense = true)
 @ErrorTypes(MuleChainErrorType.class)
