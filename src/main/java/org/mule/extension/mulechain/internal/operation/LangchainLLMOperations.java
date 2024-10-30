@@ -8,7 +8,10 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import static org.mule.extension.mulechain.internal.helpers.ResponseHelper.createLLMResponse;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 
-import java.io.InputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +21,7 @@ import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
+import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
@@ -29,6 +33,7 @@ import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.Result;
 import dev.langchain4j.service.UserMessage;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +44,8 @@ import org.slf4j.LoggerFactory;
 public class LangchainLLMOperations {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LangchainLLMOperations.class);
+  private static final String URL_BASE = "https://api.openai.com/v1/moderations";
+  private static final String MODERATION_MODEL = "omni-moderation-latest";
 
   interface Assistant {
 
@@ -168,6 +175,78 @@ public class LangchainLLMOperations {
     } catch (Exception e) {
       throw new ModuleException("Unable to provide the correct sentiments", MuleChainErrorType.AI_SERVICES_FAILURE, e);
     }
+  }
+
+  /**
+   * Use OpenAI Moderation models to moderate the input (any, from user or llm)
+   */
+  @MediaType(value = APPLICATION_JSON, strict = false)
+  @Alias("Toxicity-detection")
+  @Throws(AiServiceErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/Response.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> moderateInput(@Config LangchainLLMConfiguration configuration,
+                                                                                                                   String input) {
+    try {
+      JSONObject payload = new JSONObject();
+      payload.put("model", MODERATION_MODEL);
+      payload.put("input", input);
+      ConfigExtractor configExtractor = configuration.getConfigExtractor();
+      String openaiApiKey = configExtractor.extractValue("OPENAI_API_KEY");
+
+      String response = executeREST(openaiApiKey, payload.toString());
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put(MuleChainConstants.RESPONSE, response);
+
+      LOGGER.debug("Toxicity detection result {}", response);
+      Result<String> answer = Result.<String>builder()
+          .content(response)
+          .tokenUsage(null)
+          .build();;
+      return createLLMResponse(jsonObject.toString(), answer, new HashMap<>());
+    } catch (Exception e) {
+      throw new ModuleException("Unable to perform toxicity detection", MuleChainErrorType.AI_SERVICES_FAILURE, e);
+    }
+  }
+
+  private static HttpURLConnection getConnectionObject(URL url, String apiKey) throws IOException {
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setDoOutput(true);
+    conn.setRequestMethod("POST");
+    conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+    conn.setRequestProperty("Content-Type", "application/json;charset=utf-8");
+    return conn;
+  }
+
+  private static String executeREST(String apiKey, String payload) {
+
+    try {
+      URL url = new URL(URL_BASE);
+      HttpURLConnection conn = getConnectionObject(url, apiKey);
+
+      try (OutputStream os = conn.getOutputStream()) {
+        byte[] input = payload.getBytes(StandardCharsets.UTF_8);
+        os.write(input, 0, input.length);
+      }
+
+      int responseCode = conn.getResponseCode();
+      if (responseCode == HttpURLConnection.HTTP_OK) {
+        try (BufferedReader br = new BufferedReader(
+                                                    new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+          StringBuilder response = new StringBuilder();
+          String responseLine;
+          while ((responseLine = br.readLine()) != null) {
+            response.append(responseLine.trim());
+          }
+          return response.toString();
+        }
+      } else {
+        return "Error: " + responseCode;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      return "Exception occurred: " + e.getMessage();
+    }
+
   }
 
 

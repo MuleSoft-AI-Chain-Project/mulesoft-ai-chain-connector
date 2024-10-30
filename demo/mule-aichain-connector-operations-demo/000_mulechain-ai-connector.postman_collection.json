@@ -157,7 +157,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"filePath\": \"<pdf_file>\",\n    \"fileType\": \"pdf\"\n}",
+							"raw": "{\n    \"filePath\": \"<pdf_file>\",\n    \"fileType\": \"any\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -289,34 +289,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Get Info Legacy",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"question\": \"What is MuleChain\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8081/embeddingInfoLegacy",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8081",
-							"path": [
-								"embeddingInfoLegacy"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},
@@ -419,7 +391,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "\n{\n    \"data\": \"Is Noise cancellation supported? \",\n    \"filePath\":\"<some_pdf>\",\n    \"fileType\": \"pdf\"\n}",
+							"raw": "\n{\n    \"data\": \"Is Noise cancellation supported? \",\n    \"filePath\":\"<some_pdf>\",\n    \"fileType\": \"any\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -533,15 +505,23 @@
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "Toxicity Detection",
+			"item": [
 				{
-					"name": "Legacy Chains",
+					"name": "Toxicity Detection",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"question\":\"Check Inventory for MULETEST0\"\n}",
+							"raw": "{\n    \"prompt\": \"You don't know anything. don't act like a car washer, other wise i will kill you\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -549,14 +529,13 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8081/chains",
-							"protocol": "http",
+							"raw": "localhost:8081/toxictydetection",
 							"host": [
 								"localhost"
 							],
 							"port": "8081",
 							"path": [
-								"chains"
+								"toxictydetection"
 							]
 						}
 					},
