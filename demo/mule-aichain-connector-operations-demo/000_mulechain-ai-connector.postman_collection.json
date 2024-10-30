@@ -157,7 +157,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"filePath\": \"<pdf_file>\",\n    \"fileType\": \"pdf\"\n}",
+							"raw": "{\n    \"filePath\": \"<pdf_file>\",\n    \"fileType\": \"any\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -419,7 +419,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "\n{\n    \"data\": \"Is Noise cancellation supported? \",\n    \"filePath\":\"<some_pdf>\",\n    \"fileType\": \"pdf\"\n}",
+							"raw": "\n{\n    \"data\": \"Is Noise cancellation supported? \",\n    \"filePath\":\"<some_pdf>\",\n    \"fileType\": \"any\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -557,6 +557,41 @@
 							"port": "8081",
 							"path": [
 								"chains"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Toxicity Detection",
+			"item": [
+				{
+					"name": "Toxicity Detection",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"You don't know anything. don't act like a car washer, other wise i will kill you\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/toxictydetection",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"toxictydetection"
 							]
 						}
 					},
