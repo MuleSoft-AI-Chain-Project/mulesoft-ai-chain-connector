@@ -289,34 +289,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Get Info Legacy",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"question\": \"What is MuleChain\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8081/embeddingInfoLegacy",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8081",
-							"path": [
-								"embeddingInfoLegacy"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},
@@ -529,34 +501,6 @@
 							"port": "8081",
 							"path": [
 								"toolsMemory"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Legacy Chains",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"question\":\"Check Inventory for MULETEST0\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8081/chains",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8081",
-							"path": [
-								"chains"
 							]
 						}
 					},
