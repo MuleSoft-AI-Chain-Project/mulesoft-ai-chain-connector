@@ -88,15 +88,15 @@ public class LangchainImageModelsOperations {
       UserMessage userMessage;
       if (isURL(contextURL)) {
         userMessage = UserMessage.from(
-                TextContent.from(data),
-                ImageContent.from(contextURL));
+                                       TextContent.from(data),
+                                       ImageContent.from(contextURL));
       } else {
         String imagePath = contextURL;
         String imageBase64 = convertToBase64String(imagePath);
 
         userMessage = UserMessage.from(
-                TextContent.from(data),
-                ImageContent.from(imageBase64, "image/png"));
+                                       TextContent.from(data),
+                                       ImageContent.from(imageBase64, "image/png"));
       }
 
       Response<AiMessage> response = model.generate(userMessage);
@@ -248,6 +248,7 @@ public class LangchainImageModelsOperations {
     String urlPattern = "^(https?|ftp)://[^\\s/$.?#].[^\\s]*$";
     return fileNameFilter.matches(urlPattern);
   }
+
   private static String convertToBase64String(String filePath) {
     try {
       // Read file bytes
