@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -84,9 +85,19 @@ public class LangchainImageModelsOperations {
       LOGGER.debug("Image Read Operation called with the prompt: {} & the url: {}", data, contextURL);
       ChatLanguageModel model = configuration.getModel();
 
-      UserMessage userMessage = UserMessage.from(
-                                                 TextContent.from(data),
-                                                 ImageContent.from(contextURL));
+      UserMessage userMessage;
+      if (isURL(contextURL)) {
+        userMessage = UserMessage.from(
+                                       TextContent.from(data),
+                                       ImageContent.from(contextURL));
+      } else {
+        String imagePath = contextURL;
+        String imageBase64 = convertToBase64String(imagePath);
+
+        userMessage = UserMessage.from(
+                                       TextContent.from(data),
+                                       ImageContent.from(imageBase64, "image/png"));
+      }
 
       Response<AiMessage> response = model.generate(userMessage);
 
@@ -230,6 +241,23 @@ public class LangchainImageModelsOperations {
       return base64String;
     } catch (IOException e) {
       throw new ModuleException("Error occurred while processing the image", MuleChainErrorType.IMAGE_PROCESSING_FAILURE, e);
+    }
+  }
+
+  private boolean isURL(String fileNameFilter) {
+    String urlPattern = "^(https?|ftp)://[^\\s/$.?#].[^\\s]*$";
+    return fileNameFilter.matches(urlPattern);
+  }
+
+  private static String convertToBase64String(String filePath) {
+    try {
+      // Read file bytes
+      byte[] fileContent = Files.readAllBytes(new File(filePath).toPath());
+      // Encode bytes to Base64
+      return Base64.getEncoder().encodeToString(fileContent);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
     }
   }
 }
