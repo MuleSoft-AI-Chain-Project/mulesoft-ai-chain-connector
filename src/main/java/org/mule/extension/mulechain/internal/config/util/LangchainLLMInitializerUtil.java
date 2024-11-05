@@ -5,6 +5,7 @@ package org.mule.extension.mulechain.internal.config.util;
 
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.azure.AzureOpenAiChatModel;
+import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
@@ -26,6 +27,7 @@ public final class LangchainLLMInitializerUtil {
         .modelName(configuration.getModelName())
         .maxTokens(configuration.getMaxTokens())
         .temperature(configuration.getTemperature())
+        .topP(configuration.getTopP())
         .timeout(ofSeconds(durationInSec))
         .logRequests(true)
         .logResponses(true)
@@ -43,6 +45,7 @@ public final class LangchainLLMInitializerUtil {
         .modelName(configuration.getModelName())
         .maxTokens(configuration.getMaxTokens())
         .temperature(configuration.getTemperature())
+        .topP(configuration.getTopP())
         .timeout(ofSeconds(durationInSec))
         .logRequests(true)
         .logResponses(true)
@@ -61,6 +64,7 @@ public final class LangchainLLMInitializerUtil {
         .modelName(configuration.getModelName())
         .maxTokens(configuration.getMaxTokens())
         .temperature(configuration.getTemperature())
+        .topP(configuration.getTopP())
         .timeout(ofSeconds(durationInSec))
         .logRequests(true)
         .logResponses(true)
@@ -75,6 +79,7 @@ public final class LangchainLLMInitializerUtil {
         .baseUrl(ollamaBaseUrl)
         .modelName(configuration.getModelName())
         .temperature(configuration.getTemperature())
+        .topP(configuration.getTopP())
         .timeout(ofSeconds(durationInSec))
         .build();
   }
@@ -95,6 +100,21 @@ public final class LangchainLLMInitializerUtil {
   }
 
 
+  public static GoogleAiGeminiChatModel createGoogleGeminiChatModel(ConfigExtractor configExtractor,
+                                                                    LangchainLLMConfiguration configuration) {
+    String geminiAiKey = configExtractor.extractValue("GEMINI_AI_KEY");
+    long durationInSec = configuration.getLlmTimeoutUnit().toSeconds(configuration.getLlmTimeout());
+    return GoogleAiGeminiChatModel.builder()
+        .apiKey(geminiAiKey)
+        .modelName(configuration.getModelName())
+        .temperature(configuration.getTemperature())
+        .topP(configuration.getTopP())
+        .maxOutputTokens(configuration.getMaxTokens())
+        .logRequestsAndResponses(true)
+        .build();
+  }
+
+
   public static AnthropicChatModel createAnthropicChatModel(ConfigExtractor configExtractor,
                                                             LangchainLLMConfiguration configuration) {
     String anthropicApiKey = configExtractor.extractValue("ANTHROPIC_API_KEY");
@@ -105,6 +125,7 @@ public final class LangchainLLMInitializerUtil {
         .modelName(configuration.getModelName())
         .maxTokens(configuration.getMaxTokens())
         .temperature(configuration.getTemperature())
+        .topP(configuration.getTopP())
         .timeout(ofSeconds(durationInSec))
         .logRequests(true)
         .logResponses(true)
@@ -124,6 +145,7 @@ public final class LangchainLLMInitializerUtil {
         .deploymentName(azureOpenaiDeploymentName)
         .maxTokens(configuration.getMaxTokens())
         .temperature(configuration.getTemperature())
+        .topP(configuration.getTopP())
         .timeout(ofSeconds(durationInSec))
         .logRequestsAndResponses(true)
         .build();

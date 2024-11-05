@@ -26,7 +26,9 @@ public enum LangchainLLMType {
                       "AZURE_OPENAI", OPENAI.getModelNameStream(),
                       LangchainLLMInitializerUtil::createAzureOpenAiChatModel), HUGGING_FACE(
                           "HUGGING_FACE", getHuggingFaceModelNameStream(),
-                          LangchainLLMInitializerUtil::createHuggingFaceChatModel);
+                          LangchainLLMInitializerUtil::createHuggingFaceChatModel), GEMINI_AI("GEMINI_AI",
+                              getGoogleGeminiModelNameStream(),
+                              LangchainLLMInitializerUtil::createGoogleGeminiChatModel);
 
   private final String value;
   private final Stream<String> modelNameStream;
@@ -69,6 +71,11 @@ public enum LangchainLLMType {
     return Arrays.stream(HuggingFaceModelName.values()).map(String::valueOf);
   }
 
+  private static Stream<String> getGoogleGeminiModelNameStream() {
+    return Arrays.stream(GeminiModelName.values()).map(String::valueOf);
+  }
+
+
   private static Stream<String> getAnthropicModelNameStream() {
     return Arrays.stream(AnthropicChatModelName.values()).map(String::valueOf);
   }
@@ -102,6 +109,22 @@ public enum LangchainLLMType {
     private final String value;
 
     HuggingFaceModelName(String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return this.value;
+    }
+  }
+
+  enum GeminiModelName {
+    GEMINI_1_5_FLASH("gemini-1.5-flash"), GEMINI_1_5_PRO("gemini-1.5-pro"), GEMINI_1_PRO(
+        "gemini-1.0-pro"), AQA("aqa");
+
+    private final String value;
+
+    GeminiModelName(String value) {
       this.value = value;
     }
 

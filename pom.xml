@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mulesoft.connectors</groupId>
 	<artifactId>mule4-aichain-connector</artifactId>
-	<version>1.1.10-SNAPSHOT</version>
+	<version>1.1.11-SNAPSHOT</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleSoft AI Chain Connector - Mule 4</name>
 
@@ -200,6 +200,7 @@
 			<artifactId>langchain4j-mistral-ai</artifactId>
 			<version>${langchain4j.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-hugging-face</artifactId>
@@ -239,6 +240,11 @@
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-azure-open-ai</artifactId>
+			<version>${langchain4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-google-ai-gemini</artifactId>
 			<version>${langchain4j.version}</version>
 		</dependency>
 		<dependency>
