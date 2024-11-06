@@ -713,7 +713,7 @@ public class LangchainEmbeddingStoresOperations {
    * @return                        Returns the response while considering tools configuration
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
-  @Alias("TOOLS-use-native-ai")
+  @Alias("TOOLS-use-ai-native")
   @Throws(EmbeddingErrorTypeProvider.class)
   @OutputJsonType(schema = "api/response/ResponseTools.json")
   public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> useNativeAIServiceTools(@Config LangchainLLMConfiguration configuration,
@@ -732,37 +732,40 @@ public class LangchainEmbeddingStoresOperations {
       dev.langchain4j.data.message.UserMessage userMessage = dev.langchain4j.data.message.UserMessage.from(data);
 
       Response<AiMessage> result = model.generate(Arrays.asList(userMessage), toolsSpecs);
-      AiMessage aiMessage = result.content();
-
-      System.out.println("ToolExecutionRequests: " + aiMessage.toolExecutionRequests());
-      System.out.println("hasToolExecutionRequests: " + result.content().hasToolExecutionRequests());
-
 
       JSONObject jsonObject = new JSONObject();
-      boolean toolsUsed = false;
 
       JSONArray toolExecutionRequests = new JSONArray();
 
-      for (ToolExecutionRequest request : result.content().toolExecutionRequests()) {
+      if (result.content().hasToolExecutionRequests()) {
+        for (ToolExecutionRequest request : result.content().toolExecutionRequests()) {
+          JSONObject itemJson = new JSONObject();
+          String id = request.id();
+          String name = request.name();
+          String arguments = request.arguments();
+          JSONObject argumentsJson = new JSONObject(arguments);
+          itemJson.put("id", id);
+          itemJson.put("name", name);
+          itemJson.put("arguments", argumentsJson);
+          toolExecutionRequests.put(itemJson);
+        }
+        jsonObject.put(MuleChainConstants.RESPONSE, "Tools were used");
+        jsonObject.put(MuleChainConstants.TOOL_EXECUTION_REQUESTS, toolExecutionRequests);
+      } else {
         JSONObject itemJson = new JSONObject();
-        String id = request.id();
-        String name = request.name();
-        String arguments = request.arguments();
-        itemJson.put("id", id);
-        itemJson.put("name", name);
-        itemJson.put("arguments", arguments);
+        itemJson.put("id", "-");
+        itemJson.put("name", "-");
+        itemJson.put("arguments", "-");
         toolExecutionRequests.put(itemJson);
+        jsonObject.put(MuleChainConstants.RESPONSE, result.content().text());
+        jsonObject.put(MuleChainConstants.TOOL_EXECUTION_REQUESTS, toolExecutionRequests);
       }
-
-      jsonObject.put(MuleChainConstants.RESPONSE, result.content());
-      jsonObject.put(MuleChainConstants.TOOL_EXECUTION_REQUESTS, toolExecutionRequests);
 
       Map<String, String> attributes = new HashMap<>();
       attributes.put(MuleChainConstants.TOOLS_USED, String.valueOf(result.content().hasToolExecutionRequests()));
-
       return createLLMResponse(jsonObject.toString(), result, attributes);
     } catch (Exception e) {
-      throw new ModuleException("Error occurred while executing AI Tools with the provided config",
+      throw new ModuleException("Error occurred while executing native AI Tools with the provided config",
                                 MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
     }
   }
