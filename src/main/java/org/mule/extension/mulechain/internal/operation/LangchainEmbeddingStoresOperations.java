@@ -18,6 +18,7 @@ import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import static org.mapdb.Serializer.STRING;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,7 @@ import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.EmbeddingErrorTypeProvider;
 import org.mule.extension.mulechain.internal.helpers.FileType;
 import org.mule.extension.mulechain.internal.helpers.FileTypeParameters;
+import org.mule.extension.mulechain.internal.operation.LangchainEmbeddingStoresOperations.AssistantSources;
 import org.mule.extension.mulechain.internal.config.LangchainLLMConfiguration;
 import org.mule.extension.mulechain.internal.tools.GenericRestApiTool;
 import org.mule.extension.mulechain.internal.util.ExcludeFromGeneratedCoverage;
@@ -47,14 +49,23 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
+import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.Result;
 import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.tool.ToolExecution;
+import dev.langchain4j.service.tool.ToolExecutor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import dev.langchain4j.agent.tool.ToolExecutionRequest;
+import dev.langchain4j.agent.tool.ToolParameters;
+import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.document.loader.UrlDocumentLoader;
 import dev.langchain4j.data.document.parser.TextDocumentParser;
@@ -64,6 +75,7 @@ import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
+import dev.langchain4j.model.output.Response;
 import dev.langchain4j.retriever.EmbeddingStoreRetriever;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingStore;
@@ -599,6 +611,8 @@ public class LangchainEmbeddingStoresOperations {
     Result<String> chat(String userMessage);
   }
 
+
+
   interface AssistantEmbeddingChat {
 
     Result<String> chat(String userMessage);
@@ -688,6 +702,71 @@ public class LangchainEmbeddingStoresOperations {
                                 MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
     }
   }
+
+
+  /**
+   * (AI Services) Usage of tools by a defined AI Agent.<br>
+   * Provide a list of tools (APIs) with all required information (endpoint, headers, body, method, etc.) to the AI Agent to use it on purpose.
+   * @param configuration           Refers to the configuration object
+   * @param data                    Refers to the user prompt or query
+   * @param toolConfig              Contains the configuration required by the LLM to enable calling tools
+   * @return                        Returns the response while considering tools configuration
+   */
+  @MediaType(value = APPLICATION_JSON, strict = false)
+  @Alias("TOOLS-use-native-ai")
+  @Throws(EmbeddingErrorTypeProvider.class)
+  @OutputJsonType(schema = "api/response/ResponseTools.json")
+  public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> useNativeAIServiceTools(@Config LangchainLLMConfiguration configuration,
+                                                                                                                             @org.mule.runtime.extension.api.annotation.param.Content String data,
+                                                                                                                             InputStream toolsArray) {
+    try {
+      LOGGER.debug("Tools Use Ai Service Operation called with userPrompt: {}", data);
+      LOGGER.debug("Tools Config: {}", toolsArray);
+
+      JSONArray tools = getInputString(toolsArray);
+
+      List<ToolSpecification> toolsSpecs = getTools(tools);
+
+      ChatLanguageModel model = configuration.getModel();
+
+      dev.langchain4j.data.message.UserMessage userMessage = dev.langchain4j.data.message.UserMessage.from(data);
+
+      Response<AiMessage> result = model.generate(Arrays.asList(userMessage), toolsSpecs);
+      AiMessage aiMessage = result.content();
+
+      System.out.println("ToolExecutionRequests: " + aiMessage.toolExecutionRequests());
+      System.out.println("hasToolExecutionRequests: " + result.content().hasToolExecutionRequests());
+
+
+      JSONObject jsonObject = new JSONObject();
+      boolean toolsUsed = false;
+
+      JSONArray toolExecutionRequests = new JSONArray();
+
+      for (ToolExecutionRequest request : result.content().toolExecutionRequests()) {
+        JSONObject itemJson = new JSONObject();
+        String id = request.id();
+        String name = request.name();
+        String arguments = request.arguments();
+        itemJson.put("id", id);
+        itemJson.put("name", name);
+        itemJson.put("arguments", arguments);
+        toolExecutionRequests.put(itemJson);
+      }
+
+      jsonObject.put(MuleChainConstants.RESPONSE, result.content());
+      jsonObject.put(MuleChainConstants.TOOL_EXECUTION_REQUESTS, toolExecutionRequests);
+
+      Map<String, String> attributes = new HashMap<>();
+      attributes.put(MuleChainConstants.TOOLS_USED, String.valueOf(result.content().hasToolExecutionRequests()));
+
+      return createLLMResponse(jsonObject.toString(), result, attributes);
+    } catch (Exception e) {
+      throw new ModuleException("Error occurred while executing AI Tools with the provided config",
+                                MuleChainErrorType.TOOLS_OPERATION_FAILURE, e);
+    }
+  }
+
 
 
   /**
@@ -791,4 +870,83 @@ public class LangchainEmbeddingStoresOperations {
     }
   }
 
+
+  private static JSONArray getInputString(InputStream inputString) throws IOException {
+    InputStreamReader reader = new InputStreamReader(inputString);
+    StringBuilder inputStringBuilder = new StringBuilder();
+    int c;
+    while ((c = reader.read()) != -1) {
+      inputStringBuilder.append((char) c);
+    }
+    return new JSONArray(inputStringBuilder.toString());
+
+  }
+
+  private static List<ToolSpecification> getTools(JSONArray tools) {
+    List<ToolSpecification> toolSpecifications = new ArrayList<>();
+
+    // Iterate over each element in the tools JSONArray
+    for (int i = 0; i < tools.length(); i++) {
+      JSONObject functionEntry = tools.getJSONObject(i); // Get each JSONObject from the JSONArray
+      JSONObject function = functionEntry.getJSONObject("function");
+
+      String functionName = function.getString("name");
+      String functionDescription = function.getString("description");
+
+      JSONObject parameters = function.getJSONObject("parameters");
+      JSONObject properties = parameters.getJSONObject("properties");
+
+      Map<String, Map<String, Object>> propertiesMap = new HashMap<>();
+
+      // Iterate over each property in the "properties" object
+      for (String propertyName : properties.keySet()) {
+        JSONObject propertyDetails = properties.getJSONObject(propertyName);
+
+        Map<String, Object> propertyMap = new HashMap<>();
+        propertyMap.put("type", propertyDetails.getString("type"));
+        propertyMap.put("description", propertyDetails.getString("description"));
+
+        // Check for enum property and add if exists
+        if (propertyDetails.has("enum")) {
+          propertyMap.put("enum", propertyDetails.getJSONArray("enum").toList());
+        }
+
+        // Handle the "required" properties properly
+        List<String> requiredProperties = new ArrayList<>();
+        if (parameters.has("required")) {
+          JSONArray requiredArray = parameters.getJSONArray("required");
+          for (int j = 0; j < requiredArray.length(); j++) {
+            requiredProperties.add(requiredArray.getString(j)); // Convert JSONArray to List<String>
+          }
+        }
+
+        boolean isRequired = requiredProperties.contains(propertyName);
+        propertyMap.put("required", isRequired);
+
+        propertiesMap.put(propertyName, propertyMap);
+      }
+
+      // Create ToolParameters using the properties map
+      ToolParameters toolParams = ToolParameters.builder()
+          .properties(propertiesMap)
+          .build();
+
+      // Create ToolSpecification
+      ToolSpecification toolSpecification = ToolSpecification.builder()
+          .name(functionName)
+          .description(functionDescription)
+          .parameters(toolParams)
+          .build();
+
+      // Add the ToolSpecification to the list
+      toolSpecifications.add(toolSpecification);
+    }
+
+    // Return the list of ToolSpecifications
+    return toolSpecifications;
+  }
+
+
 }
+
+
