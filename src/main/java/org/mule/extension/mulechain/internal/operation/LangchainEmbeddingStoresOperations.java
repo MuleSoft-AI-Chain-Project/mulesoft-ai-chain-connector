@@ -652,6 +652,7 @@ public class LangchainEmbeddingStoresOperations {
       LOGGER.debug("Intermediate Answer containing the request URLs: {}", intermediateAnswer.content());
       //String response = model.generate(data);
       Result<String> response = assistantChat.chat(data);
+
       List<String> findURLs = extractUrls(intermediateAnswer.content());
       boolean toolsUsed = false;
       if (findURLs != null) {
