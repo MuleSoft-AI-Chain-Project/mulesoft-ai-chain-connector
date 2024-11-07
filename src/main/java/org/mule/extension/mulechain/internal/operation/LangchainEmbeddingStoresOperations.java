@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.concurrent.atomic.AtomicInteger;
 import dev.langchain4j.data.embedding.Embedding;
@@ -98,6 +99,8 @@ import java.util.regex.Pattern;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This class is a container for embedding related operations, every public method in this class will be taken as an extension operation.
@@ -725,11 +728,12 @@ public class LangchainEmbeddingStoresOperations {
 
       JSONArray tools = getInputString(toolsArray);
 
-      List<ToolSpecification> toolsSpecs = getTools(tools);
+      List<ToolSpecification> toolsSpecs = getTools(tools, configuration);
 
       ChatLanguageModel model = configuration.getModel();
 
       dev.langchain4j.data.message.UserMessage userMessage = dev.langchain4j.data.message.UserMessage.from(data);
+
 
       Response<AiMessage> result = model.generate(Arrays.asList(userMessage), toolsSpecs);
 
@@ -885,7 +889,83 @@ public class LangchainEmbeddingStoresOperations {
 
   }
 
-  private static List<ToolSpecification> getTools(JSONArray tools) {
+  private static List<ToolSpecification> getToolsMistral(JSONArray tools, LangchainLLMConfiguration configuration) {
+    List<ToolSpecification> toolSpecifications = new ArrayList<>();
+
+    for (int i = 0; i < tools.length(); i++) {
+      JSONObject functionEntry = tools.getJSONObject(i);
+      JSONObject function = functionEntry.getJSONObject("function");
+
+      String functionName = function.getString("name");
+      String functionDescription = function.getString("description");
+
+      JSONObject parameters = function.getJSONObject("parameters");
+      JSONObject properties = parameters.getJSONObject("properties");
+
+      Map<String, Map<String, Object>> propertiesMap = new HashMap<>();
+      List<String> requiredProperties = new ArrayList<>();
+
+      for (String propertyName : properties.keySet()) {
+        JSONObject propertyDetails = properties.getJSONObject(propertyName);
+
+        Map<String, Object> propertyMap = new HashMap<>();
+        propertyMap.put("type", propertyDetails.getString("type"));
+        propertyMap.put("description", propertyDetails.getString("description"));
+
+        // Add enum if present
+        if (propertyDetails.has("enum")) {
+          propertyMap.put("enum", propertyDetails.getJSONArray("enum").toList());
+        }
+
+        propertiesMap.put(propertyName, propertyMap);
+      }
+
+      // Gather required properties explicitly as an array
+      if (parameters.has("required")) {
+        JSONArray requiredArray = parameters.getJSONArray("required");
+        requiredProperties = requiredArray.toList().stream()
+            .map(Object::toString)
+            .collect(Collectors.toList());
+      }
+
+      // Build ToolParameters with explicit required array
+      ToolParameters toolParams = ToolParameters.builder()
+          .type("object")
+          .properties(propertiesMap)
+          .required(requiredProperties) // Use explicit required array here
+          .build();
+
+      // Construct ToolSpecification with Mistral-compliant structure
+      ToolSpecification toolSpecification = ToolSpecification.builder()
+          .name(functionName)
+          .description(functionDescription)
+          .parameters(toolParams)
+          .build();
+
+      toolSpecifications.add(toolSpecification);
+    }
+
+
+    return toolSpecifications;
+  }
+
+  private static List<ToolSpecification> getTools(JSONArray tools, LangchainLLMConfiguration configuration) {
+
+    List<ToolSpecification> toolSpecifications;
+    if ("MISTRAL_AI".equals(configuration.getLlmType())) {
+      toolSpecifications = getToolsMistral(tools, configuration);
+
+    } else {
+      toolSpecifications = getToolsGeneral(tools, configuration);
+
+    }
+
+    return toolSpecifications;
+
+  }
+
+
+  private static List<ToolSpecification> getToolsGeneral(JSONArray tools, LangchainLLMConfiguration configuration) {
     List<ToolSpecification> toolSpecifications = new ArrayList<>();
 
     // Iterate over each element in the tools JSONArray
