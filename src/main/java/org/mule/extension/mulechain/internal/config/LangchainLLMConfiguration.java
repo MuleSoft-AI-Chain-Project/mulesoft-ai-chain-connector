@@ -68,19 +68,25 @@ public class LangchainLLMConfiguration implements Initialisable {
 
   @Parameter
   @Placement(order = 6, tab = Placement.DEFAULT_TAB)
+  @Optional(defaultValue = "0.95")
+  private double topP = 0.95;
+
+
+  @Parameter
+  @Placement(order = 7, tab = Placement.DEFAULT_TAB)
   @Optional(defaultValue = "60")
   @DisplayName("LLM timeout")
   private int llmTimeout = 60;
 
   @Parameter
   @Optional(defaultValue = "SECONDS")
-  @Placement(order = 7, tab = Placement.DEFAULT_TAB)
+  @Placement(order = 8, tab = Placement.DEFAULT_TAB)
   @DisplayName("LLM timeout unit")
   @Summary("Time unit to be used in the LLM Timeout")
   private TimeUnit llmTimeoutUnit = TimeUnit.SECONDS;
 
   @Parameter
-  @Placement(order = 8, tab = Placement.DEFAULT_TAB)
+  @Placement(order = 9, tab = Placement.DEFAULT_TAB)
   @Expression(ExpressionSupport.SUPPORTED)
   @Optional(defaultValue = "500")
   private int maxTokens = 500;
@@ -108,6 +114,11 @@ public class LangchainLLMConfiguration implements Initialisable {
   public double getTemperature() {
     return temperature;
   }
+
+  public double getTopP() {
+    return topP;
+  }
+
 
   public int getLlmTimeout() {
     return llmTimeout;

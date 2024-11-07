@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "response": {
+      "type": "string"
+    },
+    "toolExecutionRequests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
