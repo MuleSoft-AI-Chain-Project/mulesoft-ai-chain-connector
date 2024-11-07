@@ -29,4 +29,4 @@ The MuleSoft AI Chain Connector integrates tightly with the Anypoint Platform ec
 
 - [MuleSoft AI Chain Connector User Guide](https://docs.mulesoft.com/connectors/mulesoft-ai-chain-connector/latest)
 - [MuleSoft AI Chain Connector Reference](https://docs.mulesoft.com/connectors/mulesoft-ai-chain-connector/mulesoft-ai-chain-connector-reference)
-- [MuleSoft AI Chain Connector Release Notes](https://docs.mulesoft.com/release-notes/)
+- [MuleSoft AI Chain Connector Release Notes](https://docs.mulesoft.com/release-notes/connector/mulesoft-ai-chain-connector-release-notes-mule-4)
