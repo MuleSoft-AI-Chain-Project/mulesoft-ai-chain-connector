@@ -109,8 +109,9 @@ public final class LangchainLLMInitializerUtil {
         .modelName(configuration.getModelName())
         .temperature(configuration.getTemperature())
         .topP(configuration.getTopP())
+        .timeout(ofSeconds(durationInSec))
         .maxOutputTokens(configuration.getMaxTokens())
-        .logRequestsAndResponses(true)
+        .logRequestsAndResponses(false)
         .build();
   }
 
