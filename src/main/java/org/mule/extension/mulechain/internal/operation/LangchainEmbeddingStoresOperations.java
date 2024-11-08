@@ -71,7 +71,6 @@ import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.document.loader.UrlDocumentLoader;
 import dev.langchain4j.data.document.parser.TextDocumentParser;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
-import dev.langchain4j.data.document.transformer.HtmlTextExtractor;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -216,9 +215,11 @@ public class LangchainEmbeddingStoresOperations {
                                     e);
         }
 
-        Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
-        HtmlTextExtractor transformer = new HtmlTextExtractor(null, null, true);
-        document = transformer.transform(htmlDocument);
+        //Document htmlDocument = UrlDocumentLoader.load(url, new TextDocumentParser());
+        document = UrlDocumentLoader.load(url, new TextDocumentParser());
+
+        /*HtmlToTextDocumentTransformer transformer = new HtmlToTextDocumentTransformer(null, null, true);
+        document = transformer.transform(htmlDocument);*/
         document.metadata().add("url", contextPath);
         ingestor.ingest(document);
         break;
