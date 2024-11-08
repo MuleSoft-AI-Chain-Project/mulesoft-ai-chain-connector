@@ -195,7 +195,7 @@ public class LangchainLLMOperations {
 
       String response = executeREST(openaiApiKey, payload.toString());
       JSONObject jsonObject = new JSONObject();
-      jsonObject.put(MuleChainConstants.RESPONSE, response);
+      jsonObject.put(MuleChainConstants.RESPONSE, new JSONObject(response));
 
       LOGGER.debug("Toxicity detection result {}", response);
       Result<String> answer = Result.<String>builder()
