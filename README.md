@@ -1,5 +1,6 @@
 
 # MuleSoft AI Chain Connector
+![Maven Central](https://img.shields.io/maven-central/v/cloud.anypoint/mule-ai-chain-connector)
 
 
 ## <img src="icon/icon.svg" width="6%" alt="banner">   [MuleSoft AI Chain Connector](https://mac-project.ai/docs/mulechain-ai)
@@ -17,9 +18,9 @@ To use this connector, add the following dependency to your application's `pom.x
 
 ```xml
 <dependency>
-   <groupId>com.mulesoft.connectors</groupId>
+   <groupId>cloud.anypoint</groupId>
    <artifactId>mule4-aichain-connector</artifactId>
-   <version>{version}</version>
+   <version>1.0.0</version>
    <classifier>mule-plugin</classifier>
 </dependency>
 ```
