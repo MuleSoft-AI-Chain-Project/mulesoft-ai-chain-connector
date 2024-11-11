@@ -282,12 +282,8 @@ public class LangchainLLMOperations {
       JSONObject resultObject =
           org.mule.extension.mulechain.internal.llm.type.ModerationModelType.moderationType(input, configuration);
 
-      System.out.println(resultObject);
-
       String response = executeREST(resultObject.getString("url"), resultObject.getString("apiKey"),
                                     resultObject.getJSONObject("payload").toString());
-
-      System.out.println(response);
 
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, new JSONObject(response));

@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mulesoft.connectors</groupId>
 	<artifactId>mule4-aichain-connector</artifactId>
-	<version>1.1.42-SNAPSHOT</version>
+	<version>1.1.43-SNAPSHOT</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleSoft AI Chain Connector - Mule 4</name>
 
