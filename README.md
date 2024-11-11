@@ -17,8 +17,8 @@ To use this connector, add the following dependency to your application's `pom.x
 
 ```xml
 <dependency>
-   <groupId>com.mule.mulechain</groupId>
-   <artifactId>mulechain-ai-connector</artifactId>
+   <groupId>com.mulesoft.connectors</groupId>
+   <artifactId>mule4-aichain-connector</artifactId>
    <version>{version}</version>
    <classifier>mule-plugin</classifier>
 </dependency>

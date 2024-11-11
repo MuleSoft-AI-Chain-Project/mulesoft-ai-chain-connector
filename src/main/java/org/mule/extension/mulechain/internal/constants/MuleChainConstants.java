@@ -41,6 +41,8 @@ public class MuleChainConstants {
   public static final String PAGE = "page";
   public static final String TOTAL_PAGES = "totalPages";
   public static final String PAGES = "pages";
+  public static final String SENTIMENT_SCORE = "sentimentScore";
+  public static final String SENTIMENT_CATEGORY = "sentimentCategory";
 
   public static class EmbeddingConstants {
 
