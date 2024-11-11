@@ -14,6 +14,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.json.JSONObject;
 import org.mule.extension.mulechain.api.metadata.LLMResponseAttributes;
@@ -28,6 +29,8 @@ import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.service.AiServices;
@@ -178,7 +181,8 @@ public class LangchainLLMOperations {
   @OutputJsonType(schema = "api/response/Response.json")
   public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> extractSentiments(
                                                                                                                        @Config LangchainLLMConfiguration configuration,
-                                                                                                                       @Content String data) {
+                                                                                                                       @Content String data,
+                                                                                                                       boolean generateResponse) {
 
     LOGGER.debug("Sentiment Analyze Operation initiated with input data: {}", data);
 
@@ -201,17 +205,23 @@ public class LangchainLLMOperations {
       // Prepare the JSON response with both the sentiment score and category
       String jsonResponse = createSentimentResponse(sentimentScore, sentimentCategory);
 
-      // Get a response based on the input data provided (instead of using sentiment category)
-      String chatPrompt = "Respond to the following input briefly:" + data;
+      String chatResponse;
+      if (generateResponse) {
+        // Get a response based on the input data provided (instead of using sentiment category)
+        String chatPrompt = "Respond to the following input briefly:" + data;
 
-      // Call the answerPromptByModelName method to get the chat response based on the input data
-      org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> chatResponseResult =
-          answerPromptByModelName(configuration, chatPrompt);
+        // Call the answerPromptByModelName method to get the chat response based on the input data
+        org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> chatResponseResult =
+            answerPromptByModelName(configuration, chatPrompt);
 
-      InputStream chatResponseStream = chatResponseResult.getOutput();
+        InputStream chatResponseStream = chatResponseResult.getOutput();
 
-      // Convert InputStream to String
-      String chatResponse = convertInputStreamToString(chatResponseStream);
+
+        // Convert InputStream to String
+        chatResponse = convertInputStreamToString(chatResponseStream);
+      } else {
+        chatResponse = "N/A";
+      }
 
       // Combine the responses into a JSON object
       JSONObject combinedResponse = new JSONObject(jsonResponse);
