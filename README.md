@@ -12,15 +12,27 @@ MuleSoft AI Chain is a MuleSoft custom connector (𝘣𝘢𝘴𝘦𝘥 on 𝘓�
 - The maximum supported version for Java SDK is JDK 17. You can use JDK 17 only for running your application.
 - Compilation with Java SDK must be done with JDK 8.
 
-### Installation
 
-To use this connector, add the following dependency to your application's `pom.xml`:
+### Installation (using Cloud.Anypoint Dependency)
 
 ```xml
 <dependency>
    <groupId>cloud.anypoint</groupId>
    <artifactId>mule4-aichain-connector</artifactId>
    <version>1.0.0</version>
+   <classifier>mule-plugin</classifier>
+</dependency>
+```
+
+### Installation (using maven)
+
+To use this connector, add the following dependency to your application's `pom.xml`:
+
+```xml
+<dependency>
+   <groupId>com.mulesoft.connectors</groupId>
+   <artifactId>mule4-aichain-connector</artifactId>
+   <version>{version}</version>
    <classifier>mule-plugin</classifier>
 </dependency>
 ```
