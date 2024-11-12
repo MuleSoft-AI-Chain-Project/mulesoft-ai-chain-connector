@@ -12,6 +12,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.StringCharacterIterator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -23,6 +24,7 @@ import org.mule.extension.mulechain.internal.constants.MuleChainConstants;
 import org.mule.extension.mulechain.internal.error.MuleChainErrorType;
 import org.mule.extension.mulechain.internal.error.provider.AiServiceErrorTypeProvider;
 import org.mule.extension.mulechain.internal.llm.config.ConfigExtractor;
+import org.mule.extension.mulechain.internal.llm.type.ModerationModelType;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
@@ -47,8 +49,6 @@ import org.slf4j.LoggerFactory;
 public class LangchainLLMOperations {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LangchainLLMOperations.class);
-  private static final String URL_BASE = "https://api.openai.com/v1/moderations";
-  private static final String MODERATION_MODEL = "omni-moderation-latest";
 
   interface Assistant {
 
@@ -270,7 +270,7 @@ public class LangchainLLMOperations {
   }
 
   /**
-   * Use OpenAI Moderation models to moderate the input (any, from user or llm)
+   * Use OpenAI or Mistral Moderation models to moderate the input (any, from user or llm)
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("Toxicity-detection")
@@ -279,13 +279,12 @@ public class LangchainLLMOperations {
   public org.mule.runtime.extension.api.runtime.operation.Result<InputStream, LLMResponseAttributes> moderateInput(@Config LangchainLLMConfiguration configuration,
                                                                                                                    String input) {
     try {
-      JSONObject payload = new JSONObject();
-      payload.put("model", MODERATION_MODEL);
-      payload.put("input", input);
-      ConfigExtractor configExtractor = configuration.getConfigExtractor();
-      String openaiApiKey = configExtractor.extractValue("OPENAI_API_KEY");
+      JSONObject resultObject =
+          org.mule.extension.mulechain.internal.llm.type.ModerationModelType.moderationType(input, configuration);
 
-      String response = executeREST(openaiApiKey, payload.toString());
+      String response = executeREST(resultObject.getString("url"), resultObject.getString("apiKey"),
+                                    resultObject.getJSONObject("payload").toString());
+
       JSONObject jsonObject = new JSONObject();
       jsonObject.put(MuleChainConstants.RESPONSE, new JSONObject(response));
 
@@ -309,10 +308,10 @@ public class LangchainLLMOperations {
     return conn;
   }
 
-  private static String executeREST(String apiKey, String payload) {
+  private static String executeREST(String urlString, String apiKey, String payload) {
 
     try {
-      URL url = new URL(URL_BASE);
+      URL url = new URL(urlString);
       HttpURLConnection conn = getConnectionObject(url, apiKey);
 
       try (OutputStream os = conn.getOutputStream()) {
