@@ -17,7 +17,7 @@ MuleSoft AI Chain is a MuleSoft custom connector (𝘣𝘢𝘴𝘦𝘥 on 𝘓�
 ```xml
 <dependency>
    <groupId>cloud.anypoint</groupId>
-   <artifactId>mule4-aichain-connector</artifactId>
+   <artifactId>mule-aichain-connector</artifactId>
    <version>1.0.0</version>
    <classifier>mule-plugin</classifier>
 </dependency>
@@ -31,7 +31,7 @@ Then add the following dependency to your application's `pom.xml`:
 ```xml
 <dependency>
    <groupId>com.mulesoft.connectors</groupId>
-   <artifactId>mule-aichain-connector</artifactId>
+   <artifactId>mule4-aichain-connector</artifactId>
    <version>{version}</version>
    <classifier>mule-plugin</classifier>
 </dependency>
