@@ -49,48 +49,6 @@
 		</developer>
 	</developers>
 
-	<description>The MuleSoft AI Chain Connector is designed to help developers easily build and manage AI-driven agents within the MuleSoft Anypoint Platform. It provides the tools and support needed to integrate Large Language Models (LLMs), embeddings, and other advanced AI services into MuleSoft applications.</description>
-	<url>https://github.com/anypointcloud/mulesoft-ai-chain-connector</url>
-	<licenses>
-		<license>
-			<name>MIT License</name>
-			<url>https://www.opensource.org/licenses/mit-license.php</url>
-		</license>
-	</licenses>
-	<developers>
-		<developer>
-			<name>Amir Khan</name>
-			<email>amir.khan@mulesoft.com</email>
-			<organization>Salesforce</organization>
-			<organizationUrl>https://www.mulesoft.com</organizationUrl>
-		</developer>
-		<developer>
-			<name>Mihael Bosnjak</name>
-			<email>mihael@bosnjak.io</email>
-			<organization>Salesforce</organization>
-			<organizationUrl>https://www.salesforce.com</organizationUrl>
-		</developer>
-		<developer>
-			<name>Arpit Gupta</name>
-			<email>gupta.arpit@salesforce.com</email>
-			<organization>Salesforce</organization>
-			<organizationUrl>https://www.mulesoft.com</organizationUrl>
-		</developer>
-		<developer>
-			<name>Dipesh Kumar Dutta</name>
-			<email>dipeshkumar.dutta@salesforce.com</email>
-			<organization>Salesforce</organization>
-			<organizationUrl>https://www.salesforce.com</organizationUrl>
-		</developer>
-		<developer>
-			<name>Ryan Hoegg</name>
-			<email>ryan@hoegg.software</email>
-			<organization>Hoegg Software, Co.</organization>
-			<organizationUrl>https://hoegg.software</organizationUrl>
-		</developer>
-	</developers>
-
-
 	<parent>
 		<groupId>org.mule.extensions</groupId>
 		<artifactId>mule-modules-parent</artifactId>
