@@ -22,6 +22,7 @@ MuleSoft AI Chain is a MuleSoft custom connector (𝘣𝘢𝘴𝘦𝘥 on 𝘓�
 </dependency>
 ```
 
+
 ### Installation (using maven)
 
 To use this connector, add the following dependency to your application's `pom.xml`:
