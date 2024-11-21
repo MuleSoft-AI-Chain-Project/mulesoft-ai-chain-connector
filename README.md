@@ -18,7 +18,7 @@ MuleSoft AI Chain is a MuleSoft custom connector (𝘣𝘢𝘴𝘦𝘥 on 𝘓�
 <dependency>
    <groupId>cloud.anypoint</groupId>
    <artifactId>mule-aichain-connector</artifactId>
-   <version>1.0.0</version>
+   <version>1.2.0</version>
    <classifier>mule-plugin</classifier>
 </dependency>
 ```
