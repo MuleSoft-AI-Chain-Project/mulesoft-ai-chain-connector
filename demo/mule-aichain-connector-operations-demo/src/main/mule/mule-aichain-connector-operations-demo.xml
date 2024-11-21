@@ -10,7 +10,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<ms-aichain:config name="MISTRAL_AI" llmType="MISTRAL_AI" configType="Configuration Json" doc:name="MuleSoft AI Chain configuration" doc:id="bf1ef7ec-4aa1-41c8-a184-a13ca165c925" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' modelName="mistral-large-latest" temperature="0.1"/>
-	<ms-aichain:config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="MuleSoft AI Chain configuration" doc:id="edb0d5a6-97c5-4d93-8098-4e197e563827" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' temperature="0.1" modelName="gpt-3.5-turbo"/>
+	<ms-aichain:config name="OPENAI" llmType="OPENAI" configType="Configuration Json" doc:name="MuleSoft AI Chain configuration" doc:id="edb0d5a6-97c5-4d93-8098-4e197e563827" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' temperature="0.1" modelName="gpt-4o-mini"/>
 	<ms-aichain:config name="OPENAI-GPT4-TURBO" llmType="OPENAI" configType="Configuration Json" doc:name="MuleSoft AI Chain configuration" doc:id="74b85066-1569-4f10-a06b-e49e854eeef2" filePath='#[mule.home ++ "/apps/" ++ app.name ++ "/envVars.json"]' modelName="gpt-4o" />
 	<flow name="PromptTemplate" doc:id="cff3a8ed-3799-424a-becf-9d7387729bd0" >
 		<http:listener doc:name="Listener" doc:id="dd18126e-81f5-48ef-8f35-9dd19afdfaf0" config-ref="HTTP_Listener_config" path="/agent">
@@ -150,24 +150,6 @@ output application/json
 			</ms-aichain:data>
 		</ms-aichain:embedding-get-info-from-store>
 	</flow>
-	<flow name="EmbeddingAdd5" doc:id="347caa3d-ed7b-4ba8-bf74-4f184e8727d3" >
-		<http:listener doc:name="Listener" doc:id="6720bf73-6b8c-4bc7-8153-f21a5df4f7d8" config-ref="HTTP_Listener_config" path="/embeddingInfoLegacy">
-			<http:response>
-				<http:body ><![CDATA[#[%dw 2.0
-output application/json
----
-{
-	payload: payload,
-	attributes: attributes
-}]]]></http:body>
-			</http:response>
-		</http:listener>
-		<ms-aichain:embedding-get-info-from-store-legacy doc:name="Embedding get info from store legacy" doc:id="1f9e0410-4357-4ad8-bf17-29112f20e2f6" config-ref="OPENAI" storeName='#["embedding.store"]'>
-			<ms-aichain:data>
-				#[payload.question]
-			</ms-aichain:data>
-		</ms-aichain:embedding-get-info-from-store-legacy>
-	</flow>
 	<flow name="ImageGenerate" doc:id="d9dfb328-65d4-499b-8eaf-282e21a245cf" >
 		<http:listener doc:name="Listener" doc:id="ebd04ee3-0e40-456e-ad6e-8be37cd9f706" config-ref="HTTP_Listener_config" path="/image">
 			<http:response>
@@ -266,24 +248,6 @@ output application/json
 			</ms-aichain:data>
 		</ms-aichain:tools-use-ai-service>
 	</flow>
-	<flow name="ms-aichain-testingFlow1" doc:id="c5236fd3-d578-4f91-b1f9-16c334e1cd7c" >
-		<http:listener doc:name="Listener" doc:id="30727c05-9524-4011-9d3a-6658f4706d4e" config-ref="HTTP_Listener_config" path="/chains">
-			<http:response>
-				<http:body ><![CDATA[#[%dw 2.0
-output application/json
----
-{
-	payload: payload,
-	attributes: attributes
-}]]]></http:body>
-			</http:response>
-		</http:listener>
-		<ms-aichain:tools-use-ai-service-legacy doc:name="Tools use ai service legacy" doc:id="51aa98dc-0ad2-42ad-9fc0-0883bdb766a4" config-ref="OPENAI-GPT4-TURBO" toolConfig='#[mule.home ++ "/apps/" ++ app.name ++ "/tools.config.json"]'>
-			<ms-aichain:data>
-				#[payload.question ++ ", dont assume things and invent answers. Answer with the most probable statement."]
-			</ms-aichain:data>
-		</ms-aichain:tools-use-ai-service-legacy>
-	</flow>
 	<flow name="ms-aichain-testingFlow2" doc:id="2f02e10e-6422-4b94-ab34-9584e5ee0ed6" >
 		<http:listener doc:name="Listener" doc:id="0f940ad8-5210-4433-9651-79af3fbd88c4" config-ref="HTTP_Listener_config" path="/scanned">
 			<http:response>
@@ -301,5 +265,17 @@ output application/json
 				#[payload.prompt]
 			</ms-aichain:data>
 		</ms-aichain:image-read-scanned-documents>
+	</flow>
+	<flow name="mulechain-testingFlow5" doc:id="cae40e72-55bd-4c51-9d8f-22337ff9b3a1" >
+		<http:listener doc:name="Listener" doc:id="93492920-a574-40a3-b1d0-31a9bd6e377f" config-ref="HTTP_Listener_config" path="/toxictydetection" />
+		<ms-aichain:toxicity-detection doc:name="Toxicity detection" doc:id="c7e47148-ef40-4ec4-9b54-65f5c0a03b15" config-ref="OPENAI" input="#[payload.prompt]"/>
+		<ee:transform doc:name="Transform Message" doc:id="cdc3042e-d7f7-46c1-9667-73ff8281dab2">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+read(payload.response default "{}","application/json")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 </mule>

@@ -18,6 +18,7 @@ public class MuleChainConstants {
   public static final String DB_FILE_PATH = "dbFilePath";
   public static final String MAX_MESSAGES = "maxMessages";
   public static final String TOOLS_USED = "toolsUsed";
+  public static final String TOOL_EXECUTION_REQUESTS = "toolExecutionRequests";
   public static final String STATUS = "status";
   public static final String STORE_NAME = "storeName";
   public static final String CREATED = "created";
@@ -40,6 +41,8 @@ public class MuleChainConstants {
   public static final String PAGE = "page";
   public static final String TOTAL_PAGES = "totalPages";
   public static final String PAGES = "pages";
+  public static final String SENTIMENT_SCORE = "sentimentScore";
+  public static final String SENTIMENT_CATEGORY = "sentimentCategory";
 
   public static class EmbeddingConstants {
 

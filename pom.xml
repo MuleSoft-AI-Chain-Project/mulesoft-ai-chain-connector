@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mulesoft.connectors</groupId>
 	<artifactId>mule4-aichain-connector</artifactId>
-	<version>1.0.0</version>
+	<version>1.2.0</version>
 	<packaging>mule-extension</packaging>
 	<name>MuleSoft AI Chain Connector - Mule 4</name>
 	<description>The MuleSoft AI Chain Connector is designed to help developers easily build and manage AI-driven agents within the MuleSoft Anypoint Platform. It provides the tools and support needed to integrate Large Language Models (LLMs), embeddings, and other advanced AI services into MuleSoft applications.</description>
@@ -49,6 +49,48 @@
 		</developer>
 	</developers>
 
+	<description>The MuleSoft AI Chain Connector is designed to help developers easily build and manage AI-driven agents within the MuleSoft Anypoint Platform. It provides the tools and support needed to integrate Large Language Models (LLMs), embeddings, and other advanced AI services into MuleSoft applications.</description>
+	<url>https://github.com/anypointcloud/mulesoft-ai-chain-connector</url>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Amir Khan</name>
+			<email>amir.khan@mulesoft.com</email>
+			<organization>Salesforce</organization>
+			<organizationUrl>https://www.mulesoft.com</organizationUrl>
+		</developer>
+		<developer>
+			<name>Mihael Bosnjak</name>
+			<email>mihael@bosnjak.io</email>
+			<organization>Salesforce</organization>
+			<organizationUrl>https://www.salesforce.com</organizationUrl>
+		</developer>
+		<developer>
+			<name>Arpit Gupta</name>
+			<email>gupta.arpit@salesforce.com</email>
+			<organization>Salesforce</organization>
+			<organizationUrl>https://www.mulesoft.com</organizationUrl>
+		</developer>
+		<developer>
+			<name>Dipesh Kumar Dutta</name>
+			<email>dipeshkumar.dutta@salesforce.com</email>
+			<organization>Salesforce</organization>
+			<organizationUrl>https://www.salesforce.com</organizationUrl>
+		</developer>
+		<developer>
+			<name>Ryan Hoegg</name>
+			<email>ryan@hoegg.software</email>
+			<organization>Hoegg Software, Co.</organization>
+			<organizationUrl>https://hoegg.software</organizationUrl>
+		</developer>
+	</developers>
+
+
 	<parent>
 		<groupId>org.mule.extensions</groupId>
 		<artifactId>mule-modules-parent</artifactId>
@@ -62,7 +104,7 @@
 		<formatterGoal>validate</formatterGoal>
 		<slf4jApi.version>2.0.7</slf4jApi.version>
 		<mule.sdk.api.version>0.9.0-rc1</mule.sdk.api.version>
-		<langchain4j.version>0.34.0</langchain4j.version> <!-- upgrade to support tools in Ollama -->
+		<langchain4j.version>0.35.0</langchain4j.version> <!-- upgrade to support tools in Ollama -->
 		<mapdb.version>3.1.0</mapdb.version>
 		<json.version>20240303</json.version>
 		<munit.input.directory>src/test/munit</munit.input.directory>
@@ -240,6 +282,7 @@
 			<artifactId>langchain4j-mistral-ai</artifactId>
 			<version>${langchain4j.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-hugging-face</artifactId>
@@ -285,6 +328,11 @@
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-azure-open-ai</artifactId>
+			<version>${langchain4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-google-ai-gemini</artifactId>
 			<version>${langchain4j.version}</version>
 		</dependency>
 		<dependency>
