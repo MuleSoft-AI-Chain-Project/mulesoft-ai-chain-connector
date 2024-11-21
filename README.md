@@ -1,5 +1,6 @@
 
 # MuleSoft AI Chain Connector
+![Maven Central](https://img.shields.io/maven-central/v/cloud.anypoint/mule-ai-chain-connector)
 
 
 ## <img src="icon/icon.svg" width="6%" alt="banner">   [MuleSoft AI Chain Connector](https://mac-project.ai/docs/mulechain-ai)
@@ -22,19 +23,29 @@ MuleSoft AI Chain is a MuleSoft custom connector (𝘣𝘢𝘴𝘦𝘥 on 𝘓�
 </dependency>
 ```
 
+### Installation (building locally)
 
-### Installation (using maven)
-
-To use this connector, add the following dependency to your application's `pom.xml`:
+To use this connector, first [build and install](https://mac-project.ai/docs/mulechain-ai/getting-started) the connector into your local maven repository. 
+Then add the following dependency to your application's `pom.xml`:
 
 ```xml
 <dependency>
    <groupId>com.mulesoft.connectors</groupId>
-   <artifactId>mule4-aichain-connector</artifactId>
+   <artifactId>mule-aichain-connector</artifactId>
    <version>{version}</version>
    <classifier>mule-plugin</classifier>
 </dependency>
 ```
+
+### Installation into private Anypoint Exchange
+
+You can also make this connector available as an asset in your Anyooint Exchange.
+
+This process will require you to build the connector as above, but additionally you will need
+to make some changes to the `pom.xml`.  For this reason, we recommend you fork the repository.
+
+Then, follow the MuleSoft [documentation](https://docs.mulesoft.com/exchange/to-publish-assets-maven) to modify and publish the asset.
+
 
 ### Documentation
 - Check out the complete documentation on [mac-project.ai](https://mac-project.ai/docs/mulechain-ai).
