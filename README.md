@@ -9,7 +9,7 @@
 MuleSoft AI Chain is a MuleSoft custom connector (𝘣𝘢𝘴𝘦𝘥 on 𝘓𝘢𝘯𝘨𝘊𝘩𝘢𝘪𝘯4𝘫) to provide a complete framework for MuleSoft users to design, build, and manage the lifecycle of AI Agents fully in the Anypoint Platform. It is part of the MuleSoft AI Chain Project (aka MAC Project) with the overall goal to provide capabilities, examples, etc. for MuleSoft Developers.
 
 ### Requirements
-[README.md](..%2Fmulesoft-vectors-connector%2FREADME.md)
+
 - The maximum supported version for Java SDK is JDK 17. You can use JDK 17 only for running your application.
 - Compilation with Java SDK must be done with JDK 8.
 
