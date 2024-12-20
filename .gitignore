@@ -4,6 +4,9 @@
 *.iml
 *.ipr
 
+# VSCode
+.vscode
+
 # Maven
 target/
 pom.xml.tag
@@ -42,4 +45,7 @@ generated-test-sources/
 # Miscellaneous
 *.bak
 *.tmp
+*.sh
+
+.java-version
 
