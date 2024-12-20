@@ -9,13 +9,20 @@
 	<packaging>mule-extension</packaging>
 	<name>MuleSoft AI Chain Connector - Mule 4</name>
 	<description>The MuleSoft AI Chain Connector is designed to help developers easily build and manage AI-driven agents within the MuleSoft Anypoint Platform. It provides the tools and support needed to integrate Large Language Models (LLMs), embeddings, and other advanced AI services into MuleSoft applications.</description>
-	<url>https://github.com/anypointcloud/mulesoft-ai-chain-connector</url>
+	<url>https://mac-project.ai/docs/mulechain-ai/connector-overview</url>
+	<scm>
+		<connection>scm:git:git://github.com/MuleSoft-AI-Chain-Project/mule-ai-chain-connector.git</connection>
+		<developerConnection>scm:git:ssh://github.com:MuleSoft-AI-Chain-Project/mule-ai-chain-connector.git</developerConnection>
+		<url>https://github.com/MuleSoft-AI-Chain-Project/mule-ai-chain-connector/tree/master</url>
+	</scm>
+
 	<licenses>
 		<license>
 			<name>MIT License</name>
 			<url>https://www.opensource.org/licenses/mit-license.php</url>
 		</license>
 	</licenses>
+
 	<developers>
 		<developer>
 			<name>Amir Khan</name>
@@ -47,6 +54,12 @@
 			<organization>Hoegg Software, Co.</organization>
 			<organizationUrl>https://hoegg.software</organizationUrl>
 		</developer>
+		<developer>
+			<name>Tommaso Bolis</name>
+			<email>tbolis-at-salesforce-dot-com</email>
+			<organization>Salesforce</organization>
+			<organizationUrl>https://www.salesforce.com</organizationUrl>
+		</developer>
 	</developers>
 
 	<parent>
@@ -74,6 +87,31 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.6.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+					<checksums>all</checksums>
+					<deploymentName>MuleSoft Vectors Connector Mule 4 Deployment</deploymentName>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jdeps-plugin</artifactId>

@@ -1,9 +1,10 @@
 
-# MuleSoft AI Chain Connector
-![Maven Central](https://img.shields.io/maven-central/v/cloud.anypoint/mule-ai-chain-connector)
+# <img src="icon/icon.svg" width="6%" alt="banner"> MuleSoft AI Chain Connector
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.mulesoft-ai-chain-project/mule4-aichain-connector)](https://central.sonatype.com/artifact/io.github.mulesoft-ai-chain-project/mule4-aichain-connector/overview)
 
+## <img src="https://raw.githubusercontent.com/MuleSoft-AI-Chain-Project/.github/main/profile/assets/mulechain-project-logo.png" width="6%" alt="banner">   [MuleSoft AI Chain (MAC) Project](https://mac-project.ai/docs/)
 
-## <img src="icon/icon.svg" width="6%" alt="banner">   [MuleSoft AI Chain Connector](https://mac-project.ai/docs/mulechain-ai)
+### <img src="icon/icon.svg" width="6%" alt="banner"> [MuleSoft AI Chain Connector](https://mac-project.ai/docs/mulechain-ai)
 
 MuleSoft AI Chain is a MuleSoft custom connector (𝘣𝘢𝘴𝘦𝘥 on 𝘓𝘢𝘯𝘨𝘊𝘩𝘢𝘪𝘯4𝘫) to provide a complete framework for MuleSoft users to design, build, and manage the lifecycle of AI Agents fully in the Anypoint Platform. It is part of the MuleSoft AI Chain Project (aka MAC Project) with the overall goal to provide capabilities, examples, etc. for MuleSoft Developers.
 
@@ -12,12 +13,12 @@ MuleSoft AI Chain is a MuleSoft custom connector (𝘣𝘢𝘴𝘦𝘥 on 𝘓�
 - The maximum supported version for Java SDK is JDK 17. You can use JDK 17 only for running your application.
 - Compilation with Java SDK must be done with JDK 8.
 
-### Installation (using Cloud.Anypoint Dependency)
+### Installation (using maven central dependency)
 
 ```xml
 <dependency>
-   <groupId>cloud.anypoint</groupId>
-   <artifactId>mule-aichain-connector</artifactId>
+   <groupId>io.github.mulesoft-ai-chain-project</groupId>
+   <artifactId>mule4-aichain-connector</artifactId>
    <version>1.2.0</version>
    <classifier>mule-plugin</classifier>
 </dependency>
