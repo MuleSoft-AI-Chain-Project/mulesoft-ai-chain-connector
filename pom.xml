@@ -109,7 +109,7 @@
 				<configuration>
 					<publishingServerId>central</publishingServerId>
 					<checksums>all</checksums>
-					<deploymentName>MuleSoft Vectors Connector Mule 4 Deployment</deploymentName>
+					<deploymentName>MuleSoft AI Chain Connector Mule 4 Deployment</deploymentName>
 				</configuration>
 			</plugin>
 			<plugin>
